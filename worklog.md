@@ -1,11 +1,11 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V6 — Agent comparison, trace waterfall, navbar polish, filter persistence, HowItWorks enhancements**
-- Page renders ~115KB+ HTML (35 headings, single H1, clean semantic structure)
+**Phase: V8 — SaaS-ready with Self-Healing API Control System, Documentation, Settings Panel**
+- Page renders with 44+ component files
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
-- All API routes functional (agents, traces, issues, alerts, metrics)
+- All API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health)
 - WebSocket real-time alert streaming on port 3001
 - Dark mode fully functional with theme toggle
 - Agent detail sheet with sparkline charts verified working
@@ -14,10 +14,11 @@
 - Command Palette (⌘K) with fuzzy search, keyboard nav, quick actions, recent items
 - Scroll progress bar + Back-to-Top button (with glow pulse)
 - Activity Timeline in Alerts tab
-- 9+ landing sections + 4-tab working dashboard + comprehensive styling
-- 35+ component files total
-- V5: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
-- **V6: Agent comparison panel, trace waterfall Gantt chart, navbar polish, filter persistence**
+- 10+ landing sections + 5-tab working dashboard + comprehensive styling
+- **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
+- **V6**: Agent comparison panel, trace waterfall Gantt chart, navbar polish, filter persistence
+- **V7**: Page skeleton loading, real-time toast notifications for WebSocket alerts
+- **V8: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel**
 
 ---
 
@@ -159,40 +160,247 @@
 
 ---
 
-## V7 Session — Completed Modifications
+## V8 Session — Completed Modifications
 
-### 1. New Component: PageSkeleton
-- Created `src/components/ui/PageSkeleton.tsx`
-- Full-page loading skeleton matching the landing page structure
-- **Top bar**: 64px skeleton mimicking Navbar height (`bg-gray-100 dark:bg-gray-900`)
-- **Hero block**: 50% width heading skeleton + 70% width subtitle skeleton (h-48, gap-4)
-- **Features block**: 3 equal-width rounded skeleton cards side by side (h-24, gap-4)
-- **Dashboard placeholder**: Large h-64 rounded skeleton with `animated-border` class
-- **Footer**: 48px skeleton bar at bottom
-- All skeleton elements use `animate-pulse` shimmer + `rounded-2xl`
-- Framer Motion `AnimatePresence` for smooth skeleton→content transition (exit 0.5s fade, enter 0.3s fade)
-- Accepts `loading` boolean prop; passes through `children` when loading is false
-- Zero new TypeScript errors
+### Overview
+Massive V8 upgrade making Sentinel a **SaaS-ready product** with the core addition of a **Self-Healing API Control System**, comprehensive **Documentation section**, **Settings panel**, and cross-device QA.
+
+### 1. New Feature: Self-Healing API Control System
+**Concept**: Monitor all external APIs your AI agents depend on (LLMs, databases, payments, search, MCP servers). Automatically detect failures and self-heal through circuit breakers, fallback activation, retry with exponential backoff, and request queuing. Inspired by Stripe's API reliability architecture.
+
+**Backend (4 new files):**
+- `src/lib/self-healing-data.ts` — 3 interfaces + 8 monitored endpoints + 13 healing actions + 192 health history data points
+- `src/app/api/endpoints/route.ts` — GET (list) + POST (add/remove/health-check/reset-circuit)
+- `src/app/api/healing/route.ts` — GET (actions + summary with success rate)
+- `src/app/api/api-health/route.ts` — GET (endpoints + health summary counts)
+
+**Frontend (3 new files):**
+- `src/components/dashboard/ApiHealthPanel.tsx` — Main container: summary strip (4 cards), endpoint grid, add-endpoint dialog, healing timeline
+- `src/components/dashboard/EndpointCard.tsx` — Endpoint card: status dot, circuit breaker badge, 4-metric grid, canvas sparkline, 3 action buttons
+- `src/components/dashboard/HealingTimeline.tsx` — Vertical timeline: severity-colored items, AUTO/MANUAL badges, relative timestamps, result icons
+
+**Dashboard Integration:**
+- 5th tab "API Health" (Heart icon) added to dashboard
+- Settings gear icon (⚙) in dashboard header opens SettingsPanel
+- All 8 API routes verified returning 200 with proper data
+
+### 2. New Feature: Documentation Landing Section
+- `src/components/landing/DocsSection.tsx` — Interactive docs section
+- 3-column responsive grid: Getting Started (expandable 4-step guide), API Integration (3 code examples with copy buttons), Self-Healing APIs (circuit breaker state visualization + 5 capabilities)
+- API Reference table: 9 endpoints with colored method badges
+- "Docs" link added to Navbar navigation
+
+### 3. New Feature: SaaS Settings Panel
+- `src/components/dashboard/SettingsPanel.tsx` — Right-side Sheet panel
+- 5 sections: Workspace (name, API key, webhook), Notifications (3 toggles), Self-Healing (2 toggles + 2 inputs), Data Retention (select + toggle), Danger Zone (3 action buttons with 2-step delete confirmation)
+- Professional SaaS-grade settings UI
+
+### 4. Integration Changes (3 modified files)
+- `src/components/dashboard/DashboardSection.tsx` — Added 5th tab, Settings button, ApiHealthPanel import
+- `src/app/page.tsx` — Added DocsSection import + rendering
+- `src/components/landing/Navbar.tsx` — Added "Docs" nav link, changed Documentation button to anchor link
+
+### 5. File Inventory Update
+- `src/lib/self-healing-data.ts` ✨ NEW
+- `src/app/api/endpoints/route.ts` ✨ NEW
+- `src/app/api/healing/route.ts` ✨ NEW
+- `src/app/api/api-health/route.ts` ✨ NEW
+- `src/components/dashboard/ApiHealthPanel.tsx` ✨ NEW
+- `src/components/dashboard/EndpointCard.tsx` ✨ NEW
+- `src/components/dashboard/HealingTimeline.tsx` ✨ NEW
+- `src/components/landing/DocsSection.tsx` ✨ NEW
+- `src/components/dashboard/SettingsPanel.tsx` ✨ NEW
+- `src/components/dashboard/DashboardSection.tsx` ✏️ MODIFIED (5th tab, settings)
+- `src/app/page.tsx` ✏️ MODIFIED (DocsSection)
+- `src/components/landing/Navbar.tsx` ✏️ MODIFIED (Docs link)
+
+### Total component count: 44+ files
+
+---
+
+## Verification Results
+- ✅ ESLint: Zero errors
+- ✅ Page: HTTP 200, compiles and renders
+- ✅ Zero JS errors (verified via dev.log)
+- ✅ All 5 dashboard tabs work (Overview, Traces, Issues, Alerts, API Health)
+- ✅ API Health tab: 8 endpoint cards, all action buttons, healing timeline
+- ✅ Settings panel: 5 sections, all toggles/inputs, copy buttons, danger zone
+- ✅ Docs section: 3-column grid, expandable steps, code copy buttons, API reference table
+- ✅ Dark mode: All new components render correctly
+- ✅ Mobile responsive: iPhone 14 viewport tested, all tabs work, single-column layout
+- ✅ API routes: All 8 returning 200 (agents, traces, issues, alerts, metrics, endpoints, healing, api-health)
+- ✅ Navbar: "Docs" link navigates to #docs section
+- ✅ Agent-browser verified all interactions
+
+## Unresolved Issues
+- None critical. All features verified working.
+
+## Priority Recommendations for Next Phase
+1. **Real database backend** — Move from mock data to Prisma-backed CRUD operations
+2. **Authentication** — NextAuth.js integration for SaaS login/signup
+3. **WebSocket for API health** — Real-time health check streaming to the API Health tab
+4. **Lazy loading** — Dynamic imports for below-fold sections
+5. **PDF export** — Generate styled PDF reports
+6. **Agent comparison for 3+ agents** — Extend comparison to multi-agent table
+7. **Real-time toasts for healing actions** — Toast popups when new healing events arrive via WebSocket
+8. **Rate limiting middleware** — SaaS-grade API rate limiting
+
+---
+
+## Task 2-a — Self-Healing API Control System Backend
+
+### Overview
+Created backend data layer and API routes for the self-healing API control system. This provides the data foundation for monitoring AI agent dependencies, circuit breakers, fallbacks, and auto-remediation actions.
+
+### Files Created (4 new files)
+
+1. **`src/lib/self-healing-data.ts`** — Seed data + TypeScript interfaces
+   - `ApiEndpoint` interface: 20 fields covering status, circuit breaker, latency, error rate, retry config, fallback config, tags
+   - `HealingAction` interface: action log with severity, type (auto/manual), result, duration
+   - `HealthHistory` interface: time-series data point per endpoint
+   - 8 API endpoints: OpenAI GPT-4o (healthy), Anthropic Claude 3.5 (degraded/half-open), Pinecone (healthy), Stripe (healthy), Tavily Search (down/open circuit), Redis (healthy), GitHub MCP (degraded), Notion API (maintenance)
+   - 13 healing actions: circuit breaker trips, fallback activations, retry escalations, timeout adjustments, queue enablements, manual reset attempts
+   - 192 health history data points (8 endpoints × 24 points, 15-min intervals over 6 hours) with realistic degradation curves
+
+2. **`src/app/api/endpoints/route.ts`** — GET + POST
+   - GET: Returns all 8 endpoints
+   - POST: Accepts `{ action: 'add'|'remove'|'health-check'|'reset-circuit', endpointId?, endpoint? }` — simulated responses
+
+3. **`src/app/api/healing/route.ts`** — GET
+   - Returns sorted healing actions + summary (totalActions, automaticCount, manualCount, successRate, lastAction)
+
+4. **`src/app/api/api-health/route.ts`** — GET
+   - Returns all endpoints + summary (healthy/degraded/down counts, totalLatency, avgErrorRate, circuitsOpen)
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles and serves HTTP 200
+- ✅ All API routes follow existing project patterns (NextResponse.json, mock data imports)
+- ✅ No existing files modified
+
+### Important Data Structure Notes
+- `ep-tavily` is the only endpoint with `status: 'down'` and `circuitBreaker: 'open'` — ideal for demonstrating full self-healing flow
+- `ep-anthropic-claude` has `circuitBreaker: 'half-open'` — demonstrates the probing/recovery state
+- `ep-notion` is in `maintenance` mode with retries disabled — a non-error state
+- Health history for Tavily shows degradation starting at point index 2, then full 503 at point 3+
+- Health history for Anthropic shows gradual degradation from point 3 onward
+- All timestamps are dynamically generated relative to `Date.now()` so they're always within last 24 hours
 
 ### File Inventory Update
-- `src/components/ui/PageSkeleton.tsx` ✨ NEW V7
+- `src/lib/self-healing-data.ts` ✨ NEW
+- `src/app/api/endpoints/route.ts` ✨ NEW
+- `src/app/api/healing/route.ts` ✨ NEW
+- `src/app/api/api-health/route.ts` ✨ NEW
 
-### 2. New Component: ToastNotifications
-- Created `src/components/ui/ToastNotifications.tsx`
-- Real-time toast notification stack for WebSocket alerts
-- **Props**: `alerts: ToastAlert[]`, `maxVisible?: number` (default 3)
-- **Behavior**: Shows most recent `maxVisible` alerts, new toasts slide in from right (Framer Motion x:100→0, opacity 0→1), auto-dismiss after 6s with exit animation (x:0→100, opacity 1→0)
-- **Position**: Fixed bottom-right, `z-30` (above BackToTop button), `flex-col-reverse` with 8px gap (newest on top)
-- **Duplicate prevention**: `shownIds` ref (Set of IDs) prevents re-triggering timers for duplicate alerts
-- **Dismissed tracking**: `dismissedIds` state (Set) + useMemo derivation for visible alerts — no setState-in-effect
-- **Toast design**: `rounded-xl border bg-white dark:bg-gray-900 shadow-xl border-l-4` with severity-colored left border
-  - `critical`: red left border + `bg-red-50/50 dark:bg-red-950/20` + AlertTriangle icon (`text-red-500`)
-  - `warning`: amber left border + AlertTriangle icon (`text-amber-500`)
-  - `info`: blue left border + Bell icon (`text-blue-500`)
-- **Layout**: Close button (X, top-right), severity icon, title (font-semibold text-sm), relative time (timeAgo helper), message (text-xs, line-clamp-2)
-- **Width**: `w-80 sm:w-96`
-- **Framer Motion**: `layout` prop for smooth stacking, `AnimatePresence mode="popLayout"` for enter/exit
-- ESLint: Zero errors
+---
+
+## Task 2-b — Self-Healing API Control System UI Components
+
+### Overview
+Created 3 new UI component files for the API Health tab (5th dashboard tab). These components render the self-healing API monitoring interface with endpoint cards, circuit breaker status, healing action timeline, and an add-endpoint dialog.
+
+### Files Created (3 new files)
+
+1. **`src/components/dashboard/EndpointCard.tsx`** — Individual endpoint card component
+   - Props: `endpoint: ApiEndpoint`, `onAction`, `sparklineData: number[]`, `index`
+   - **Status indicator**: Colored dot with glow classes (`status-glow-active`, `status-glow-degraded`, `status-glow-critical`); down status has `animate-pulse` + `animate-pulse-ring`
+   - **Card border-left**: Color-coded by status (emerald/amber/red/gray)
+   - **Header**: Status dot + endpoint name + category badge (LLM/Payment/Database/Search/MCP)
+   - **URL**: Truncated mono-font display
+   - **Circuit breaker badge**: Rounded-full colored badge (Closed=green, Open=red, Half-Open=amber)
+   - **Metrics grid**: 4-column layout with Latency (ms), Error Rate (color-coded), Uptime (color-coded), Total Requests (formatted)
+   - **Canvas sparkline**: 60×24px, reuses MetricCards pattern, draws from actual health history data, green/red based on error rate
+   - **Action buttons**: "Force Health Check" (RefreshCw), "Reset Circuit" (ShieldCheck), "Toggle Fallback" (ToggleLeft) — ghost buttons with red hover
+   - **Styling**: Uses `glass-card`, `card-lift` utility classes
+   - **Framer Motion**: Staggered entrance animation per card index
+
+2. **`src/components/dashboard/HealingTimeline.tsx`** — Healing actions timeline component
+   - Props: `actions: HealingAction[]`
+   - **Vertical timeline**: Left border line (gray-200) with colored border-l per item based on severity
+   - **Timeline dots**: 10px colored circles (gray/amber/red) with white border, positioned on the line
+   - **Each item**: AUTO/MANUAL type badge (red for auto, gray for manual), action name, relative timestamp (timeAgo helper), result icon (CheckCircle2/XCircle/Clock)
+   - **Action details**: Icon per action type (ShieldAlert, ArrowRightLeft, RotateCcw, Timer, Zap), truncated 2-line description, endpoint name (mono), duration (auto-formatted ms/s)
+   - **Severity styling**: info=gray, warning=amber, critical=red — applied to left border, dot, and background tint
+   - **Scroll container**: `max-h-[400px]` with `dashboard-scroll` custom scrollbar
+   - **Framer Motion**: Staggered slide-in from left (x: -12 → 0, delay: i * 0.04)
+
+3. **`src/components/dashboard/ApiHealthPanel.tsx`** — Main container for API Health tab
+   - **Data fetching**: `useEffect` + `useCallback` fetches 3 API routes in parallel (`/api/endpoints`, `/api/api-health`, `/api/healing`)
+   - **Sparkline data**: `useMemo` extracts per-endpoint latency from `healthHistory` data file
+   - **Loading state**: Centered spinner with "Loading API health data…" text
+   - **Summary strip**: 4 mini-cards in `grid-cols-2 md:grid-cols-4`
+     - Healthy (emerald, CheckCircle2 icon, number)
+     - Degraded (amber, AlertTriangle icon, number)
+     - Down (red, ServerCrash icon with animate-pulse, red background tint when >0)
+     - Circuit Breakers Open (red, ShieldAlert icon, red tint when >0)
+   - **Endpoint grid**: `grid-cols-1 lg:grid-cols-2` — fully responsive
+   - **Add Endpoint dialog**: shadcn Dialog with form fields
+     - Name (Input), Base URL (Input), Category (Select with 5 options), Timeout/Retries/Backoff (3-col number inputs), Fallback URL (optional Input)
+     - Validation: requires name, URL, category
+     - On submit: POST to `/api/endpoints` with `action: 'add'`, toast notification, form reset, data refetch
+   - **Action handler**: `handleAction` POSTs to `/api/endpoints` with action type + endpointId, shows toast, refetches
+   - **Styling**: Uses existing `card-lift`, `btn-glow`, `dashboard-scroll` utility classes; consistent `#dc2626` red accent
+
+### Verification
+- ✅ ESLint: Zero errors (verified twice)
+- ✅ Dev server: Compiles successfully (278–307ms compile times)
+- ✅ All types imported from `@/lib/self-healing-data`
+- ✅ All shadcn/ui components used: Badge, Button, Dialog (all sub-components), Input, Label, Select (all sub-components)
+- ✅ All Lucide icons used (no unused imports)
+- ✅ No existing files modified
+- ✅ Responsive: 1-col mobile, 2-col desktop grid; summary strip 2→4 cols; action buttons responsive text
+- ✅ Framer Motion: Staggered animations on summary cards, endpoint grid, and timeline items
+- ✅ Dark mode: All components use `dark:` variants
+- ✅ Canvas sparkline: Reuses MetricCards pattern with actual health history data
 
 ### File Inventory Update
-- `src/components/ui/ToastNotifications.tsx` ✨ NEW V7
+- `src/components/dashboard/EndpointCard.tsx` ✨ NEW
+- `src/components/dashboard/HealingTimeline.tsx` ✨ NEW
+- `src/components/dashboard/ApiHealthPanel.tsx` ✨ NEW
+
+---
+
+## Task 2-c — Documentation Landing Section + SaaS Settings Panel
+
+### Overview
+Created 2 new component files: an interactive documentation section for the landing page and a SaaS-style settings panel for the dashboard.
+
+### Files Created (2 new files)
+
+1. **`src/components/landing/DocsSection.tsx`** — Interactive documentation landing section
+   - **Section header**: Badge ("Documentation"), H2 with `text-gradient` ("Everything you need to get started"), subtitle
+   - **3-Column Grid** (`lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1`) with staggered Framer Motion entrance:
+     - **Card 1 — Getting Started** (Rocket icon, red accent): Expandable/collapsible toggle with 4 steps. Each step has a red numbered circle badge, title, description, and step 3 includes a styled dark code block. Uses `useState` for expanded/collapsed with `motion.div` height animation.
+     - **Card 2 — API Integration** (Plug icon, gray accent): 3 code examples (Initialize SDK, Wrap Agent Calls, Custom Trace Attributes) each in dark `bg-gray-900` code blocks with `CopyButton` (uses `navigator.clipboard`, shows Check/Copy icon toggle).
+     - **Card 3 — Self-Healing APIs** (Shield icon, red accent): Extracted `CircuitBreakerViz` component — 3 colored circles (Closed=emerald, Half-Open=amber, Open=red) connected by dot-line connectors. Below: 5-item capabilities list with green Check icons and descriptions.
+   - **API Reference Table** below the grid: Clean table with 9 rows (GET/POST), method badges (GET=emerald, POST=blue), mono-font endpoint paths, alternating row colors. Animated with Framer Motion on scroll.
+   - **Styling**: `glass-card` + `card-lift` on cards, `bg-dot-pattern` background, red glow blur, consistent with existing sections
+   - **Variants**: Moved `containerVariants`/`itemVariants` to top of file (before usage)
+
+2. **`src/components/dashboard/SettingsPanel.tsx`** — SaaS settings dialog panel
+   - **Props**: `{ open: boolean; onClose: () => void }`
+   - **shadcn Sheet** (right side, `sm:max-w-md`) with `dashboard-scroll` overflow
+   - **Sticky header** with SheetTitle ("Settings") + SheetDescription, border-b
+   - **5 sections** separated by `Separator` components:
+     - **Workspace**: Name (Input), API Key (readonly Input + CopyIconButton), Webhook URL (readonly Input + CopyIconButton)
+     - **Notifications**: 3 Switch toggles (Slack, Email, In-app toasts) — each with title + description
+     - **Self-Healing**: 2 Switch toggles (auto-remediation, circuit breakers, default on), Health check interval (number Input, default 30, suffix "seconds"), Error threshold (number Input, default 50, suffix "%")
+     - **Data Retention**: Retention period Select (7/14/30/90 days, default 30), trace sampling Switch (default off)
+     - **Danger Zone**: Red-bordered container (`border-red-200 dark:border-red-900/50 bg-red-50/50`), Export All Data (secondary), Reset Dashboard (secondary), Delete Workspace (destructive) — with 2-step confirmation (shows "Are you sure?" + Cancel/Confirm)
+   - **CopyIconButton**: Reusable helper with Check/Copy icon toggle, uses `navigator.clipboard`
+   - **SectionHeading**: Reusable sub-component for section titles with optional descriptions
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles and serves HTTP 200
+- ✅ No existing files modified
+- ✅ All shadcn/ui components used: Sheet (all sub-components), Input, Label, Switch, Select (all sub-components), Button, Separator
+- ✅ All Lucide icons used (no unused imports): Rocket, Plug, Shield, ChevronDown, Copy, Check, Download, RotateCcw, Trash2
+- ✅ Responsive: 3→2→1 column grid on docs section; Sheet responsive width
+- ✅ Dark mode: All components use `dark:` variants
+- ✅ Framer Motion: Scroll-triggered entrance animations on cards and table
+- ✅ `&apos;` used for apostrophe in JSX text content
+
+### File Inventory Update
+- `src/components/landing/DocsSection.tsx` ✨ NEW
+- `src/components/dashboard/SettingsPanel.tsx` ✨ NEW

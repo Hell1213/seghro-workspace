@@ -29,6 +29,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
   const navLinks = [
     { label: 'Features', href: '#features' },
     { label: 'Dashboard', href: '#dashboard' },
+    { label: 'Docs', href: '#docs' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Integrations', href: '#integrations' },
   ];
@@ -83,9 +84,12 @@ export function Navbar({ onSearchClick }: NavbarProps) {
                 <span className="text-xs">⌘</span>K
               </kbd>
             </button>
-            <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#dc2626] focus-ring">
+            <a
+              href="#docs"
+              className="px-3.5 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:text-[#dc2626] rounded-lg hover:bg-red-50/60 dark:hover:bg-red-950/40 focus-ring"
+            >
               Documentation
-            </Button>
+            </a>
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

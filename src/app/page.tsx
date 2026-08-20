@@ -13,6 +13,7 @@ import { NewsletterSection } from '@/components/landing/NewsletterSection';
 import { IntegrationSection } from '@/components/landing/IntegrationSection';
 import { CtaSection } from '@/components/landing/CtaSection';
 import { Footer } from '@/components/landing/Footer';
+import { DocsSection } from '@/components/landing/DocsSection';
 import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette';
 import { ScrollProgress } from '@/components/ui/ScrollProgress';
 import { BackToTop } from '@/components/ui/BackToTop';
@@ -78,6 +79,17 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <DashboardSection />
+        </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <DocsSection />
         </motion.div>
 
         <div className="section-divider max-w-7xl mx-auto" />

@@ -14,6 +14,8 @@ import {
   X,
   GitCompareArrows,
   BarChart3,
+  Heart,
+  Settings,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ExportButton } from '@/components/ui/ExportButton';
@@ -29,14 +31,17 @@ import { AgentDetailSheet } from './AgentDetailSheet';
 import { AgentComparison } from './AgentComparison';
 import { TraceWaterfall } from './TraceWaterfall';
 import { DashboardSkeleton } from './DashboardSkeleton';
+import { ApiHealthPanel } from './ApiHealthPanel';
+import { SettingsPanel } from './SettingsPanel';
 
-type TabId = 'overview' | 'traces' | 'issues' | 'alerts';
+type TabId = 'overview' | 'traces' | 'issues' | 'alerts' | 'api-health';
 
 const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'traces', label: 'Traces', icon: GitBranch },
   { id: 'issues', label: 'Issues', icon: AlertTriangle },
   { id: 'alerts', label: 'Alerts', icon: Bell },
+  { id: 'api-health', label: 'API Health', icon: Heart },
 ];
 
 interface Agent {
@@ -98,7 +103,7 @@ export function DashboardSection() {
   // Sync tab to URL hash
   useEffect(() => {
     const hash = window.location.hash.replace('#dashboard-', '').replace('#', '');
-    if (['overview', 'traces', 'issues', 'alerts'].includes(hash)) {
+    if (['overview', 'traces', 'issues', 'alerts', 'api-health'].includes(hash)) {
       setActiveTab(hash as TabId);
     }
   }, []);
@@ -112,6 +117,7 @@ export function DashboardSection() {
   const [comparisonIds, setComparisonIds] = useState<string[]>([]);
   const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
   const [showWaterfall, setShowWaterfall] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [traces, setTraces] = useState<Trace[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -311,9 +317,18 @@ export function DashboardSection() {
                   );
                 })}
               </div>
-              <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                Live
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live
+                </div>
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+                  aria-label="Open settings"
+                >
+                  <Settings className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -563,6 +578,16 @@ export function DashboardSection() {
                   </motion.div>
                 )}
 
+                {/* API HEALTH TAB */}
+                {activeTab === 'api-health' && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <ApiHealthPanel />
+                  </motion.div>
+                )}
+
                 {/* ALERTS TAB */}
                 {activeTab === 'alerts' && (
                   <motion.div
@@ -592,6 +617,7 @@ export function DashboardSection() {
       </div>
 
       <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       {comparisonAgents && (
         <AgentComparison
           agentA={comparisonAgents[0]}
