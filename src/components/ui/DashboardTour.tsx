@@ -57,8 +57,8 @@ interface TooltipCoords {
   arrowSide: TourPosition;
 }
 
-const TOOLTIP_OFFSET = 16;
-const TOOLTIP_MAX_W = 320;
+const TOOLTIP_OFFSET = 12;
+const TOOLTIP_MAX_W = 300;
 
 function calcTooltipPosition(
   rect: DOMRect,
@@ -94,24 +94,12 @@ function calcTooltipPosition(
     }
   }
 
-  // Clamp within viewport (approximate — tooltip max-width is 320px)
+  // Clamp within viewport
   const halfW = TOOLTIP_MAX_W / 2;
-  if (x - halfW < 8) {
-    x = halfW + 8;
-  }
-  if (x + halfW > vw - 8) {
-    x = vw - halfW - 8;
-  }
-  if (y < 8) {
-    // Flip to bottom if too high
-    y = rect.bottom + TOOLTIP_OFFSET;
-    arrowSide = 'bottom';
-  }
-  if (y + 120 > vh - 8) {
-    // Flip to top if too low
-    y = rect.top - TOOLTIP_OFFSET;
-    arrowSide = 'top';
-  }
+  if (x - halfW < 8) x = halfW + 8;
+  if (x + halfW > vw - 8) x = vw - halfW - 8;
+  if (y < 8) { y = rect.bottom + TOOLTIP_OFFSET; arrowSide = 'bottom'; }
+  if (y + 140 > vh - 8) { y = rect.top - TOOLTIP_OFFSET; arrowSide = 'top'; }
 
   return { x, y, arrowSide };
 }
@@ -120,34 +108,16 @@ const arrowStyles: Record<
   TourPosition,
   { transform: string; top?: string; bottom?: string; left?: string; right?: string }
 > = {
-  top: {
-    transform: 'translateX(-50%)',
-    bottom: '-6px',
-    left: '50%',
-  },
-  bottom: {
-    transform: 'translateX(-50%)',
-    top: '-6px',
-    left: '50%',
-  },
-  left: {
-    transform: 'translateY(-50%)',
-    right: '-6px',
-    top: '50%',
-  },
-  right: {
-    transform: 'translateY(-50%)',
-    left: '-6px',
-    top: '50%',
-  },
+  top: { transform: 'translateX(-50%)', bottom: '-6px', left: '50%' },
+  bottom: { transform: 'translateX(-50%)', top: '-6px', left: '50%' },
+  left: { transform: 'translateY(-50%)', right: '-6px', top: '50%' },
+  right: { transform: 'translateY(-50%)', left: '-6px', top: '50%' },
 };
 
 export default function DashboardTour() {
   const [isVisible, setIsVisible] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return !!sessionStorage.getItem('sentinel-tour-done');
-    }
+    if (typeof window !== 'undefined') return !!sessionStorage.getItem('sentinel-tour-done');
     return false;
   });
   const [isActive, setIsActive] = useState(false);
@@ -156,31 +126,27 @@ export default function DashboardTour() {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
 
   const stepIndexRef = useRef(0);
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const resizeHandlerRef = useRef<() => void>(() => {});
+  const rafRef = useRef<number>(0);
 
-  // ── IntersectionObserver: show button when #dashboard is visible ──
+  // Show button when dashboard is visible
   useEffect(() => {
-    const dashboardEl = document.getElementById('dashboard');
-    if (!dashboardEl) return;
-
+    const el = document.getElementById('dashboard');
+    if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
-      },
+      ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.1 }
     );
-    observer.observe(dashboardEl);
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // ── Tour controls (declared early for dependency) ──
   const finishTour = useCallback(() => {
     setIsActive(false);
     setTooltipPos(null);
     setTargetRect(null);
     setTourCompleted(true);
     sessionStorage.setItem('sentinel-tour-done', '1');
+    cancelAnimationFrame(rafRef.current);
   }, []);
 
   const startTour = useCallback(() => {
@@ -189,46 +155,33 @@ export default function DashboardTour() {
     setIsActive(true);
   }, []);
 
-  const updatePositionRef = useRef<() => void>(() => {});
-
-  // ── Position calculation for current step ──
+  // Instant position calc — no scroll delay
   const updatePosition = useCallback(() => {
     const step = TOUR_STEPS[stepIndexRef.current];
     if (!step) return;
-
     const el = document.querySelector(step.target);
     if (!el) {
-      // Target not found — skip to next
       if (stepIndexRef.current < TOUR_STEPS.length - 1) {
         stepIndexRef.current += 1;
         setCurrentStep(stepIndexRef.current);
-        requestAnimationFrame(() => updatePositionRef.current());
       } else {
         finishTour();
       }
       return;
     }
-
     const rect = el.getBoundingClientRect();
     setTargetRect(rect);
-    const pos = calcTooltipPosition(rect, step.position);
-    setTooltipPos(pos);
+    setTooltipPos(calcTooltipPosition(rect, step.position));
   }, [finishTour]);
 
-  useEffect(() => {
-    updatePositionRef.current = updatePosition;
-  });
-
-  // ── When step changes, scroll & position ──
+  // When step changes — scroll and position immediately
   useEffect(() => {
     if (!isActive) return;
-
     const step = TOUR_STEPS[currentStep];
     if (!step) return;
 
     const el = document.querySelector(step.target);
     if (!el) {
-      // Skip step if target not found
       if (currentStep < TOUR_STEPS.length - 1) {
         stepIndexRef.current = currentStep + 1;
         setCurrentStep(stepIndexRef.current);
@@ -238,28 +191,28 @@ export default function DashboardTour() {
       return;
     }
 
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.scrollIntoView({ behavior: 'instant', block: 'center' });
+    // Use rAF to position after scroll completes
+    cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        updatePosition();
+      });
+    });
 
-    // Wait for scroll to settle before positioning
-    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    scrollTimeoutRef.current = setTimeout(() => {
-      updatePosition();
-    }, 350);
-
-    return () => {
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
+    return () => cancelAnimationFrame(rafRef.current);
   }, [isActive, currentStep, updatePosition, finishTour]);
 
-  // ── Window resize handler ──
+  // Reposition on resize/scroll
   useEffect(() => {
     if (!isActive) return;
-
-    resizeHandlerRef.current = () => {
-      updatePosition();
+    const handleUpdate = () => updatePosition();
+    window.addEventListener('resize', handleUpdate, { passive: true });
+    window.addEventListener('scroll', handleUpdate, { passive: true });
+    return () => {
+      window.removeEventListener('resize', handleUpdate);
+      window.removeEventListener('scroll', handleUpdate);
     };
-    window.addEventListener('resize', resizeHandlerRef.current);
-    return () => window.removeEventListener('resize', resizeHandlerRef.current);
   }, [isActive, updatePosition]);
 
   const nextStep = useCallback(() => {
@@ -284,14 +237,14 @@ export default function DashboardTour() {
 
   return (
     <>
-      {/* ── Floating "Take Tour" button ── */}
+      {/* Floating Take Tour button */}
       <AnimatePresence>
         {!isActive && isVisible && !tourCompleted && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
             onClick={startTour}
             className="fixed bottom-20 left-4 z-50 h-9 px-3.5 rounded-full bg-[#dc2626] text-white text-xs font-medium shadow-lg shadow-red-200 dark:shadow-red-950/50 hover:bg-[#b91c1c] transition-colors inline-flex items-center gap-1.5"
           >
@@ -301,26 +254,26 @@ export default function DashboardTour() {
         )}
       </AnimatePresence>
 
-      {/* ── Active tour overlay + highlight + tooltip ── */}
+      {/* Active tour overlay + tooltip */}
       <AnimatePresence>
         {isActive && targetRect && (
           <>
-            {/* Overlay: transparent target-sized element with massive box-shadow for cutout */}
+            {/* Overlay cutout */}
             <motion.div
               key={`overlay-${currentStep}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.1 }}
               className="fixed z-[60] pointer-events-none"
               style={{
                 top: targetRect.top,
                 left: targetRect.left,
                 width: targetRect.width,
                 height: targetRect.height,
-                borderRadius: 12,
-                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.3)',
-                outline: '3px solid #dc2626',
+                borderRadius: 8,
+                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.35)',
+                outline: '2px solid #dc2626',
                 outlineOffset: '4px',
               }}
             />
@@ -329,46 +282,34 @@ export default function DashboardTour() {
             {tooltipPos && step && (
               <motion.div
                 key={`tooltip-${currentStep}`}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.1, ease: 'easeOut' }}
                 className="fixed z-[70] pointer-events-auto"
                 style={{
                   left: tooltipPos.x,
                   top: tooltipPos.y,
                   translate:
-                    tooltipPos.arrowSide === 'top' ||
-                    tooltipPos.arrowSide === 'bottom'
+                    tooltipPos.arrowSide === 'top' || tooltipPos.arrowSide === 'bottom'
                       ? '-50% 0'
                       : tooltipPos.arrowSide === 'left'
                         ? '0 -50%'
                         : '0 -50%',
                 }}
               >
-                {/* Arrow / caret */}
+                {/* Arrow */}
                 <div
                   className="absolute w-3 h-3 bg-white dark:bg-gray-900 rotate-45 z-10"
                   style={arrowStyles[tooltipPos.arrowSide]}
                 />
 
-                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-4 max-w-xs relative">
-                  {/* Title */}
-                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                    {step.title}
-                  </p>
-
-                  {/* Description */}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {step.description}
-                  </p>
-
-                  {/* Step counter */}
-                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2.5 mb-2">
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 p-3.5 max-w-[280px] relative">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{step.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">{step.description}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-2 mb-1.5">
                     {currentStep + 1}/{TOUR_STEPS.length}
                   </p>
-
-                  {/* Buttons */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       {!isFirst && (

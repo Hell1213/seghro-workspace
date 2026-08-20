@@ -117,11 +117,11 @@ export function HeroSection() {
     target: ref,
     offset: ['start start', 'end start'],
   });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  // Parallax Y only — NO opacity fade, keeps content visible on scroll
+  const y = useTransform(scrollYProgress, [0, 1], [0, 80]);
 
   return (
-    <section id="hero" ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
+    <section id="hero" ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-14 sm:pt-16">
       {/* Particle network */}
       <ParticleCanvas />
       {/* Background grid + noise texture */}
@@ -138,19 +138,19 @@ export function HeroSection() {
       </div>
 
       <motion.div
-        style={{ y, opacity }}
+        style={{ y }}
         className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full"
       >
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left content */}
           <div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="mb-6"
+              transition={{ duration: 0.5 }}
+              className="mb-5"
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1.5 text-xs font-medium text-[#dc2626]">
+              <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-[#dc2626]">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
@@ -162,8 +162,8 @@ export function HeroSection() {
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.1]"
             >
               <span className="text-gray-900 dark:text-gray-100">Stop guessing why </span>
               <span className="text-gradient">your agents fail</span>
@@ -172,25 +172,25 @@ export function HeroSection() {
             <motion.p
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl min-h-[3.5rem]"
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="mt-5 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl min-h-[2.5rem]"
             >
               <TypingText
                 text="Surface silent failures, pull context across traces, and improve your agent before users churn. Real-time observability for production AI systems."
-                delay={800}
-                speed={18}
+                delay={600}
+                speed={16}
               />
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="mt-10 flex flex-wrap items-center gap-4"
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
             >
               <Button
                 size="lg"
-                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02] btn-glow"
+                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-6 sm:px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02] btn-glow"
               >
                 <Activity className="mr-2 h-4 w-4 self-center" />
                 View Live Dashboard
@@ -198,7 +198,7 @@ export function HeroSection() {
               <Button
                 variant="outline"
                 size="lg"
-                className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 px-7"
+                className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 px-6 sm:px-7"
                 asChild
               >
                 <a href="#docs">Read the Docs</a>
@@ -209,8 +209,8 @@ export function HeroSection() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              className="mt-6 flex items-center justify-center gap-4 sm:gap-6"
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2"
             >
               <div className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
@@ -225,29 +225,13 @@ export function HeroSection() {
                 <span className="text-xs text-gray-400 dark:text-gray-500">GDPR Ready</span>
               </div>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6, duration: 0.8 }}
-              className="mt-10 flex items-center gap-8 text-sm text-gray-400 dark:text-gray-500"
-            >
-              <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-[#dc2626]" />
-                <span><strong className="text-gray-600 dark:text-gray-300">50ms</strong> trace latency</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-[#dc2626]" />
-                <span><strong className="text-gray-600 dark:text-gray-300">SOC 2</strong> compliant</span>
-              </div>
-            </motion.div>
           </div>
 
           {/* Right visual - Animated trace */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
             className="hidden lg:block"
           >
             <div className="relative">
@@ -260,7 +244,7 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
+          transition={{ delay: 1.2 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
         >
           <motion.div

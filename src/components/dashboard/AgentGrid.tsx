@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Bot, ExternalLink, GitCompareArrows } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -35,71 +34,59 @@ const timeAgo = (dateStr: string) => {
 
 export function AgentGrid({ agents, onSelect, onCompare, comparisonIds }: { agents: Agent[]; onSelect: (agent: Agent) => void; onCompare?: (agent: Agent) => void; comparisonIds?: string[] }) {
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {agents.map((agent, i) => {
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      {agents.map((agent) => {
         const cfg = statusConfig[agent.status];
         return (
-          <motion.div
+          <div
             key={agent.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05, duration: 0.4 }}
             onClick={() => onSelect(agent)}
-            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden card-lift"
+            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 hover:border-red-200 dark:hover:border-red-900/50 transition-colors duration-200 relative overflow-hidden card-lift"
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className={`relative flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 transition-colors`}>
-                  <Bot className="h-4.5 w-4.5 text-gray-400 group-hover:text-[#dc2626] transition-colors" />
-                  <div className="relative">
-                    {agent.status === 'critical' && (
-                      <span className="absolute inset-0 rounded-full bg-red-500/30 animate-pulse-ring" />
-                    )}
-                    <div className={`relative h-2.5 w-2.5 rounded-full ${cfg.color} ${agent.status === 'critical' ? 'animate-pulse' : ''}`} />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 font-mono">{agent.name}</h3>
-                  <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${cfg.badge}`}>
-                    {cfg.label}
-                  </Badge>
-                </div>
+            {/* Status dot — top right, always visible */}
+            <div className={`absolute top-3 right-3 h-2.5 w-2.5 rounded-full ${cfg.color} ${agent.status === 'critical' ? 'animate-pulse' : ''}`} title={cfg.label} />
+
+            <div className="flex items-center gap-3 mb-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 transition-colors">
+                <Bot className="h-4 w-4 text-gray-400 group-hover:text-[#dc2626] transition-colors" />
               </div>
-              <div className="flex items-center gap-1">
-                {onCompare && (
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onCompare(agent); }}
-                    className={`p-1 rounded-md transition-colors ${comparisonIds?.includes(agent.id) ? 'bg-[#dc2626]/10 text-[#dc2626]' : 'text-gray-300 hover:text-[#dc2626] opacity-0 group-hover:opacity-100'}`}
-                    title={comparisonIds?.includes(agent.id) ? 'Selected for comparison' : 'Compare this agent'}
-                  >
-                    <GitCompareArrows className="h-3.5 w-3.5" />
-                  </button>
-                )}
-                <ExternalLink className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#dc2626] transition-colors" />
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 font-mono truncate">{agent.name}</h3>
+                <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${cfg.badge}`}>
+                  {cfg.label}
+                </Badge>
               </div>
             </div>
 
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-3 line-clamp-2 leading-relaxed min-h-[2.5rem]">
               {agent.description}
             </p>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="text-gray-500 dark:text-gray-400">Error Rate</span>
-                <span className={`font-semibold ${agent.errorRate > 10 ? 'text-[#dc2626]' : agent.errorRate > 5 ? 'text-amber-600' : 'text-gray-700 dark:text-gray-300'}`}>
+                <span className={`font-semibold tabular-nums ${agent.errorRate > 10 ? 'text-[#dc2626]' : agent.errorRate > 5 ? 'text-amber-600' : 'text-gray-700 dark:text-gray-300'}`}>
                   {agent.errorRate}%
                 </span>
               </div>
-              <Progress
-                value={Math.min(agent.errorRate, 100)}
-                className="h-1.5"
-              />
-              <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 pt-1">
+              <Progress value={Math.min(agent.errorRate, 100)} className="h-1.5" />
+              <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500">
                 <span>{agent.framework}</span>
-                <span>{timeAgo(agent.lastRunAt)}</span>
+                <div className="flex items-center gap-2">
+                  {onCompare && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onCompare(agent); }}
+                      className={`p-0.5 rounded transition-colors ${comparisonIds?.includes(agent.id) ? 'text-[#dc2626]' : 'text-gray-300 hover:text-[#dc2626] opacity-0 group-hover:opacity-100'}`}
+                      title={comparisonIds?.includes(agent.id) ? 'Selected' : 'Compare'}
+                    >
+                      <GitCompareArrows className="h-3 w-3" />
+                    </button>
+                  )}
+                  <span>{timeAgo(agent.lastRunAt)}</span>
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         );
       })}
     </div>

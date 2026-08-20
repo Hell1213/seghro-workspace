@@ -1,21 +1,22 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V11 — Status Page, Live Metric Charts, Magnetic Hover, Agent Detail Tabs, Enhanced Footer**
-- Page renders with 51+ component files (optimized with lazy loading)
+**Phase: V12 — Responsive Navbar, Performance Optimization, Self-Healing Agent, Status Dots**
+- Page renders with 52+ component files (optimized with lazy loading)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
-- All 9 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity)
+- All 10 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity, self-heal)
 - WebSocket real-time alert streaming on port 3001
 - Dark mode fully functional with theme toggle
 - 12+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
-- **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
-- **V6**: Agent comparison panel, trace waterfall Gantt chart, navbar polish, filter persistence
-- **V7**: Page skeleton loading, real-time toast notifications for WebSocket alerts
+- **V12**: Fully responsive navbar (dynamic link count by viewport), instant tab switching (no motion fade), status dots on all feature cards, LLM-agnostic self-healing agent system, HowItWorks step alignment fix, HeroSection no-fade-on-scroll, 8-card feature grid with Self-Healing APIs + LLM-Agnostic Healing features, tour guide instant positioning
+- **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer
+- **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row
+- **V9**: Pricing section (3-tier SaaS), tab bar polish, Activity API, lazy loading
 - **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
-- **V9**: Pricing section (3-tier SaaS), 9 new CSS utilities, tab bar polish, Activity API, lazy loading, CSS fix
-- **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row + accent bar
-- **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer (status indicator, newsletter inline, 5 social icons), 6 new CSS utilities
+- **V7**: Page skeleton loading, real-time toast notifications
+- **V6**: Agent comparison, trace waterfall Gantt chart, navbar polish, filter persistence
+- **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
 
 ---
 

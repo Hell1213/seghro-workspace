@@ -344,10 +344,7 @@ export function DashboardSection() {
               <>
                 {/* OVERVIEW TAB */}
                 {activeTab === 'overview' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="space-y-6"
+                  <div className="space-y-6"
                   >
                     {metrics?.cards && (
                       <div data-tour="metrics">
@@ -383,15 +380,12 @@ export function DashboardSection() {
                         />
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* TRACES TAB */}
                 {activeTab === 'traces' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
+                  <div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
                         <GitBranch className="h-4 w-4 text-gray-400" />
@@ -475,15 +469,12 @@ export function DashboardSection() {
                         <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
                       </div>
                     )}
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* ISSUES TAB */}
                 {activeTab === 'issues' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
+                  <div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
@@ -578,25 +569,17 @@ export function DashboardSection() {
                     ) : (
                       <IssuesPanel issues={filteredIssues} onUpdate={fetchIssues} />
                     )}
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* API HEALTH TAB */}
                 {activeTab === 'api-health' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <ApiHealthPanel />
-                  </motion.div>
+                  <ApiHealthPanel />
                 )}
 
                 {/* ALERTS TAB */}
                 {activeTab === 'alerts' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
+                  <div>
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                       <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-3">
@@ -611,7 +594,7 @@ export function DashboardSection() {
                         <AlertFeed alerts={alertItems} />
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </>
             )}
