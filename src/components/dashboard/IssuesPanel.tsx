@@ -2,9 +2,10 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { AlertOctagon, AlertTriangle, Info, ChevronDown, ChevronRight, CheckCircle2, XCircle, Clock, Target } from 'lucide-react';
+import { AlertOctagon, AlertTriangle, Info, ChevronDown, ChevronRight, CheckCircle2, XCircle, Clock, Target, RotateCcw, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface Issue {
   id: string;
@@ -36,8 +37,24 @@ const statusConfig = {
   reopened: { label: 'Reopened', color: 'text-purple-600', bg: 'bg-purple-50' },
 };
 
-export function IssuesPanel({ issues }: { issues: Issue[] }) {
+export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: () => void }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const handleStatusChange = async (issueId: string, newStatus: string) => {
+    try {
+      const res = await fetch('/api/issues', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: issueId, status: newStatus }),
+      });
+      if (res.ok) {
+        toast.success('Issue status updated');
+        onUpdate?.();
+      }
+    } catch {
+      // silently fail
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -123,6 +140,59 @@ export function IssuesPanel({ issues }: { issues: Issue[] }) {
                       <Button variant="outline" size="sm" className="text-xs h-7">
                         View Traces
                       </Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200/50">
+                      {issue.status === 'open' && (
+                        <>
+                          <Button
+                            size="sm"
+                            className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-7"
+                            onClick={() => handleStatusChange(issue.id, 'investigating')}
+                          >
+                            <Play className="h-3 w-3 mr-1" />
+                            Start Investigation
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-7"
+                            onClick={() => handleStatusChange(issue.id, 'resolved')}
+                          >
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Mark Resolved
+                          </Button>
+                        </>
+                      )}
+                      {issue.status === 'investigating' && (
+                        <Button
+                          size="sm"
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs h-7"
+                          onClick={() => handleStatusChange(issue.id, 'resolved')}
+                        >
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          Mark Resolved
+                        </Button>
+                      )}
+                      {issue.status === 'resolved' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-gray-300 text-gray-600 hover:bg-gray-100 text-xs h-7"
+                          onClick={() => handleStatusChange(issue.id, 'reopened')}
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" />
+                          Reopen
+                        </Button>
+                      )}
+                      {issue.status === 'reopened' && (
+                        <Button
+                          size="sm"
+                          className="bg-amber-500 hover:bg-amber-600 text-white text-xs h-7"
+                          onClick={() => handleStatusChange(issue.id, 'investigating')}
+                        >
+                          <Play className="h-3 w-3 mr-1" />
+                          Start Investigation
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </motion.div>

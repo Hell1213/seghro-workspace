@@ -33,7 +33,7 @@ const timeAgo = (dateStr: string) => {
   return `${Math.floor(hours / 24)}d ago`;
 };
 
-export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (id: string) => void }) {
+export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (agent: Agent) => void }) {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {agents.map((agent, i) => {
@@ -44,7 +44,7 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (id
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.4 }}
-            onClick={() => onSelect(agent.id)}
+            onClick={() => onSelect(agent)}
             className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-5 hover:border-red-200 hover:shadow-lg hover:shadow-red-50 transition-all duration-300"
           >
             <div className="flex items-start justify-between mb-3">

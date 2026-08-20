@@ -20,6 +20,7 @@ import { IssuesPanel } from './IssuesPanel';
 import { AlertFeed } from './AlertFeed';
 import { MetricsCharts } from './MetricsCharts';
 import { McpPanel } from './McpPanel';
+import { AgentDetailSheet } from './AgentDetailSheet';
 
 type TabId = 'overview' | 'traces' | 'issues' | 'alerts';
 
@@ -86,6 +87,7 @@ export function DashboardSection() {
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [traces, setTraces] = useState<Trace[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -121,6 +123,15 @@ export function DashboardSection() {
       if (ws) ws.close();
     };
   }, []);
+
+  const fetchIssues = async () => {
+    try {
+      const issuesRes = await fetch('/api/issues').then((r) => r.json());
+      setIssues(issuesRes);
+    } catch {
+      // silently fail
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -177,7 +188,7 @@ export function DashboardSection() {
             Live Demo
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            The{' '}
+            The{'00A0'}
             <span className="text-gradient">observability dashboard</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
@@ -260,7 +271,7 @@ export function DashboardSection() {
                           <h3 className="text-sm font-semibold text-gray-900">Monitored Agents</h3>
                           <span className="text-xs text-gray-400">({agents.length})</span>
                         </div>
-                        <AgentGrid agents={agents} onSelect={setSelectedAgentId} />
+                        <AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} />
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900 mb-4">MCP Fix Workflow</h3>
@@ -393,7 +404,7 @@ export function DashboardSection() {
                         <p className="text-sm">No issues match your filters</p>
                       </div>
                     ) : (
-                      <IssuesPanel issues={filteredIssues} />
+                      <IssuesPanel issues={filteredIssues} onUpdate={fetchIssues} />
                     )}
                   </motion.div>
                 )}
@@ -412,6 +423,8 @@ export function DashboardSection() {
           </div>
         </motion.div>
       </div>
+
+      <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
     </section>
   );
 }

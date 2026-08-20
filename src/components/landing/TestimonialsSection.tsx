@@ -114,7 +114,7 @@ export function TestimonialsSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Loved by{' '}
+            Loved by{'00A0'}
             <span className="text-gradient">engineering teams</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">

@@ -57,7 +57,7 @@ export function HowItWorks() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            From failure to fix in{' '}
+            From failure to fix in{'00A0'}
             <span className="text-gradient">four steps</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">

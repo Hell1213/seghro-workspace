@@ -115,19 +115,19 @@ function SpanRow({ span, maxDuration, depth = 0 }: { span: Span; maxDuration: nu
             <div className="ml-14 mr-3 mb-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
               <div className="grid grid-cols-2 gap-2 text-[11px]">
                 <div>
-                  <span className="text-gray-400">Input Tokens:</span>{' '}
+                  <span className="text-gray-400">Input Tokens:</span>{'00A0'}
                   <span className="text-gray-700 font-medium">{span.inputTokens.toLocaleString()}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Output Tokens:</span>{' '}
+                  <span className="text-gray-400">Output Tokens:</span>{'00A0'}
                   <span className="text-gray-700 font-medium">{span.outputTokens.toLocaleString()}</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Duration:</span>{' '}
+                  <span className="text-gray-400">Duration:</span>{'00A0'}
                   <span className="text-gray-700 font-medium">{span.duration}ms</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Status:</span>{' '}
+                  <span className="text-gray-400">Status:</span>{'00A0'}
                   <span className={`font-medium ${span.status === 'error' ? 'text-[#dc2626]' : span.status === 'warning' ? 'text-amber-600' : 'text-emerald-600'}`}>{span.status}</span>
                 </div>
               </div>

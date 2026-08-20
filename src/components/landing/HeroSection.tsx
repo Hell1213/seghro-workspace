@@ -93,8 +93,9 @@ export function HeroSection() {
 
   return (
     <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
-      {/* Background grid */}
+      {/* Background grid + noise texture */}
       <div className="absolute inset-0 bg-grid-pattern" />
+      <div className="absolute inset-0 bg-noise" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-red-500/5 blur-[120px]" />
 
       <motion.div

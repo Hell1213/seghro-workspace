@@ -112,7 +112,7 @@ export function StatsSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-            Trusted at{' '}
+            Trusted at{'00A0'}
             <span className="text-[#dc2626]">scale</span>
           </h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">

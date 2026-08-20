@@ -8,6 +8,7 @@ import { HowItWorks } from '@/components/landing/HowItWorks';
 import { StatsSection } from '@/components/landing/StatsSection';
 import { DashboardSection } from '@/components/dashboard/DashboardSection';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
+import { NewsletterSection } from '@/components/landing/NewsletterSection';
 import { IntegrationSection } from '@/components/landing/IntegrationSection';
 import { CtaSection } from '@/components/landing/CtaSection';
 import { Footer } from '@/components/landing/Footer';
@@ -63,6 +64,15 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <TestimonialsSection />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <NewsletterSection />
         </motion.div>
 
         <motion.div

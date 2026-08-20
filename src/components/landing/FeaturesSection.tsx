@@ -88,7 +88,7 @@ export function FeaturesSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Everything you need to{' '}
+            Everything you need to{'00A0'}
             <span className="text-gradient">ship reliable agents</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">

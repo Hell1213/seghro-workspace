@@ -24,7 +24,7 @@ export function CtaSection() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-6">
-            Start monitoring your{' '}
+            Start monitoring your{'00A0'}
             <span className="text-gradient">agents today</span>
           </h2>
           <p className="text-lg text-gray-500 max-w-xl mx-auto mb-10">
