@@ -457,7 +457,7 @@ export function DocsSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="docs" className="relative py-24 sm:py-32 dark:bg-gray-900/50">
+    <section id="docs" className="relative py-24 sm:py-32 bg-white dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
       <div className="absolute bottom-0 left-1/3 w-1/2 h-1/2 bg-red-500/[0.02] blur-[100px] rounded-full" />
 

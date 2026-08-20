@@ -150,7 +150,7 @@ export function HeroSection() {
               transition={{ duration: 0.5 }}
               className="mb-5"
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-[#dc2626]">
+              <span className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3 py-1.5 text-xs font-medium text-[#dc2626]">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
@@ -190,7 +190,7 @@ export function HeroSection() {
             >
               <Button
                 size="lg"
-                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-6 sm:px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02] btn-glow"
+                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-6 sm:px-7 shadow-lg shadow-red-200 dark:shadow-red-900/30 hover:shadow-red-300 dark:hover:shadow-red-900/50 transition-all hover:scale-[1.02] btn-glow"
               >
                 <Activity className="mr-2 h-4 w-4 self-center" />
                 View Live Dashboard

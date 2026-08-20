@@ -263,7 +263,7 @@ export function DashboardSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-10"
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
             <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
             Live Demo
           </div>
@@ -271,7 +271,7 @@ export function DashboardSection() {
             The{'\u00A0'}
             <span className="text-gradient">observability dashboard</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
             Real-time monitoring of AI agent traces, issues, and metrics —
             everything running live below.
           </p>
@@ -321,13 +321,13 @@ export function DashboardSection() {
                 })}
               </div>
               <div className="hidden sm:flex items-center gap-2">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Live
                 </div>
                 <button
                   onClick={() => setSettingsOpen(true)}
-                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
                   aria-label="Open settings"
                 >
                   <Settings className="h-4 w-4" />
@@ -355,7 +355,7 @@ export function DashboardSection() {
                     <div className="grid lg:grid-cols-3 gap-6">
                       <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-4">
-                          <Bot className="h-4 w-4 text-gray-400" />
+                          <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
                           <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
                         </div>
@@ -388,25 +388,25 @@ export function DashboardSection() {
                   <div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
-                        <GitBranch className="h-4 w-4 text-gray-400" />
+                        <GitBranch className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
                         <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <div className="relative flex-1 sm:flex-none">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                           <Input
                             placeholder="Search traces..."
                             value={traceSearch}
                             onChange={(e) => setTraceSearch(e.target.value)}
-                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
                           />
                           {traceSearch && (
                             <button
                               onClick={() => setTraceSearch('')}
                               className="absolute right-2 top-1/2 -translate-y-1/2"
                             >
-                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
                             </button>
                           )}
                         </div>
@@ -422,7 +422,7 @@ export function DashboardSection() {
                     <div className="flex flex-wrap items-center gap-2 mb-4">
                       <button
                         onClick={() => setShowWaterfall(!showWaterfall)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'}`}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
                       >
                         <BarChart3 className="h-3 w-3" />
                         Waterfall
@@ -443,8 +443,8 @@ export function DashboardSection() {
                             traceStatusFilter === stat
                               ? stat === 'success' ? 'bg-emerald-500 text-white'
                                 : stat === 'error' ? 'bg-[#dc2626] text-white'
-                                : 'bg-gray-200 text-gray-700'
-                              : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                              : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                         >
                           {stat.charAt(0).toUpperCase() + stat.slice(1)}
@@ -453,8 +453,8 @@ export function DashboardSection() {
                     </div>
 
                     {filteredTraces.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400">
-                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                         <p className="text-sm">No traces match your filters</p>
                       </div>
                     ) : (
@@ -463,7 +463,7 @@ export function DashboardSection() {
                     {showWaterfall && filteredTraces.length > 0 && (
                       <div className="mt-6">
                         <div className="flex items-center gap-2 mb-3">
-                          <BarChart3 className="h-4 w-4 text-gray-400" />
+                          <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
                         </div>
                         <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
@@ -483,19 +483,19 @@ export function DashboardSection() {
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <div className="relative flex-1 sm:flex-none">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                           <Input
                             placeholder="Search issues..."
                             value={issueSearch}
                             onChange={(e) => setIssueSearch(e.target.value)}
-                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
                           />
                           {issueSearch && (
                             <button
                               onClick={() => setIssueSearch('')}
                               className="absolute right-2 top-1/2 -translate-y-1/2"
                             >
-                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
                             </button>
                           )}
                         </div>
@@ -504,7 +504,7 @@ export function DashboardSection() {
                           className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
                             showFilters
                               ? 'bg-[#dc2626] text-white border-[#dc2626]'
-                              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                           }`}
                         >
                           <Filter className="h-3.5 w-3.5" />
@@ -526,7 +526,7 @@ export function DashboardSection() {
                         exit={{ height: 0, opacity: 0 }}
                         className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
                       >
-                        <span className="text-[11px] text-gray-500 font-medium">Severity:</span>
+                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Severity:</span>
                         {['all', 'P0', 'P1', 'P2'].map((sev) => (
                           <button
                             key={sev}
@@ -536,15 +536,15 @@ export function DashboardSection() {
                                 ? sev === 'P0' ? 'bg-[#dc2626] text-white'
                                   : sev === 'P1' ? 'bg-amber-500 text-white'
                                   : sev === 'P2' ? 'bg-gray-500 text-white'
-                                  : 'bg-gray-200 text-gray-700'
-                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                             }`}
                           >
                             {sev === 'all' ? 'All' : sev}
                           </button>
                         ))}
-                        <div className="w-px h-4 bg-gray-200 mx-1" />
-                        <span className="text-[11px] text-gray-500 font-medium">Status:</span>
+                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Status:</span>
                         {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
                           <button
                             key={stat}
@@ -552,7 +552,7 @@ export function DashboardSection() {
                             className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
                               issueStatusFilter === stat
                                 ? 'bg-[#dc2626] text-white'
-                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                             }`}
                           >
                             {stat.charAt(0).toUpperCase() + stat.slice(1)}
@@ -562,8 +562,8 @@ export function DashboardSection() {
                     )}
 
                     {filteredIssues.length === 0 ? (
-                      <div className="text-center py-12 text-gray-400">
-                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                         <p className="text-sm">No issues match your filters</p>
                       </div>
                     ) : (
@@ -583,7 +583,7 @@ export function DashboardSection() {
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                       <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-3">
-                          <Clock className="h-4 w-4 text-gray-400" />
+                          <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
                         </div>
                         <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">

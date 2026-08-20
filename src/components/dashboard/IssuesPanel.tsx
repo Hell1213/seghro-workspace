@@ -31,10 +31,10 @@ const severityConfig = {
 };
 
 const statusConfig = {
-  open: { label: 'Open', color: 'text-[#dc2626]', bg: 'bg-red-50' },
-  investigating: { label: 'Investigating', color: 'text-amber-600', bg: 'bg-amber-50' },
-  resolved: { label: 'Resolved', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  reopened: { label: 'Reopened', color: 'text-purple-600', bg: 'bg-purple-50' },
+  open: { label: 'Open', color: 'text-[#dc2626]', bg: 'bg-red-50 dark:bg-red-950/30' },
+  investigating: { label: 'Investigating', color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950/30' },
+  resolved: { label: 'Resolved', color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-950/30' },
+  reopened: { label: 'Reopened', color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950/30' },
 };
 
 export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: () => void }) {
@@ -84,7 +84,7 @@ export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: 
                     <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${stat.color} ${stat.bg} border-current/20`}>
                       {stat.label}
                     </Badge>
-                    <span className="text-[10px] font-mono text-gray-400">{issue.agentName}</span>
+                    <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500">{issue.agentName}</span>
                   </div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{issue.title}</h3>
                   <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{issue.description}</p>
@@ -104,7 +104,7 @@ export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: 
                   </div>
                 </div>
                 <div className="shrink-0">
-                  {isExpanded ? <ChevronDown className="h-4 w-4 text-gray-400" /> : <ChevronRight className="h-4 w-4 text-gray-400" />}
+                  {isExpanded ? <ChevronDown className="h-4 w-4 text-gray-400 dark:text-gray-500" /> : <ChevronRight className="h-4 w-4 text-gray-400 dark:text-gray-500" />}
                 </div>
               </div>
             </button>
@@ -127,7 +127,7 @@ export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: 
                       <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-800 rounded-lg p-3">{issue.rootCause}</p>
                     </div>
                     <div>
-                      <h4 className="text-xs font-semibold text-gray-700 mb-1.5 flex items-center gap-1.5">
+                      <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-1.5">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
                         Suggested Fix
                       </h4>
@@ -141,7 +141,7 @@ export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: 
                         View Traces
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200/50">
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-200/50 dark:border-gray-700/50">
                       {issue.status === 'open' && (
                         <>
                           <Button
@@ -176,7 +176,7 @@ export function IssuesPanel({ issues, onUpdate }: { issues: Issue[]; onUpdate?: 
                         <Button
                           variant="outline"
                           size="sm"
-                          className="border-gray-300 text-gray-600 hover:bg-gray-100 text-xs h-7"
+                          className="border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs h-7"
                           onClick={() => handleStatusChange(issue.id, 'reopened')}
                         >
                           <RotateCcw className="h-3 w-3 mr-1" />

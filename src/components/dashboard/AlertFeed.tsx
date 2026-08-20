@@ -58,7 +58,7 @@ export function AlertFeed({ alerts }: { alerts: AlertItem[] }) {
             initial={{ opacity: 0, x: -15 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
-            className={`rounded-lg border-l-[3px] ${severityAccent[alert.severity]} border border-gray-100 ${
+            className={`rounded-lg border-l-[3px] ${severityAccent[alert.severity]} border border-gray-100 dark:border-gray-800 ${
               alert.status === 'unread' ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
             } p-3.5 hover:shadow-sm transition-all group cursor-pointer`}
           >
@@ -66,7 +66,7 @@ export function AlertFeed({ alerts }: { alerts: AlertItem[] }) {
               <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-tight">
                 {alert.title}
               </h4>
-              <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap shrink-0">
                 {timeAgo(alert.createdAt)}
               </span>
             </div>
@@ -74,7 +74,7 @@ export function AlertFeed({ alerts }: { alerts: AlertItem[] }) {
               {alert.message}
             </p>
             <div className="flex items-center gap-2 mt-2">
-              <span className="flex items-center gap-1 text-[10px] text-gray-400">
+              <span className="flex items-center gap-1 text-[10px] text-gray-400 dark:text-gray-500">
                 <Hash className="h-2.5 w-2.5" />
                 {alert.channel}
               </span>

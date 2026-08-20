@@ -41,7 +41,7 @@ export function McpPanel() {
   const [activeStep, setActiveStep] = useState(-1);
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-950 overflow-hidden">
+    <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-950 overflow-hidden">
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800">
         <div className="flex items-center gap-2">

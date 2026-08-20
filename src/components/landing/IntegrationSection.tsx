@@ -11,7 +11,7 @@ const frameworks = [
   { name: 'AutoGen', logo: 'AG', color: 'bg-gray-600 text-white' },
   { name: 'LlamaIndex', logo: 'LI', color: 'bg-gray-400 text-white' },
   { name: 'LangGraph', logo: 'LG', color: 'bg-gray-700 text-white' },
-  { name: 'Custom SDK', logo: 'SDK', color: 'border-2 border-gray-300 text-gray-600' },
+  { name: 'Custom SDK', logo: 'SDK', color: 'border-2 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400' },
 ];
 
 const securityBadges = [
@@ -42,7 +42,7 @@ agent = trace_agent(your_agent,
   };
 
   return (
-    <section id="integrations" className="relative py-24 sm:py-32 dark:bg-gray-900/50">
+    <section id="integrations" className="relative py-24 sm:py-32 bg-white dark:bg-gray-900/50">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -88,7 +88,7 @@ agent = trace_agent(your_agent,
             <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-950 p-5 relative">
               <button
                 onClick={handleCopy}
-                className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+                className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-white/10 dark:hover:bg-white/5 transition-colors"
               >
                 {copied ? (
                   <Check className="h-4 w-4 text-green-400" />

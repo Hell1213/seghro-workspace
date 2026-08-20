@@ -39,7 +39,7 @@ export function CtaSection() {
           >
             <Button
               size="lg"
-              className="bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold px-8 h-12 text-base rounded-xl shadow-lg shadow-red-200/50 hover:shadow-red-300/60 transition-all btn-glow"
+              className="bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold px-8 h-12 text-base rounded-xl shadow-lg shadow-red-200/50 dark:shadow-red-900/30 hover:shadow-red-300/60 dark:hover:shadow-red-900/50 transition-all btn-glow"
             >
               Get Started Free
               <ArrowRight className="ml-2 h-4 w-4" />

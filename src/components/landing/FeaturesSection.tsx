@@ -135,7 +135,7 @@ export function FeaturesSection() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="features" className="relative py-20 sm:py-28 dark:bg-gray-900/50">
+    <section id="features" className="relative py-20 sm:py-28 bg-white dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
       <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/[0.02] blur-[100px] rounded-full" />
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gray-500/[0.03] blur-[80px] rounded-full" />

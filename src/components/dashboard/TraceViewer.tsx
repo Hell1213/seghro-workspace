@@ -72,9 +72,9 @@ function SpanRow({ span, maxDuration, depth = 0 }: { span: Span; maxDuration: nu
       >
         <div className="flex items-center gap-2.5">
           {expanded ? (
-            <ChevronDown className="h-3.5 w-3.5 text-gray-300" />
+            <ChevronDown className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
           ) : (
-            <ChevronRight className="h-3.5 w-3.5 text-gray-300" />
+            <ChevronRight className="h-3.5 w-3.5 text-gray-300 dark:text-gray-600" />
           )}
           <div className={`h-2 w-2 rounded-full ${statusDot[span.status]} ${span.status === 'error' ? 'animate-pulse' : ''}`} />
           <Icon className={`h-3.5 w-3.5 ${typeColors[span.type]}`} />
@@ -127,7 +127,7 @@ function SpanRow({ span, maxDuration, depth = 0 }: { span: Span; maxDuration: nu
                   <span className="text-gray-700 dark:text-gray-300 font-medium">{span.duration}ms</span>
                 </div>
                 <div>
-                  <span className="text-gray-400">Status:</span> 
+                  <span className="text-gray-400 dark:text-gray-500">Status:</span> 
                   <span className={`font-medium ${span.status === 'error' ? 'text-[#dc2626]' : span.status === 'warning' ? 'text-amber-600' : 'text-emerald-600'}`}>{span.status}</span>
                 </div>
               </div>

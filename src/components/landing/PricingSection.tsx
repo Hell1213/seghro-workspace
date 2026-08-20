@@ -182,7 +182,7 @@ export function PricingSection() {
                 variant={tier.buttonVariant}
                 className={`w-full font-semibold ${
                   tier.buttonVariant === 'default'
-                    ? 'bg-[#dc2626] hover:bg-[#b91c1c] text-white shadow-lg shadow-red-200/50 hover:shadow-red-300/60 btn-glow'
+                    ? 'bg-[#dc2626] hover:bg-[#b91c1c] text-white shadow-lg shadow-red-200/50 dark:shadow-red-900/30 hover:shadow-red-300/60 dark:hover:shadow-red-900/50 btn-glow'
                     : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100'
                 }`}
               >

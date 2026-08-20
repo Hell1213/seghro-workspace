@@ -17,10 +17,10 @@ interface Agent {
 }
 
 const statusConfig = {
-  active: { color: 'bg-emerald-500', label: 'Active', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  degraded: { color: 'bg-amber-500', label: 'Degraded', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
-  critical: { color: 'bg-red-500', label: 'Critical', badge: 'bg-red-50 text-red-700 border-red-200' },
-  inactive: { color: 'bg-gray-400', label: 'Inactive', badge: 'bg-gray-50 text-gray-500 border-gray-200' },
+  active: { color: 'bg-emerald-500', label: 'Active', badge: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50' },
+  degraded: { color: 'bg-amber-500', label: 'Degraded', badge: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50' },
+  critical: { color: 'bg-red-500', label: 'Critical', badge: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/50' },
+  inactive: { color: 'bg-gray-400', label: 'Inactive', badge: 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700' },
 };
 
 const timeAgo = (dateStr: string) => {
@@ -76,7 +76,7 @@ export function AgentGrid({ agents, onSelect, onCompare, comparisonIds }: { agen
                   {onCompare && (
                     <button
                       onClick={(e) => { e.stopPropagation(); onCompare(agent); }}
-                      className={`p-0.5 rounded transition-colors ${comparisonIds?.includes(agent.id) ? 'text-[#dc2626]' : 'text-gray-300 hover:text-[#dc2626] opacity-0 group-hover:opacity-100'}`}
+                      className={`p-0.5 rounded transition-colors ${comparisonIds?.includes(agent.id) ? 'text-[#dc2626]' : 'text-gray-300 dark:text-gray-600 hover:text-[#dc2626] opacity-0 group-hover:opacity-100'}`}
                       title={comparisonIds?.includes(agent.id) ? 'Selected' : 'Compare'}
                     >
                       <GitCompareArrows className="h-3 w-3" />

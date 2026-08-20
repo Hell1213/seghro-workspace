@@ -23,10 +23,10 @@ interface Agent {
 }
 
 const statusConfig = {
-  active: { label: 'Active', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-  degraded: { label: 'Degraded', badge: 'bg-amber-50 text-amber-700 border-amber-200' },
-  critical: { label: 'Critical', badge: 'bg-red-50 text-red-700 border-red-200' },
-  inactive: { label: 'Inactive', badge: 'bg-gray-50 text-gray-500 border-gray-200' },
+  active: { label: 'Active', badge: 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50' },
+  degraded: { label: 'Degraded', badge: 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800/50' },
+  critical: { label: 'Critical', badge: 'bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800/50' },
+  inactive: { label: 'Inactive', badge: 'bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700' },
 };
 
 const severityBadge = {
@@ -159,7 +159,7 @@ export function AgentDetailSheet({ agent, open, onClose }: { agent: Agent | null
           <motion.div variants={itemVariants} className="flex items-start justify-between pr-6">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800">
-                <Bot className="h-5 w-5 text-gray-500" />
+                <Bot className="h-5 w-5 text-gray-500 dark:text-gray-400" />
               </div>
               <div>
                 <h3 className="text-base font-semibold font-mono text-gray-900 dark:text-gray-100">{agent.name}</h3>
@@ -167,7 +167,7 @@ export function AgentDetailSheet({ agent, open, onClose }: { agent: Agent | null
                   <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${cfg.badge}`}>
                     {cfg.label}
                   </Badge>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-gray-200 text-gray-500">
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400">
                     {agent.framework}
                   </Badge>
                 </div>
@@ -290,11 +290,11 @@ export function AgentDetailSheet({ agent, open, onClose }: { agent: Agent | null
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-1">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8 border-gray-200 text-gray-600 hover:border-red-200 hover:text-red-600">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-red-200 hover:text-red-600">
                     <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
                     View Full Trace
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8 border-gray-200 text-gray-600 hover:border-red-200 hover:text-red-600">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs h-8 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-red-200 hover:text-red-600">
                     View All Issues
                   </Button>
                 </div>

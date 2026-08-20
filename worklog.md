@@ -1,7 +1,7 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V12 — Responsive Navbar, Performance Optimization, Self-Healing Agent, Status Dots**
+**Phase: V13 — Comprehensive Dark/Light Theme Fix**
 - Page renders with 52+ component files (optimized with lazy loading)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
@@ -9,6 +9,7 @@
 - WebSocket real-time alert streaming on port 3001
 - Dark mode fully functional with theme toggle
 - 12+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
+- **V13**: Comprehensive dark/light theme fix across 15+ files, 70+ individual class fixes. All sections verified in both themes via agent-browser.
 - **V12**: Fully responsive navbar (dynamic link count by viewport), instant tab switching (no motion fade), status dots on all feature cards, LLM-agnostic self-healing agent system, HowItWorks step alignment fix, HeroSection no-fade-on-scroll, 8-card feature grid with Self-Healing APIs + LLM-Agnostic Healing features, tour guide instant positioning
 - **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer
 - **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row
