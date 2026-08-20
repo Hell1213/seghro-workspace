@@ -295,7 +295,7 @@ export function DashboardSection() {
                     <button
                       key={tab.id}
                       onClick={() => handleTabChange(tab.id)}
-                      className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                      className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-all duration-200 ${
                         isActive
                           ? 'text-[#dc2626] border-[#dc2626]'
                           : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
@@ -303,13 +303,16 @@ export function DashboardSection() {
                     >
                       <Icon className="h-4 w-4" />
                       {tab.label}
+                      {isActive && (
+                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full" />
+                      )}
                       {tab.id === 'issues' && issues.length > 0 && (
-                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
                           {issues.filter((i) => i.status !== 'resolved').length}
                         </span>
                       )}
                       {tab.id === 'alerts' && alertItems.filter((a) => a.status === 'unread').length > 0 && (
-                        <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
                           {alertItems.filter((a) => a.status === 'unread').length}
                         </span>
                       )}

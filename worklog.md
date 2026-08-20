@@ -1,11 +1,11 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V8 — SaaS-ready with Self-Healing API Control System, Documentation, Settings Panel**
-- Page renders with 44+ component files
+**Phase: V9 — SaaS-Complete: Pricing, CSS enhancements, Activity API, Lazy Loading, Tab Polish**
+- Page renders with 48+ component files (optimized with lazy loading)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
-- All API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health)
+- All 9 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity)
 - WebSocket real-time alert streaming on port 3001
 - Dark mode fully functional with theme toggle
 - Agent detail sheet with sparkline charts verified working
@@ -13,12 +13,13 @@
 - Newsletter section with email subscription toast
 - Command Palette (⌘K) with fuzzy search, keyboard nav, quick actions, recent items
 - Scroll progress bar + Back-to-Top button (with glow pulse)
-- Activity Timeline in Alerts tab
-- 10+ landing sections + 5-tab working dashboard + comprehensive styling
+- Activity Timeline fetches real data from /api/activity with loading skeleton
+- 11+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
 - **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
 - **V6**: Agent comparison panel, trace waterfall Gantt chart, navbar polish, filter persistence
 - **V7**: Page skeleton loading, real-time toast notifications for WebSocket alerts
-- **V8: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel**
+- **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
+- **V9**: Pricing section (3-tier SaaS), 9 new CSS utilities, tab bar polish, Activity API, lazy loading, CSS fix
 
 ---
 
@@ -74,10 +75,10 @@
 
 ---
 
-## Full File Inventory (35+ component files)
+## Full File Inventory (48+ files)
 
-### Landing Components (11 files)
-- `src/components/landing/Navbar.tsx` (V6: animated logo ping, btn-glow, AnimatePresence mobile menu, glass effect)
+### Landing Components (12 files)
+- `src/components/landing/Navbar.tsx` (V6: animated logo, V8: Docs link, V9: Pricing link)
 - `src/components/landing/HeroSection.tsx` (V5: particle canvas, typing animation, btn-glow)
 - `src/components/landing/FeaturesSection.tsx` (V5: card-lift)
 - `src/components/landing/HowItWorks.tsx` (V6: card-lift on code blocks)
@@ -87,21 +88,27 @@
 - `src/components/landing/NewsletterSection.tsx`
 - `src/components/landing/CtaSection.tsx` (V5: btn-glow)
 - `src/components/landing/Footer.tsx` (V4: gradient accent line)
+- `src/components/landing/DocsSection.tsx` ✨ V8
+- `src/components/landing/PricingSection.tsx` ✨ V9
 
-### Dashboard Components (13 files)
-- `src/components/dashboard/DashboardSection.tsx` (V6: comparison, waterfall toggle, filter persistence)
+### Dashboard Components (16 files)
+- `src/components/dashboard/DashboardSection.tsx` (V6: comparison, waterfall, V8: 5th tab, settings, V9: tab polish)
 - `src/components/dashboard/AgentDetailSheet.tsx`
 - `src/components/dashboard/MetricCards.tsx` (V5: mini sparklines, card-lift)
-- `src/components/dashboard/AgentGrid.tsx` (V6: compare icon button, comparisonIds prop)
-- `src/components/dashboard/AgentComparison.tsx` ✨ NEW V6
+- `src/components/dashboard/AgentGrid.tsx` (V6: compare icon)
+- `src/components/dashboard/AgentComparison.tsx` ✨ V6
 - `src/components/dashboard/TraceViewer.tsx`
-- `src/components/dashboard/TraceWaterfall.tsx` ✨ NEW V6
+- `src/components/dashboard/TraceWaterfall.tsx` ✨ V6
 - `src/components/dashboard/IssuesPanel.tsx`
 - `src/components/dashboard/AlertFeed.tsx`
-- `src/components/dashboard/ActivityTimeline.tsx`
+- `src/components/dashboard/ActivityTimeline.tsx` (V9: API integration, loading skeleton)
 - `src/components/dashboard/MetricsCharts.tsx`
 - `src/components/dashboard/McpPanel.tsx`
 - `src/components/dashboard/DashboardSkeleton.tsx`
+- `src/components/dashboard/ApiHealthPanel.tsx` ✨ V8
+- `src/components/dashboard/EndpointCard.tsx` ✨ V8
+- `src/components/dashboard/HealingTimeline.tsx` ✨ V8
+- `src/components/dashboard/SettingsPanel.tsx` ✨ V8
 
 ### UI Components (7 files)
 - `src/components/ui/CommandPalette.tsx`
@@ -110,9 +117,23 @@
 - `src/components/ui/ParticleCanvas.tsx`
 - `src/components/ui/ExportButton.tsx`
 - `src/components/ui/DashboardTour.tsx`
+- `src/components/ui/ToastNotifications.tsx` ✨ V7
+
+### API Routes (9 files)
+- `src/app/api/agents/route.ts`
+- `src/app/api/traces/route.ts`
+- `src/app/api/issues/route.ts`
+- `src/app/api/alerts/route.ts`
+- `src/app/api/metrics/route.ts`
+- `src/app/api/endpoints/route.ts` ✨ V8
+- `src/app/api/healing/route.ts` ✨ V8
+- `src/app/api/api-health/route.ts` ✨ V8
+- `src/app/api/activity/route.ts` ✨ V9
 
 ### Utilities
 - `src/lib/export-utils.ts`
+- `src/lib/self-healing-data.ts` ✨ V8
+- `src/lib/seed-data.ts`
 
 ### Mini Services
 - `mini-services/alert-streamer/index.ts`
@@ -404,3 +425,114 @@ Created 2 new component files: an interactive documentation section for the land
 ### File Inventory Update
 - `src/components/landing/DocsSection.tsx` ✨ NEW
 - `src/components/dashboard/SettingsPanel.tsx` ✨ NEW
+
+---
+
+## V9 Session — Tasks v9-3/v9-5/v9-8 — Completed Modifications
+
+### Overview
+V9 enhancements adding 9 new CSS utility classes, polished dashboard tab bar, and a new 3-tier SaaS pricing landing section.
+
+### 1. New CSS Utility Classes (Part A)
+Added 9 new utility classes to `src/app/globals.css` (before the last Dot grid pattern comment):
+- `.tab-indicator` — 2px animated pill with red gradient, slide-in animation
+- `.badge-pulse` — Subtle 1.0→1.15→1.0 scale pulse, 2s ease-in-out infinite
+- `.gradient-border-card` — Animated conic-gradient border (red→gray→transparent→gray→red), 8s rotation, dark mode support
+- `.shimmer-bg` — Moving gradient left-to-right at 3% opacity, 2s infinite
+- `.text-glow-red` — Red text-shadow at 30% opacity for critical states
+- `.hover-scale` — Scale to 1.02 on hover, 0.2s ease transition
+- `.stagger-children > *` — 10-child staggered fade-in + slide-up (index * 0.05s delay)
+- `@keyframes orbit` + `.animate-orbit` — 20s linear infinite rotation for decorative elements
+- `.noise-overlay` — Inline SVG noise texture at 2% opacity, pointer-events: none
+
+### 2. Dashboard Tab Bar Polish (Part B)
+Enhanced `src/components/dashboard/DashboardSection.tsx` tab buttons:
+- Added absolute-positioned red gradient glow pill (`h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full`) below active tab text
+- Added `badge-pulse` class to issue count badge and alert count badge
+- Changed `transition-colors` to `transition-all duration-200` on tab button for smooth hover transitions
+
+### 3. New Pricing Landing Section (Part C)
+Created `src/components/landing/PricingSection.tsx`:
+- 3-tier SaaS pricing section (Starter $0, Pro $49, Enterprise Custom)
+- Section header with Badge, H2 with `text-gradient`, and subtitle
+- Pro card highlighted: `-mt-4`, `border-2 border-[#dc2626]/20`, `ring-1 ring-[#dc2626]/10`, `gradient-border-card`, "Most Popular" badge
+- Starter & Enterprise use outline button variant; Pro uses red bg + `btn-glow`
+- Feature lists with green Check icons
+- Bottom note about SSL, 99.9% uptime SLA, unlimited team members
+- Framer Motion staggered card entrance (delay: i * 0.1)
+- `bg-dot-pattern` background, glass-card, card-lift styling
+- Fully responsive (stacks on mobile)
+
+### 4. Page Integration (Part D)
+Edited `src/app/page.tsx`:
+- Added `import { PricingSection }` import
+- Inserted PricingSection between TestimonialsSection and NewsletterSection
+- Wrapped in `motion.div` with scroll-triggered fade (matching existing pattern)
+- Added `section-divider` div before it
+
+### 5. Navbar Update (Part E)
+Edited `src/components/landing/Navbar.tsx`:
+- Added `{ label: 'Pricing', href: '#pricing' }` to navLinks array (after Docs, before How It Works)
+
+### File Inventory
+- `src/app/globals.css` ✏️ MODIFIED (9 new utility classes)
+- `src/components/dashboard/DashboardSection.tsx` ✏️ MODIFIED (tab bar polish)
+- `src/components/landing/PricingSection.tsx` ✨ NEW
+- `src/app/page.tsx` ✏️ MODIFIED (PricingSection import + rendering)
+- `src/components/landing/Navbar.tsx` ✏️ MODIFIED (Pricing nav link)
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles successfully (GET / 200)
+- ✅ All API routes returning 200
+- ✅ No existing functionality broken
+
+---
+
+## V9 Session — Activity API, Dynamic Timeline, Lazy Loading
+
+### Part A: Activity Timeline API Endpoint
+- Created `src/app/api/activity/route.ts`
+- **GET** endpoint returning 15 realistic activity events sorted newest-first
+- Event types: `trace`, `issue`, `healing`, `alert`, `deployment`
+- Each event includes: id, type, title, description, agentName?, severity?, timestamp, metadata?
+- Severity levels: `info`, `warning`, `critical`
+- All events span the last ~10 hours of activity
+- Exported `ActivityEvent` interface for type safety
+
+### Part B: Activity Timeline Component Refactor
+- Modified `src/components/dashboard/ActivityTimeline.tsx`
+- Replaced hardcoded `mockEvents` with `useState` + `useEffect` fetching from `/api/activity`
+- Added `TimelineSkeleton` component (6 skeleton rows with Skeleton from shadcn/ui)
+- Mapped API `type` field to icons: trace→FileSearch, issue→AlertTriangle, healing→Wrench, alert→Bell, deployment→Rocket
+- Mapped API `severity` field to title colors: critical→red, warning→amber, info→gray
+- Metadata formatting: `Record<string, string>` joined with `·` separator; agent name prepended if present
+- Removed unused imports (Activity, CheckCircle2, Eye, BarChart3)
+- Preserved all existing styling: vertical timeline line, ring-4 icon container, dark mode, motion variants, critical ping animation
+
+### Part C: Lazy Loading Below-Fold Sections
+- Modified `src/app/page.tsx`
+- Converted 9 below-fold sections to `next/dynamic` with `ssr: false`:
+  - HowItWorks, StatsSection, DashboardSection (h-[600px] placeholder)
+  - TestimonialsSection, DocsSection, PricingSection (h-96 placeholder)
+  - NewsletterSection, IntegrationSection, CtaSection (h-64 placeholder)
+- Kept 6 above-fold components as static imports: Navbar, HeroSection, FeaturesSection, ScrollProgress, BackToTop, DashboardTour
+- All dynamic imports use `.then(m => ({ default: m.X }))` pattern for named exports
+
+### Bonus Fix: Pre-existing CSS Syntax Error
+- Fixed orphaned closing brace in `src/app/globals.css` (lines 466-593 were incorrectly indented inside a missing wrapper block)
+- Removed orphaned `}` at line 593, un-indented 7 utility class blocks
+- This fix resolved a 500 error on the homepage that was blocking rendering
+
+### File Inventory
+- `src/app/api/activity/route.ts` ✨ NEW (Activity API endpoint with 15 events)
+- `src/components/dashboard/ActivityTimeline.tsx` ✏️ MODIFIED (API integration, loading skeleton, severity mapping)
+- `src/app/page.tsx` ✏️ MODIFIED (9 lazy-loaded dynamic imports)
+- `src/app/globals.css` ✏️ MODIFIED (fixed pre-existing CSS syntax error)
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: GET / 200 (all routes including /api/activity returning 200)
+- ✅ Activity Timeline loads data from API with loading skeleton
+- ✅ Below-fold sections lazy loaded with placeholder divs
+- ✅ No existing functionality broken

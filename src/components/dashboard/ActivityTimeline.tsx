@@ -1,85 +1,73 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Activity,
   AlertTriangle,
-  CheckCircle2,
   Bell,
-  Eye,
   Wrench,
-  BarChart3,
+  Rocket,
+  FileSearch,
   type LucideIcon,
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type EventType =
-  | 'agent_status_change'
-  | 'issue_detected'
-  | 'issue_resolved'
-  | 'alert_fired'
-  | 'alert_acknowledged'
-  | 'mcp_fix_run'
-  | 'eval_completed';
+  | 'trace'
+  | 'issue'
+  | 'healing'
+  | 'alert'
+  | 'deployment';
 
-interface TimelineEvent {
+interface ActivityEvent {
   id: string;
   type: EventType;
-  timestamp: string;
   title: string;
   description: string;
-  metadata?: string;
-  critical: boolean;
+  agentName?: string;
+  severity?: 'info' | 'warning' | 'critical';
+  timestamp: string;
+  metadata?: Record<string, string>;
 }
 
 const eventConfig: Record<EventType, { icon: LucideIcon; color: string; bg: string; darkBg: string }> = {
-  agent_status_change: {
-    icon: Activity,
-    color: 'text-blue-500',
-    bg: 'bg-blue-100',
-    darkBg: 'dark:bg-blue-900/40',
+  trace: {
+    icon: FileSearch,
+    color: 'text-cyan-500',
+    bg: 'bg-cyan-100',
+    darkBg: 'dark:bg-cyan-900/40',
   },
-  issue_detected: {
+  issue: {
     icon: AlertTriangle,
     color: 'text-amber-500',
     bg: 'bg-amber-100',
     darkBg: 'dark:bg-amber-900/40',
   },
-  issue_resolved: {
-    icon: CheckCircle2,
-    color: 'text-emerald-500',
-    bg: 'bg-emerald-100',
-    darkBg: 'dark:bg-emerald-900/40',
-  },
-  alert_fired: {
-    icon: Bell,
-    color: 'text-[#dc2626]',
-    bg: 'bg-red-100',
-    darkBg: 'dark:bg-red-900/40',
-  },
-  alert_acknowledged: {
-    icon: Eye,
-    color: 'text-purple-500',
-    bg: 'bg-purple-100',
-    darkBg: 'dark:bg-purple-900/40',
-  },
-  mcp_fix_run: {
+  healing: {
     icon: Wrench,
     color: 'text-orange-500',
     bg: 'bg-orange-100',
     darkBg: 'dark:bg-orange-900/40',
   },
-  eval_completed: {
-    icon: BarChart3,
-    color: 'text-cyan-500',
-    bg: 'bg-cyan-100',
-    darkBg: 'dark:bg-cyan-900/40',
+  alert: {
+    icon: Bell,
+    color: 'text-[#dc2626]',
+    bg: 'bg-red-100',
+    darkBg: 'dark:bg-red-900/40',
+  },
+  deployment: {
+    icon: Rocket,
+    color: 'text-emerald-500',
+    bg: 'bg-emerald-100',
+    darkBg: 'dark:bg-emerald-900/40',
   },
 };
 
-function minutesAgo(m: number): string {
-  const d = new Date(Date.now() - m * 60 * 1000);
-  return d.toISOString();
-}
+const severityColorMap: Record<string, { title: string; darkTitle: string }> = {
+  critical: { title: 'text-[#dc2626]', darkTitle: 'dark:text-red-400' },
+  warning: { title: 'text-amber-600', darkTitle: 'dark:text-amber-400' },
+  info: { title: 'text-gray-900', darkTitle: 'dark:text-gray-100' },
+};
 
 function formatRelativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -91,116 +79,31 @@ function formatRelativeTime(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const mockEvents: TimelineEvent[] = [
-  {
-    id: 'act-1',
-    type: 'alert_fired',
-    timestamp: minutesAgo(3),
-    title: 'Error rate spike detected',
-    description: 'Support agent error rate exceeded 40% threshold',
-    metadata: 'Agent: support-agent',
-    critical: true,
-  },
-  {
-    id: 'act-2',
-    type: 'alert_acknowledged',
-    timestamp: minutesAgo(8),
-    title: 'Alert acknowledged by ops team',
-    description: 'High latency alert on code-reviewer acknowledged',
-    metadata: 'User: @sarah.chen',
-    critical: false,
-  },
-  {
-    id: 'act-3',
-    type: 'issue_detected',
-    timestamp: minutesAgo(15),
-    title: 'Token budget overflow',
-    description: 'Data-pipeline agent exceeded 50k token budget per request',
-    metadata: 'Severity: P1',
-    critical: true,
-  },
-  {
-    id: 'act-4',
-    type: 'mcp_fix_run',
-    timestamp: minutesAgo(22),
-    title: 'MCP auto-fix applied',
-    description: 'Retry logic patched for data-pipeline token overflow',
-    metadata: 'Fix: retry-with-backoff',
-    critical: false,
-  },
-  {
-    id: 'act-5',
-    type: 'agent_status_change',
-    timestamp: minutesAgo(35),
-    title: 'Agent status changed',
-    description: 'Support agent transitioned from active to degraded',
-    metadata: 'Agent: support-agent',
-    critical: true,
-  },
-  {
-    id: 'act-6',
-    type: 'eval_completed',
-    timestamp: minutesAgo(48),
-    title: 'Evaluation run completed',
-    description: 'Weekly quality eval: 87.3% pass rate across 6 agents',
-    metadata: 'Score: 87.3%',
-    critical: false,
-  },
-  {
-    id: 'act-7',
-    type: 'issue_resolved',
-    timestamp: minutesAgo(62),
-    title: 'Issue resolved',
-    description: 'Hallucination loop in research-agent fixed after 3 retries',
-    metadata: 'Duration: 2h 14m',
-    critical: false,
-  },
-  {
-    id: 'act-8',
-    type: 'alert_fired',
-    timestamp: minutesAgo(90),
-    title: 'Latency threshold exceeded',
-    description: 'Code-reviewer avg latency reached 4.2s (threshold: 3s)',
-    metadata: 'Agent: code-reviewer',
-    critical: true,
-  },
-  {
-    id: 'act-9',
-    type: 'mcp_fix_run',
-    timestamp: minutesAgo(105),
-    title: 'MCP fix attempted',
-    description: 'Prompt optimization applied to code-reviewer for latency',
-    metadata: 'Fix: prompt-trim',
-    critical: false,
-  },
-  {
-    id: 'act-10',
-    type: 'agent_status_change',
-    timestamp: minutesAgo(140),
-    title: 'Agent back to active',
-    description: 'Research-agent recovered and returned to active status',
-    metadata: 'Agent: research-agent',
-    critical: false,
-  },
-  {
-    id: 'act-11',
-    type: 'eval_completed',
-    timestamp: minutesAgo(180),
-    title: 'Regression test passed',
-    description: 'Post-fix regression eval: all 24 test cases passing',
-    metadata: 'Tests: 24/24',
-    critical: false,
-  },
-  {
-    id: 'act-12',
-    type: 'issue_detected',
-    timestamp: minutesAgo(210),
-    title: 'Context window truncation',
-    description: 'Data-pipeline losing context on long conversation threads',
-    metadata: 'Severity: P2',
-    critical: false,
-  },
-];
+function formatMetadata(meta?: Record<string, string>): string {
+  if (!meta) return '';
+  return Object.entries(meta)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(' · ');
+}
+
+function TimelineSkeleton() {
+  return (
+    <div className="w-full space-y-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="relative flex gap-4 py-3">
+          <div className="relative z-10 flex-shrink-0">
+            <Skeleton className="h-[30px] w-[30px] rounded-full" />
+          </div>
+          <div className="flex-1 min-w-0 pt-0.5 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -222,6 +125,31 @@ const itemVariants = {
 };
 
 export function ActivityTimeline() {
+  const [events, setEvents] = useState<ActivityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/activity')
+      .then((res) => res.json())
+      .then((data: ActivityEvent[]) => {
+        setEvents(data);
+      })
+      .catch(() => {
+        // Silently fall back to empty state
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full">
+        <TimelineSkeleton />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <div className="relative">
@@ -234,9 +162,14 @@ export function ActivityTimeline() {
           initial="hidden"
           animate="visible"
         >
-          {mockEvents.map((event) => {
+          {events.map((event) => {
             const config = eventConfig[event.type];
             const Icon = config.icon;
+            const isCritical = event.severity === 'critical';
+            const severityColors = severityColorMap[event.severity ?? 'info'];
+            const metaStr = event.agentName
+              ? `Agent: ${event.agentName}` + (event.metadata ? ` · ${formatMetadata(event.metadata)}` : '')
+              : formatMetadata(event.metadata);
             return (
               <motion.div
                 key={event.id}
@@ -250,7 +183,7 @@ export function ActivityTimeline() {
                   >
                     <Icon className={`h-3.5 w-3.5 ${config.color}`} />
                   </div>
-                  {event.critical && (
+                  {isCritical && (
                     <div className="absolute top-0 left-0 h-[30px] w-[30px] rounded-full animate-ping bg-red-400/20" />
                   )}
                 </div>
@@ -258,7 +191,7 @@ export function ActivityTimeline() {
                 {/* Content */}
                 <div className="flex-1 min-w-0 pt-0.5">
                   <div className="flex items-center gap-2">
-                    <p className={`text-sm font-medium truncate ${event.critical ? 'text-[#dc2626] dark:text-red-400' : 'text-gray-900 dark:text-gray-100'}`}>
+                    <p className={`text-sm font-medium truncate ${severityColors.title} ${severityColors.darkTitle}`}>
                       {event.title}
                     </p>
                   </div>
@@ -269,9 +202,9 @@ export function ActivityTimeline() {
                     <span className="text-[11px] text-gray-400 dark:text-gray-500">
                       {formatRelativeTime(event.timestamp)}
                     </span>
-                    {event.metadata && (
+                    {metaStr && (
                       <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                        ·{'\u00A0'}{event.metadata}
+                        ·{'\u00A0'}{metaStr}
                       </span>
                     )}
                   </div>

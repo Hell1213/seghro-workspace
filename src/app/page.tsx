@@ -2,23 +2,53 @@
 
 import { useCallback } from 'react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { Navbar } from '@/components/landing/Navbar';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
-import { HowItWorks } from '@/components/landing/HowItWorks';
-import { StatsSection } from '@/components/landing/StatsSection';
-import { DashboardSection } from '@/components/dashboard/DashboardSection';
-import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
-import { NewsletterSection } from '@/components/landing/NewsletterSection';
-import { IntegrationSection } from '@/components/landing/IntegrationSection';
-import { CtaSection } from '@/components/landing/CtaSection';
-import { Footer } from '@/components/landing/Footer';
-import { DocsSection } from '@/components/landing/DocsSection';
 import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette';
 import { ScrollProgress } from '@/components/ui/ScrollProgress';
 import { BackToTop } from '@/components/ui/BackToTop';
 import DashboardTour from '@/components/ui/DashboardTour';
+import { Footer } from '@/components/landing/Footer';
 import { useAppStore } from '@/lib/store';
+
+const HowItWorks = dynamic(
+  () => import('@/components/landing/HowItWorks').then(m => ({ default: m.HowItWorks })),
+  { loading: () => <div className="h-96" />, ssr: false }
+);
+const StatsSection = dynamic(
+  () => import('@/components/landing/StatsSection').then(m => ({ default: m.StatsSection })),
+  { loading: () => <div className="h-96" />, ssr: false }
+);
+const DashboardSection = dynamic(
+  () => import('@/components/dashboard/DashboardSection').then(m => ({ default: m.DashboardSection })),
+  { loading: () => <div className="h-[600px]" />, ssr: false }
+);
+const TestimonialsSection = dynamic(
+  () => import('@/components/landing/TestimonialsSection').then(m => ({ default: m.TestimonialsSection })),
+  { loading: () => <div className="h-64" />, ssr: false }
+);
+const DocsSection = dynamic(
+  () => import('@/components/landing/DocsSection').then(m => ({ default: m.DocsSection })),
+  { loading: () => <div className="h-96" />, ssr: false }
+);
+const PricingSection = dynamic(
+  () => import('@/components/landing/PricingSection').then(m => ({ default: m.PricingSection })),
+  { loading: () => <div className="h-96" />, ssr: false }
+);
+const NewsletterSection = dynamic(
+  () => import('@/components/landing/NewsletterSection').then(m => ({ default: m.NewsletterSection })),
+  { loading: () => <div className="h-64" />, ssr: false }
+);
+const IntegrationSection = dynamic(
+  () => import('@/components/landing/IntegrationSection').then(m => ({ default: m.IntegrationSection })),
+  { loading: () => <div className="h-64" />, ssr: false }
+);
+const CtaSection = dynamic(
+  () => import('@/components/landing/CtaSection').then(m => ({ default: m.CtaSection })),
+  { loading: () => <div className="h-64" />, ssr: false }
+);
 
 export default function Home() {
   const { open, close, toggle } = useCommandPalette();
@@ -101,6 +131,17 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <TestimonialsSection />
+        </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <PricingSection />
         </motion.div>
 
         <motion.div
