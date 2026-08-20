@@ -31,11 +31,11 @@ interface PieItem {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-lg">
-        <p className="text-[11px] text-gray-400 mb-0.5">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 shadow-lg">
+        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-0.5">
           {new Date(label).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </p>
-        <p className="text-xs font-semibold text-gray-900">
+        <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
           {payload[0].value.toFixed(1)}
         </p>
       </div>
@@ -86,13 +86,13 @@ export function MetricsCharts({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="lg:col-span-2 rounded-xl border border-gray-100 bg-white p-5"
+        className="lg:col-span-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-gray-900">Agent Metrics (24h)</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Agent Metrics (24h)</h3>
           <div className="flex items-center gap-3">
             {timeSeries.map((s) => (
-              <span key={s.name} className="flex items-center gap-1.5 text-[10px] text-gray-500">
+              <span key={s.name} className="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400">
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />
                 {s.name}
               </span>
@@ -110,7 +110,7 @@ export function MetricsCharts({
                   </linearGradient>
                 ))}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border, #f3f4f6)" vertical={false} />
               <XAxis
                 dataKey="time"
                 tickFormatter={formatTime}
@@ -147,9 +147,9 @@ export function MetricsCharts({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="rounded-xl border border-gray-100 bg-white p-5"
+        className="rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5"
       >
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Issue Severity</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Issue Severity</h3>
         <div className="h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -174,7 +174,7 @@ export function MetricsCharts({
         </div>
         <div className="mt-3 grid grid-cols-2 gap-1.5">
           {severity.map((item) => (
-            <div key={item.name} className="flex items-center gap-1.5 text-[10px] text-gray-500">
+            <div key={item.name} className="flex items-center gap-1.5 text-[10px] text-gray-500 dark:text-gray-400">
               <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
               <span className="truncate">{item.name}</span>
             </div>
@@ -187,9 +187,9 @@ export function MetricsCharts({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="lg:col-span-3 rounded-xl border border-gray-100 bg-white p-5"
+        className="lg:col-span-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5"
       >
-        <h3 className="text-sm font-semibold text-gray-900 mb-4">Framework Distribution</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">Framework Distribution</h3>
         <div className="h-[100px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={frameworks} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>

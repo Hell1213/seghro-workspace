@@ -15,9 +15,9 @@ interface AlertItem {
 }
 
 const severityAccent = {
-  critical: 'border-l-red-500',
+  critical: 'border-l-red-500 dark:border-l-red-400',
   warning: 'border-l-amber-400',
-  info: 'border-l-gray-300',
+  info: 'border-l-gray-300 dark:border-l-gray-600',
 };
 
 const timeAgo = (dateStr: string) => {
@@ -38,7 +38,7 @@ export function AlertFeed({ alerts }: { alerts: AlertItem[] }) {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Bell className="h-4 w-4 text-[#dc2626]" />
-          <h3 className="text-sm font-semibold text-gray-900">Live Alerts</h3>
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Live Alerts</h3>
           {unreadCount > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#dc2626] px-1.5 text-[10px] font-bold text-white">
               {unreadCount}
@@ -59,18 +59,18 @@ export function AlertFeed({ alerts }: { alerts: AlertItem[] }) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.05, duration: 0.3 }}
             className={`rounded-lg border-l-[3px] ${severityAccent[alert.severity]} border border-gray-100 ${
-              alert.status === 'unread' ? 'bg-white' : 'bg-gray-50/50'
+              alert.status === 'unread' ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/50'
             } p-3.5 hover:shadow-sm transition-all group cursor-pointer`}
           >
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h4 className="text-xs font-semibold text-gray-800 leading-tight">
+              <h4 className="text-xs font-semibold text-gray-800 dark:text-gray-200 leading-tight">
                 {alert.title}
               </h4>
               <span className="text-[10px] text-gray-400 whitespace-nowrap shrink-0">
                 {timeAgo(alert.createdAt)}
               </span>
             </div>
-            <p className="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2">
               {alert.message}
             </p>
             <div className="flex items-center gap-2 mt-2">

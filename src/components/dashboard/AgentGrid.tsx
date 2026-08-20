@@ -45,16 +45,16 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.4 }}
             onClick={() => onSelect(agent)}
-            className="group cursor-pointer rounded-xl border border-gray-100 bg-white p-5 hover:border-red-200 hover:shadow-lg hover:shadow-red-50 transition-all duration-300"
+            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-lg hover:shadow-red-50 dark:hover:shadow-red-950/20 transition-all duration-300"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">
-                <div className={`relative flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50 group-hover:bg-red-50 transition-colors`}>
+                <div className={`relative flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 transition-colors`}>
                   <Bot className="h-4.5 w-4.5 text-gray-400 group-hover:text-[#dc2626] transition-colors" />
                   <div className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${cfg.color} ${agent.status === 'critical' ? 'animate-pulse' : ''}`} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 font-mono">{agent.name}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 font-mono">{agent.name}</h3>
                   <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${cfg.badge}`}>
                     {cfg.label}
                   </Badge>
@@ -63,14 +63,14 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
               <ExternalLink className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#dc2626] transition-colors" />
             </div>
 
-            <p className="text-xs text-gray-400 mb-4 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4 line-clamp-2 leading-relaxed">
               {agent.description}
             </p>
 
             <div className="space-y-2.5">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-500">Error Rate</span>
-                <span className={`font-semibold ${agent.errorRate > 10 ? 'text-[#dc2626]' : agent.errorRate > 5 ? 'text-amber-600' : 'text-gray-700'}`}>
+                <span className="text-gray-500 dark:text-gray-400">Error Rate</span>
+                <span className={`font-semibold ${agent.errorRate > 10 ? 'text-[#dc2626]' : agent.errorRate > 5 ? 'text-amber-600' : 'text-gray-700 dark:text-gray-300'}`}>
                   {agent.errorRate}%
                 </span>
               </div>
@@ -78,7 +78,7 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
                 value={Math.min(agent.errorRate, 100)}
                 className="h-1.5"
               />
-              <div className="flex items-center justify-between text-[11px] text-gray-400 pt-1">
+              <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 pt-1">
                 <span>{agent.framework}</span>
                 <span>{timeAgo(agent.lastRunAt)}</span>
               </div>

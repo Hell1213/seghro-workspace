@@ -21,6 +21,7 @@ import { AlertFeed } from './AlertFeed';
 import { MetricsCharts } from './MetricsCharts';
 import { McpPanel } from './McpPanel';
 import { AgentDetailSheet } from './AgentDetailSheet';
+import { DashboardSkeleton } from './DashboardSkeleton';
 
 type TabId = 'overview' | 'traces' | 'issues' | 'alerts';
 
@@ -101,6 +102,10 @@ export function DashboardSection() {
   const [issueStatusFilter, setIssueStatusFilter] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Trace search and filter state
+  const [traceSearch, setTraceSearch] = useState('');
+  const [traceStatusFilter, setTraceStatusFilter] = useState<string>('all');
+
   // WebSocket for real-time alerts
   useEffect(() => {
     let ws: WebSocket | null = null;
@@ -158,9 +163,15 @@ export function DashboardSection() {
     fetchData();
   }, []);
 
-  const filteredTraces = selectedAgentId
-    ? traces.filter((t) => t.agentId === selectedAgentId)
-    : traces;
+  const filteredTraces = traces.filter((t) => {
+    const matchesAgent = !selectedAgentId || t.agentId === selectedAgentId;
+    const matchesSearch = !traceSearch ||
+      t.traceId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+      t.agentId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+      t.status.toLowerCase().includes(traceSearch.toLowerCase());
+    const matchesStatus = traceStatusFilter === 'all' || t.status === traceStatusFilter;
+    return matchesAgent && matchesSearch && matchesStatus;
+  });
 
   const filteredIssues = issues.filter((issue) => {
     const matchesSearch = !issueSearch ||
@@ -173,7 +184,7 @@ export function DashboardSection() {
   });
 
   return (
-    <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50">
+    <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50 dark:bg-gray-900/30">
       <div className="absolute inset-0 bg-grid-pattern opacity-30" />
       <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
@@ -187,8 +198,8 @@ export function DashboardSection() {
             <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
             Live Demo
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            The{'00A0'}
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            The 
             <span className="text-gradient">observability dashboard</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
@@ -202,10 +213,10 @@ export function DashboardSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-2xl border border-gray-200 bg-white shadow-xl shadow-gray-200/50 overflow-hidden"
+          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
         >
           {/* Dashboard header with tabs */}
-          <div className="border-b border-gray-100 px-4 sm:px-6">
+          <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
                 {tabs.map((tab) => {
@@ -218,7 +229,7 @@ export function DashboardSection() {
                       className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
                         isActive
                           ? 'text-[#dc2626] border-[#dc2626]'
-                          : 'text-gray-400 border-transparent hover:text-gray-600'
+                          : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -247,12 +258,7 @@ export function DashboardSection() {
           {/* Dashboard content */}
           <div className="p-4 sm:p-6">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="flex items-center gap-3 text-gray-400">
-                  <div className="h-5 w-5 rounded-full border-2 border-gray-200 border-t-[#dc2626] animate-spin" />
-                  <span className="text-sm">Loading dashboard...</span>
-                </div>
-              </div>
+              <DashboardSkeleton />
             ) : (
               <>
                 {/* OVERVIEW TAB */}
@@ -268,13 +274,13 @@ export function DashboardSection() {
                       <div className="lg:col-span-2">
                         <div className="flex items-center gap-2 mb-4">
                           <Bot className="h-4 w-4 text-gray-400" />
-                          <h3 className="text-sm font-semibold text-gray-900">Monitored Agents</h3>
-                          <span className="text-xs text-gray-400">({agents.length})</span>
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
                         </div>
                         <AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} />
                       </div>
                       <div>
-                        <h3 className="text-sm font-semibold text-gray-900 mb-4">MCP Fix Workflow</h3>
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
                         <McpPanel />
                       </div>
                     </div>
@@ -295,20 +301,65 @@ export function DashboardSection() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <div className="flex items-center gap-2 mb-4">
-                      <GitBranch className="h-4 w-4 text-gray-400" />
-                      <h3 className="text-sm font-semibold text-gray-900">Trace Explorer</h3>
-                      <span className="text-xs text-gray-400">({filteredTraces.length} traces)</span>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-2">
+                        <GitBranch className="h-4 w-4 text-gray-400" />
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
+                      </div>
+                      <div className="relative w-full sm:w-auto">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                        <Input
+                          placeholder="Search traces..."
+                          value={traceSearch}
+                          onChange={(e) => setTraceSearch(e.target.value)}
+                          className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                        />
+                        {traceSearch && (
+                          <button
+                            onClick={() => setTraceSearch('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2"
+                          >
+                            <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    {selectedAgentId && (
-                      <button
-                        onClick={() => setSelectedAgentId(null)}
-                        className="mb-3 text-xs text-[#dc2626] hover:underline"
-                      >
-                        ← All agents
-                      </button>
+
+                    <div className="flex flex-wrap items-center gap-2 mb-4">
+                      {selectedAgentId && (
+                        <button
+                          onClick={() => setSelectedAgentId(null)}
+                          className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/20 hover:bg-[#dc2626]/20 transition-colors"
+                        >
+                          ← All agents
+                        </button>
+                      )}
+                      {['all', 'success', 'error'].map((stat) => (
+                        <button
+                          key={stat}
+                          onClick={() => setTraceStatusFilter(stat)}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                            traceStatusFilter === stat
+                              ? stat === 'success' ? 'bg-emerald-500 text-white'
+                                : stat === 'error' ? 'bg-[#dc2626] text-white'
+                                : 'bg-gray-200 text-gray-700'
+                              : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                        </button>
+                      ))}
+                    </div>
+
+                    {filteredTraces.length === 0 ? (
+                      <div className="text-center py-12 text-gray-400">
+                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">No traces match your filters</p>
+                      </div>
+                    ) : (
+                      <TraceViewer traces={filteredTraces} />
                     )}
-                    <TraceViewer traces={filteredTraces} />
                   </motion.div>
                 )}
 
@@ -321,8 +372,8 @@ export function DashboardSection() {
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
-                        <h3 className="text-sm font-semibold text-gray-900">Detected Issues</h3>
-                        <span className="text-xs text-gray-400">({filteredIssues.length}/{issues.length})</span>
+                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Detected Issues</h3>
+                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredIssues.length}/{issues.length})</span>
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
                         <div className="relative flex-1 sm:flex-none">
@@ -361,7 +412,7 @@ export function DashboardSection() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 border border-gray-100"
+                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
                       >
                         <span className="text-[11px] text-gray-500 font-medium">Severity:</span>
                         {['all', 'P0', 'P1', 'P2'].map((sev) => (

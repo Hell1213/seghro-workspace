@@ -122,9 +122,60 @@
 - ✅ WebSocket: Alert streamer active on port 3001
 - ✅ 35 headings, 1 H1, clean semantic structure
 
+## Verification Results
+- ✅ ESLint: Zero errors
+- ✅ Page: HTTP 200, 94,472 bytes
+- ✅ Dark mode toggle: Renders, switches theme
+- ✅ Agent detail sheet: Opens with stats, sparkline, issues on card click
+- ✅ Issue resolution: PATCH /api/issues 200, status transitions work, toast fires
+- ✅ Newsletter: Section renders with subscribe form
+- ✅ A11y whitespace: Fixed with non-breaking spaces
+- ✅ API routes: All 5 returning 200
+- ✅ WebSocket: Alert streamer active on port 3001
+- ✅ 35 headings, 1 H1, clean semantic structure
+
+### 7. Hero & Navbar Styling + Full Dark Mode Polish (V3-8)
+- **HeroSection**: Changed sub-headline `text-gray-500` → `text-gray-600` for better contrast/readability
+- **HeroSection**: Increased CTA container spacing `mt-8` → `mt-10`
+- **HeroSection**: Added `self-center` to Activity icon in primary CTA button for vertical alignment
+- **HeroSection**: Added `dark:text-gray-100` on h1, `dark:text-gray-400` on paragraph, `dark:text-gray-300`/`dark:text-gray-500` on stat labels
+- **HeroSection**: Added dark mode on outline button (border, text, hover bg)
+- **HeroSection**: Added `dark:opacity-30` on grid-pattern and noise texture backgrounds
+- **HeroSection**: Added `dark:text-gray-600` on scroll indicator arrow
+- **Navbar**: Logo text already had `font-bold text-gray-900 dark:text-gray-100 tracking-tight` — confirmed correct
+- **Navbar**: Added subtle red glow (`drop-shadow`) on "Sentinel" logo text when page is scrolled
+- **FeaturesSection**: Added `dark:bg-gray-900/50` on section
+- **FeaturesSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
+- **FeaturesSection**: Added `dark:bg-gray-900 dark:border-gray-800` on cards
+- **FeaturesSection**: Enhanced hover with `hover:border-red-200 dark:hover:border-red-900/50` and `dark:hover:shadow-red-900/20`
+- **FeaturesSection**: Added pulsing green dot (animate-ping) next to "Live Alerts" feature title
+- **FeaturesSection**: Added dark mode variants to all feature icon color/background classes
+- **StatsSection**: Added subtle red glow box-shadow on stat card hover
+- **StatsSection**: Section left as-is (bg-gray-950) — no double-darken risk
+- **HowItWorks**: Added `dark:bg-gray-900/30` on section
+- **HowItWorks**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
+- **HowItWorks**: Added `dark:border-gray-800` on code blocks
+- **HowItWorks**: Added `dark:bg-gray-900` on step number circles, `dark:via-gray-800 dark:to-gray-800` on connector line
+- **HowItWorks**: Added step number red glow on row hover via `group-hover:shadow`
+- **TestimonialsSection**: Added `dark:bg-gray-900` on section
+- **TestimonialsSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
+- **TestimonialsSection**: Added `dark:bg-gray-900 dark:border-gray-800` on cards, `dark:text-gray-300` on tweet text
+- **TestimonialsSection**: Quote icon uses `dark:text-red-900/60` in dark mode
+- **TestimonialsSection**: Updated edge fade gradients with `dark:from-gray-900`
+- **CtaSection**: Added `dark:bg-gray-950` on section background, `dark:bg-red-950/30` on center glow
+- **CtaSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
+- **CtaSection**: Added dark mode to outline button (border, text, hover)
+- **NewsletterSection**: Already had full dark mode — no changes needed
+- **IntegrationSection**: Added `dark:bg-gray-900/50` on section
+- **IntegrationSection**: Added `dark:text-gray-100` on headings, `dark:text-gray-400` on descriptions
+- **IntegrationSection**: Added dark mode to framework cards, install code block, security badges, and trust card
+- **Footer**: Added `dark:border-gray-800 bg-white dark:bg-gray-950` on footer
+- **Footer**: Added dark mode to logo text, description, social links, column headings, link items, and bottom bar
+- **No `{'\u00A0'}` issues found** — all were already fixed in prior session
+- **Verified**: `next build` compiles with zero errors
+
 ## Unresolved Issues
 - None critical. All features verified working.
-- Minor: Dark mode could be further refined for specific component edge cases
 - Minor: Agent detail sheet sparkline uses randomly seeded data (could use real API data)
 
 ## Priority Recommendations for Next Phase

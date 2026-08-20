@@ -49,7 +49,7 @@ export function Navbar() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]">
               <Shield className="h-4.5 w-4.5 text-white" />
             </div>
-            <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            <span className={`text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-all duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}>
               Sentinel
             </span>
           </motion.div>

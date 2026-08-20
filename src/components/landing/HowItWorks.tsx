@@ -48,7 +48,7 @@ export function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="how-it-works" className="relative py-24 sm:py-32 bg-gray-50/50">
+    <section id="how-it-works" className="relative py-24 sm:py-32 bg-gray-50/50 dark:bg-gray-900/30">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -56,18 +56,18 @@ export function HowItWorks() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            From failure to fix in{'00A0'}
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            From failure to fix in 
             <span className="text-gradient">four steps</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
             A closed-loop workflow that catches what your error monitoring can&apos;t.
           </p>
         </motion.div>
 
         <div className="relative">
           {/* Vertical connector line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-[#dc2626] via-gray-200 to-gray-200 hidden lg:block" />
+          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-[#dc2626] via-gray-200 dark:via-gray-800 to-gray-200 dark:to-gray-800 hidden lg:block" />
 
           <div className="space-y-12 lg:space-y-16">
             {steps.map((step, i) => (
@@ -80,11 +80,11 @@ export function HowItWorks() {
                   delay: i * 0.15,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="relative grid lg:grid-cols-2 gap-8 items-center"
+                className="relative grid lg:grid-cols-2 gap-8 items-center group"
               >
                 {/* Step number on the line */}
                 <div className="absolute left-5 lg:left-5 top-2 z-10 hidden lg:flex">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white border-2 border-[#dc2626] text-xs font-bold text-[#dc2626]">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white dark:bg-gray-900 border-2 border-[#dc2626] text-xs font-bold text-[#dc2626] group-hover:shadow-[0_0_12px_rgba(220,38,38,0.3)] transition-shadow duration-300">
                     {step.number}
                   </div>
                 </div>
@@ -101,10 +101,10 @@ export function HowItWorks() {
                       Step {step.number}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                     {step.title}
                   </h3>
-                  <p className="text-gray-500 leading-relaxed">
+                  <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
                     {step.description}
                   </p>
                 </div>
@@ -115,7 +115,7 @@ export function HowItWorks() {
                     i % 2 === 1 ? 'lg:col-start-1 lg:pr-16' : 'lg:pl-16'
                   } pl-16 lg:pl-0`}
                 >
-                  <div className="rounded-xl border border-gray-200 bg-gray-950 p-5 overflow-hidden">
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-950 p-5 overflow-hidden">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
                       <div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />

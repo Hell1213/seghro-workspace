@@ -94,8 +94,8 @@ export function HeroSection() {
   return (
     <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
       {/* Background grid + noise texture */}
-      <div className="absolute inset-0 bg-grid-pattern" />
-      <div className="absolute inset-0 bg-noise" />
+      <div className="absolute inset-0 bg-grid-pattern dark:opacity-30" />
+      <div className="absolute inset-0 bg-noise dark:opacity-30" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-red-500/5 blur-[120px]" />
 
       <motion.div
@@ -126,7 +126,7 @@ export function HeroSection() {
               transition={{ duration: 0.7, delay: 0.1 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]"
             >
-              <span className="text-gray-900">Stop guessing why </span>
+              <span className="text-gray-900 dark:text-gray-100">Stop guessing why </span>
               <span className="text-gradient">your agents fail</span>
             </motion.h1>
 
@@ -134,7 +134,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-6 text-lg text-gray-500 leading-relaxed max-w-xl"
+              className="mt-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl"
             >
               Surface silent failures, pull context across traces, and improve
               your agent before users churn. Real-time observability for
@@ -145,19 +145,19 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="mt-8 flex flex-wrap items-center gap-4"
+              className="mt-10 flex flex-wrap items-center gap-4"
             >
               <Button
                 size="lg"
                 className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02]"
               >
-                <Activity className="mr-2 h-4 w-4" />
+                <Activity className="mr-2 h-4 w-4 self-center" />
                 View Live Dashboard
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 px-7"
+                className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 px-7"
               >
                 Read the Docs
               </Button>
@@ -167,15 +167,15 @@ export function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="mt-10 flex items-center gap-8 text-sm text-gray-400"
+              className="mt-10 flex items-center gap-8 text-sm text-gray-400 dark:text-gray-500"
             >
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-[#dc2626]" />
-                <span><strong className="text-gray-600">50ms</strong> trace latency</span>
+                <span><strong className="text-gray-600 dark:text-gray-300">50ms</strong> trace latency</span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-[#dc2626]" />
-                <span><strong className="text-gray-600">SOC 2</strong> compliant</span>
+                <span><strong className="text-gray-600 dark:text-gray-300">SOC 2</strong> compliant</span>
               </div>
             </motion.div>
           </div>
@@ -204,7 +204,7 @@ export function HeroSection() {
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >
-            <ArrowDown className="h-5 w-5 text-gray-300" />
+            <ArrowDown className="h-5 w-5 text-gray-300 dark:text-gray-600" />
           </motion.div>
         </motion.div>
       </motion.div>

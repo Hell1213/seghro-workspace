@@ -112,7 +112,7 @@ export function StatsSection() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
-            Trusted at{'00A0'}
+            Trusted at{'\u00A0'}
             <span className="text-[#dc2626]">scale</span>
           </h2>
           <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
@@ -130,7 +130,7 @@ export function StatsSection() {
             <motion.div
               key={stat.label}
               variants={itemVariants}
-              className="relative group rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm p-6 text-center hover:border-[#dc2626]/30 transition-all duration-300"
+              className="relative group rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm p-6 text-center hover:border-[#dc2626]/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(220,38,38,0.08)]"
             >
               {/* Red accent top bar */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-[#dc2626] rounded-full group-hover:w-3/4 transition-all duration-500" />

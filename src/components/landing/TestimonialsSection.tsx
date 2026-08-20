@@ -105,7 +105,7 @@ export function TestimonialsSection() {
   const duplicatedTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section id="testimonials" className="relative py-24 sm:py-32 bg-gray-50">
+    <section id="testimonials" className="relative py-24 sm:py-32 bg-gray-50 dark:bg-gray-900">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -113,11 +113,11 @@ export function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Loved by{'00A0'}
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            Loved by 
             <span className="text-gradient">engineering teams</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
             Hear from the teams shipping reliable AI agents in production.
           </p>
         </motion.div>
@@ -131,9 +131,9 @@ export function TestimonialsSection() {
         className="relative"
       >
         {/* Left fade */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 dark:from-gray-900 to-transparent z-10 pointer-events-none" />
         {/* Right fade */}
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 dark:from-gray-900 to-transparent z-10 pointer-events-none" />
 
         <div
           ref={scrollRef}
@@ -146,10 +146,10 @@ export function TestimonialsSection() {
             <motion.div
               key={`${t.handle}-${i}`}
               variants={itemVariants}
-              className="flex-shrink-0 w-[340px] sm:w-[380px] rounded-2xl border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md hover:shadow-red-100/20 transition-all duration-300"
+              className="flex-shrink-0 w-[340px] sm:w-[380px] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-md hover:shadow-red-100/20 dark:hover:shadow-red-900/20 transition-all duration-300"
             >
-              <Quote className="h-5 w-5 text-gray-200 mb-3" />
-              <p className="text-sm text-gray-600 leading-relaxed mb-5">
+              <Quote className="h-5 w-5 text-gray-200 dark:text-red-900/60 mb-3" />
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5">
                 {t.tweet}
               </p>
               <div className="flex items-center gap-3">
@@ -157,10 +157,10 @@ export function TestimonialsSection() {
                   {t.initials}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{t.name}</p>
-                  <p className="text-xs text-gray-400">{t.handle}</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{t.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{t.handle}</p>
                 </div>
-                <span className="text-xs text-gray-300 flex-shrink-0">{t.timestamp}</span>
+                <span className="text-xs text-gray-300 dark:text-gray-600 flex-shrink-0">{t.timestamp}</span>
               </div>
             </motion.div>
           ))}

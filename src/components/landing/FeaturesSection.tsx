@@ -10,48 +10,54 @@ const features = [
     title: 'Surface Silent Failures',
     description:
       'Audit every trace against your agent\'s instructions. Group recurring failures into actionable issues — even ones that return success codes.',
-    color: 'bg-red-50 text-[#dc2626] border-red-100',
-    iconColor: 'text-[#dc2626]',
+    color: 'bg-red-50 dark:bg-red-950/40 text-[#dc2626] dark:text-red-400 border-red-100 dark:border-red-900/50',
+    iconColor: 'text-[#dc2626] dark:text-red-400',
+    live: false,
   },
   {
     icon: Bell,
     title: 'Live Alerts',
     description:
       'Get notified on what matters. Sentinel triages issues by severity and alerts you in Slack, PagerDuty, or webhooks — no noise.',
-    color: 'bg-gray-50 text-gray-700 border-gray-200',
-    iconColor: 'text-gray-600',
+    color: 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+    iconColor: 'text-gray-600 dark:text-gray-400',
+    live: true,
   },
   {
     icon: Wrench,
     title: 'MCP Fix Integration',
     description:
       'Pull context directly into your coding agent via MCP. Resolve issues without context-switching between tools.',
-    color: 'bg-red-50 text-[#dc2626] border-red-100',
-    iconColor: 'text-[#dc2626]',
+    color: 'bg-red-50 dark:bg-red-950/40 text-[#dc2626] dark:text-red-400 border-red-100 dark:border-red-900/50',
+    iconColor: 'text-[#dc2626] dark:text-red-400',
+    live: false,
   },
   {
     icon: BarChart3,
     title: 'Online Evals',
     description:
       'After deploying a fix, Sentinel creates an online eval. If a regression occurs, you\'ll know immediately.',
-    color: 'bg-gray-50 text-gray-700 border-gray-200',
-    iconColor: 'text-gray-600',
+    color: 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+    iconColor: 'text-gray-600 dark:text-gray-400',
+    live: false,
   },
   {
     icon: Eye,
     title: 'Full Trace Visibility',
     description:
       'See every span, token, tool call, and model invocation. Understand exactly what your agent did and why.',
-    color: 'bg-red-50 text-[#dc2626] border-red-100',
-    iconColor: 'text-[#dc2626]',
+    color: 'bg-red-50 dark:bg-red-950/40 text-[#dc2626] dark:text-red-400 border-red-100 dark:border-red-900/50',
+    iconColor: 'text-[#dc2626] dark:text-red-400',
+    live: false,
   },
   {
     icon: GitBranch,
     title: 'Framework Agnostic',
     description:
       'Native support for LangChain, CrewAI, AutoGen, LlamaIndex, and custom frameworks. Drop-in integration.',
-    color: 'bg-gray-50 text-gray-700 border-gray-200',
-    iconColor: 'text-gray-600',
+    color: 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700',
+    iconColor: 'text-gray-600 dark:text-gray-400',
+    live: false,
   },
 ];
 
@@ -78,7 +84,7 @@ export function FeaturesSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="features" className="relative py-24 sm:py-32">
+    <section id="features" className="relative py-24 sm:py-32 dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
       <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -87,11 +93,11 @@ export function FeaturesSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Everything you need to{'00A0'}
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            Everything you need to{'\u00A0'}
             <span className="text-gradient">ship reliable agents</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
             From detection to resolution — a complete observability stack built
             for the unique challenges of production AI systems.
           </p>
@@ -107,15 +113,21 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group relative rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-lg hover:shadow-red-100/30 transition-all duration-300 hover:-translate-y-0.5"
+              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-lg hover:shadow-red-100/30 dark:hover:shadow-red-900/20 hover:border-red-200 dark:hover:border-red-900/50 transition-all duration-300 hover:-translate-y-0.5"
             >
               <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border ${feature.color} mb-4 transition-transform group-hover:scale-110`}> 
                 <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
               </div>
-              <h3 className="text-base font-semibold text-gray-900 mb-2">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                 {feature.title}
+                {'live' in feature && feature.live && (
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  </span>
+                )}
               </h3>
-              <p className="text-sm text-gray-500 leading-relaxed">
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                 {feature.description}
               </p>
               {/* Hover accent line */}

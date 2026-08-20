@@ -42,7 +42,7 @@ agent = trace_agent(your_agent,
   };
 
   return (
-    <section id="integrations" className="relative py-24 sm:py-32">
+    <section id="integrations" className="relative py-24 sm:py-32 dark:bg-gray-900/50">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -50,11 +50,11 @@ agent = trace_agent(your_agent,
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900">
-            Fits into your{'00A0'}
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            Fits into your 
             <span className="text-gradient">existing stack</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
             Native support for the frameworks your team already uses. One line to instrument.
           </p>
         </motion.div>
@@ -74,18 +74,18 @@ agent = trace_agent(your_agent,
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3.5 hover:border-red-200 hover:shadow-sm transition-all"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-sm transition-all"
                 >
                   <div className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold ${fw.color} transition-transform group-hover:scale-110`}>
                     {fw.logo}
                   </div>
-                  <span className="text-sm font-medium text-gray-700">{fw.name}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{fw.name}</span>
                 </motion.div>
               ))}
             </div>
 
             {/* Install code */}
-            <div className="rounded-xl border border-gray-200 bg-gray-950 p-5 relative">
+            <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-950 p-5 relative">
               <button
                 onClick={handleCopy}
                 className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-white/10 transition-colors"
@@ -108,11 +108,11 @@ agent = trace_agent(your_agent,
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 sm:p-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Trust is non-negotiable
               </h3>
-              <p className="text-sm text-gray-500 mb-6">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
                 Your data stays yours. Protected by best-in-class infrastructure and verified compliance.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -122,13 +122,13 @@ agent = trace_agent(your_agent,
                     initial={{ opacity: 0, y: 10 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ delay: 0.3 + i * 0.1 }}
-                    className="rounded-xl bg-gray-50 p-4"
+                    className="rounded-xl bg-gray-50 dark:bg-gray-800 p-4"
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <div className="h-2 w-2 rounded-full bg-[#dc2626]" />
-                      <span className="text-sm font-semibold text-gray-900">{badge.label}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">{badge.label}</span>
                     </div>
-                    <p className="text-xs text-gray-500">{badge.desc}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{badge.desc}</p>
                   </motion.div>
                 ))}
               </div>
