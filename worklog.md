@@ -156,3 +156,43 @@
 6. **Agent comparison for 3+ agents** — extend to multi-agent comparison table
 7. **Real-time notification toasts** — toast popups when WebSocket alerts arrive
 8. **Trace selector for waterfall** — independent trace selection for waterfall view
+
+---
+
+## V7 Session — Completed Modifications
+
+### 1. New Component: PageSkeleton
+- Created `src/components/ui/PageSkeleton.tsx`
+- Full-page loading skeleton matching the landing page structure
+- **Top bar**: 64px skeleton mimicking Navbar height (`bg-gray-100 dark:bg-gray-900`)
+- **Hero block**: 50% width heading skeleton + 70% width subtitle skeleton (h-48, gap-4)
+- **Features block**: 3 equal-width rounded skeleton cards side by side (h-24, gap-4)
+- **Dashboard placeholder**: Large h-64 rounded skeleton with `animated-border` class
+- **Footer**: 48px skeleton bar at bottom
+- All skeleton elements use `animate-pulse` shimmer + `rounded-2xl`
+- Framer Motion `AnimatePresence` for smooth skeleton→content transition (exit 0.5s fade, enter 0.3s fade)
+- Accepts `loading` boolean prop; passes through `children` when loading is false
+- Zero new TypeScript errors
+
+### File Inventory Update
+- `src/components/ui/PageSkeleton.tsx` ✨ NEW V7
+
+### 2. New Component: ToastNotifications
+- Created `src/components/ui/ToastNotifications.tsx`
+- Real-time toast notification stack for WebSocket alerts
+- **Props**: `alerts: ToastAlert[]`, `maxVisible?: number` (default 3)
+- **Behavior**: Shows most recent `maxVisible` alerts, new toasts slide in from right (Framer Motion x:100→0, opacity 0→1), auto-dismiss after 6s with exit animation (x:0→100, opacity 1→0)
+- **Position**: Fixed bottom-right, `z-30` (above BackToTop button), `flex-col-reverse` with 8px gap (newest on top)
+- **Duplicate prevention**: `shownIds` ref (Set of IDs) prevents re-triggering timers for duplicate alerts
+- **Dismissed tracking**: `dismissedIds` state (Set) + useMemo derivation for visible alerts — no setState-in-effect
+- **Toast design**: `rounded-xl border bg-white dark:bg-gray-900 shadow-xl border-l-4` with severity-colored left border
+  - `critical`: red left border + `bg-red-50/50 dark:bg-red-950/20` + AlertTriangle icon (`text-red-500`)
+  - `warning`: amber left border + AlertTriangle icon (`text-amber-500`)
+  - `info`: blue left border + Bell icon (`text-blue-500`)
+- **Layout**: Close button (X, top-right), severity icon, title (font-semibold text-sm), relative time (timeAgo helper), message (text-xs, line-clamp-2)
+- **Width**: `w-80 sm:w-96`
+- **Framer Motion**: `layout` prop for smooth stacking, `AnimatePresence mode="popLayout"` for enter/exit
+- ESLint: Zero errors
+
+### File Inventory Update
+- `src/components/ui/ToastNotifications.tsx` ✨ NEW V7
