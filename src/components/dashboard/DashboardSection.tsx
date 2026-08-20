@@ -12,6 +12,8 @@ import {
   Search,
   Filter,
   X,
+  GitCompareArrows,
+  BarChart3,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ExportButton } from '@/components/ui/ExportButton';
@@ -24,6 +26,8 @@ import { ActivityTimeline } from './ActivityTimeline';
 import { MetricsCharts } from './MetricsCharts';
 import { McpPanel } from './McpPanel';
 import { AgentDetailSheet } from './AgentDetailSheet';
+import { AgentComparison } from './AgentComparison';
+import { TraceWaterfall } from './TraceWaterfall';
 import { DashboardSkeleton } from './DashboardSkeleton';
 
 type TabId = 'overview' | 'traces' | 'issues' | 'alerts';
@@ -105,6 +109,9 @@ export function DashboardSection() {
   };
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
+  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
+  const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
+  const [showWaterfall, setShowWaterfall] = useState(true);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [traces, setTraces] = useState<Trace[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -121,6 +128,29 @@ export function DashboardSection() {
   // Trace search and filter state
   const [traceSearch, setTraceSearch] = useState('');
   const [traceStatusFilter, setTraceStatusFilter] = useState<string>('all');
+
+  // Filter persistence via localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('sentinel-dash-filters');
+      if (saved) {
+        const f = JSON.parse(saved);
+        if (f.traceSearch) setTraceSearch(f.traceSearch);
+        if (f.issueSearch) setIssueSearch(f.issueSearch);
+        if (f.traceStatusFilter) setTraceStatusFilter(f.traceStatusFilter);
+        if (f.issueSeverityFilter) setIssueSeverityFilter(f.issueSeverityFilter);
+        if (f.issueStatusFilter) setIssueStatusFilter(f.issueStatusFilter);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sentinel-dash-filters', JSON.stringify({
+        traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter,
+      }));
+    } catch { /* ignore */ }
+  }, [traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter]);
 
   // WebSocket for real-time alerts
   useEffect(() => {
@@ -178,6 +208,23 @@ export function DashboardSection() {
     }
     fetchData();
   }, []);
+
+  const handleCompareAgent = (agent: Agent) => {
+    if (comparisonIds.includes(agent.id)) {
+      setComparisonIds(comparisonIds.filter(id => id !== agent.id));
+      return;
+    }
+    const newIds = [...comparisonIds, agent.id].slice(-2);
+    setComparisonIds(newIds);
+    if (newIds.length === 2) {
+      const a = agents.find(a => a.id === newIds[0]);
+      const b = agents.find(a => a.id === newIds[1]);
+      if (a && b) {
+        setComparisonAgents([a, b]);
+        setComparisonIds([]);
+      }
+    }
+  };
 
   const filteredTraces = traces.filter((t) => {
     const matchesAgent = !selectedAgentId || t.agentId === selectedAgentId;
@@ -297,7 +344,11 @@ export function DashboardSection() {
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
                           <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
                         </div>
-                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} /></div>
+                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} onCompare={handleCompareAgent} comparisonIds={comparisonIds} />
+                        {comparisonIds.length === 1 && (
+                          <p className="text-xs text-[#dc2626] mt-2 flex items-center gap-1.5"><GitCompareArrows className="h-3 w-3" />1 agent selected — click another to compare</p>
+                        )}
+                        </div>
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
@@ -357,6 +408,13 @@ export function DashboardSection() {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 mb-4">
+                      <button
+                        onClick={() => setShowWaterfall(!showWaterfall)}
+                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'}`}
+                      >
+                        <BarChart3 className="h-3 w-3" />
+                        Waterfall
+                      </button>
                       {selectedAgentId && (
                         <button
                           onClick={() => setSelectedAgentId(null)}
@@ -389,6 +447,15 @@ export function DashboardSection() {
                       </div>
                     ) : (
                       <TraceViewer traces={filteredTraces} />
+                    )}
+                    {showWaterfall && filteredTraces.length > 0 && (
+                      <div className="mt-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <BarChart3 className="h-4 w-4 text-gray-400" />
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
+                        </div>
+                        <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
+                      </div>
                     )}
                   </motion.div>
                 )}
@@ -525,6 +592,14 @@ export function DashboardSection() {
       </div>
 
       <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
+      {comparisonAgents && (
+        <AgentComparison
+          agentA={comparisonAgents[0]}
+          agentB={comparisonAgents[1]}
+          open={!!comparisonAgents}
+          onClose={() => { setComparisonAgents(null); setComparisonIds([]); }}
+        />
+      )}
     </section>
   );
 }

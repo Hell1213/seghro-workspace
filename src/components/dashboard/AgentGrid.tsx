@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Bot, ExternalLink } from 'lucide-react';
+import { Bot, ExternalLink, GitCompareArrows } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
@@ -33,7 +33,7 @@ const timeAgo = (dateStr: string) => {
   return `${Math.floor(hours / 24)}d ago`;
 };
 
-export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (agent: Agent) => void }) {
+export function AgentGrid({ agents, onSelect, onCompare, comparisonIds }: { agents: Agent[]; onSelect: (agent: Agent) => void; onCompare?: (agent: Agent) => void; comparisonIds?: string[] }) {
   return (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {agents.map((agent, i) => {
@@ -65,7 +65,18 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
                   </Badge>
                 </div>
               </div>
-              <ExternalLink className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#dc2626] transition-colors" />
+              <div className="flex items-center gap-1">
+                {onCompare && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onCompare(agent); }}
+                    className={`p-1 rounded-md transition-colors ${comparisonIds?.includes(agent.id) ? 'bg-[#dc2626]/10 text-[#dc2626]' : 'text-gray-300 hover:text-[#dc2626] opacity-0 group-hover:opacity-100'}`}
+                    title={comparisonIds?.includes(agent.id) ? 'Selected for comparison' : 'Compare this agent'}
+                  >
+                    <GitCompareArrows className="h-3.5 w-3.5" />
+                  </button>
+                )}
+                <ExternalLink className="h-3.5 w-3.5 text-gray-300 group-hover:text-[#dc2626] transition-colors" />
+              </div>
             </div>
 
             <p className="text-xs text-gray-400 dark:text-gray-500 mb-4 line-clamp-2 leading-relaxed">

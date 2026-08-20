@@ -115,7 +115,7 @@ export function HowItWorks() {
                     i % 2 === 1 ? 'lg:col-start-1 lg:pr-16' : 'lg:pl-16'
                   } pl-16 lg:pl-0`}
                 >
-                  <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-950 p-5 overflow-hidden">
+                  <div className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-950 p-5 overflow-hidden card-lift">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="h-2.5 w-2.5 rounded-full bg-red-500" />
                       <div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />

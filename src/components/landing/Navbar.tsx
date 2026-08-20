@@ -50,8 +50,9 @@ export function Navbar({ onSearchClick }: NavbarProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]">
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626] shadow-md shadow-red-500/20">
               <Shield className="h-4.5 w-4.5 text-white" />
+              <span className="absolute inset-0 rounded-lg bg-[#dc2626] animate-ping opacity-20" />
             </div>
             <span className={`text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-all duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}>
               Sentinel
@@ -63,7 +64,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
               <a
                 key={link.href}
                 href={link.href}
-                className="px-3.5 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:text-[#dc2626] rounded-lg hover:bg-red-50/60 dark:hover:bg-red-950/40"
+                className="px-3.5 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:text-[#dc2626] rounded-lg hover:bg-red-50/60 dark:hover:bg-red-950/40 focus-ring"
               >
                 {link.label}
               </a>
@@ -82,13 +83,13 @@ export function Navbar({ onSearchClick }: NavbarProps) {
                 <span className="text-xs">⌘</span>K
               </kbd>
             </button>
-            <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#dc2626]">
+            <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#dc2626] focus-ring">
               Documentation
             </Button>
             {mounted && (
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+                className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors focus-ring"
                 aria-label="Toggle theme"
               >
                 <AnimatePresence mode="wait">
@@ -116,7 +117,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
                 </AnimatePresence>
               </button>
             )}
-            <Button className="bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-5 shadow-md shadow-red-200 hover:shadow-red-300 transition-all">
+            <Button className="bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-5 shadow-md shadow-red-200 hover:shadow-red-300 transition-all btn-glow">
               Get Started
             </Button>
           </div>
@@ -131,27 +132,32 @@ export function Navbar({ onSearchClick }: NavbarProps) {
       </div>
 
       {/* Mobile menu */}
-      {mobileOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="md:hidden bg-white dark:bg-[#0a0a0a] border-b border-gray-100 dark:border-gray-800 px-4 pb-4"
-        >
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#dc2626] rounded-lg hover:bg-red-50/60 dark:hover:bg-red-950/40"
-            >
-              {link.label}
-            </a>
-          ))}
-          <Button className="w-full mt-2 bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm">
-            Get Started
-          </Button>
-        </motion.div>
-      )}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            className="md:hidden overflow-hidden bg-white/95 dark:bg-[#0a0a0a]/95 border-b border-gray-100 dark:border-gray-800 px-4 pb-4"
+            style={{ backdropFilter: 'blur(12px)' }}
+          >
+            {navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="block px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#dc2626] rounded-lg hover:bg-red-50/60 dark:hover:bg-red-950/40"
+              >
+                {link.label}
+              </a>
+            ))}
+            <Button className="w-full mt-2 bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm btn-glow">
+              Get Started
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
