@@ -72,13 +72,31 @@ wss.on('connection', (ws) => {
     }
   }, 8000 + Math.random() * 7000);
 
+  // Stream API health events every 8 seconds
+  const healthInterval = setInterval(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      const endpoints = ['ep-tavily', 'ep-anthropic-claude', 'ep-openai-gpt4o', 'ep-github-mcp'];
+      const randomEp = endpoints[Math.floor(Math.random() * endpoints.length)];
+      const events = [
+        { type: 'health_check_passed', endpointId: randomEp, latency: Math.floor(Math.random() * 500 + 50), status: 'healthy' },
+        { type: 'latency_spike', endpointId: randomEp, latency: Math.floor(Math.random() * 1500 + 500), status: 'degraded' },
+        { type: 'health_check_failed', endpointId: 'ep-tavily', latency: 0, status: 'down' },
+        { type: 'circuit_breaker_state', endpointId: randomEp, newState: ['closed', 'half-open', 'open'][Math.floor(Math.random() * 3)] },
+      ];
+      const event = events[Math.floor(Math.random() * events.length)];
+      ws.send(JSON.stringify({ type: 'api_health_event', event }));
+    }
+  }, 8000);
+
   ws.on('close', () => {
     console.log('Client disconnected');
     clearInterval(interval);
+    clearInterval(healthInterval);
   });
 
   ws.on('error', (err) => {
     console.error('WebSocket error:', err.message);
     clearInterval(interval);
+    clearInterval(healthInterval);
   });
 });

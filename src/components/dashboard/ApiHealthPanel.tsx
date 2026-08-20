@@ -38,6 +38,17 @@ import { HealingTimeline } from '@/components/dashboard/HealingTimeline';
 import { healthHistory } from '@/lib/self-healing-data';
 import type { ApiEndpoint, HealingAction } from '@/lib/self-healing-data';
 
+const ENDPOINT_NAMES: Record<string, string> = {
+  'ep-tavily': 'Tavily Search',
+  'ep-anthropic-claude': 'Anthropic Claude 3.5',
+  'ep-openai-gpt4o': 'OpenAI GPT-4o',
+  'ep-github-mcp': 'GitHub MCP Server',
+  'ep-pinecone': 'Pinecone Vector DB',
+  'ep-stripe': 'Stripe Payments',
+  'ep-redis': 'Redis Cache',
+  'ep-notion': 'Notion API',
+};
+
 interface HealthSummary {
   healthy: number;
   degraded: number;
@@ -95,6 +106,42 @@ export function ApiHealthPanel() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // WebSocket connection for real-time API health events
+  useEffect(() => {
+    try {
+      const ws = new WebSocket('ws://localhost:3001/?XTransformPort=3001');
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'api_health_event' && data.event) {
+            const evt = data.event;
+            const endpointName = ENDPOINT_NAMES[evt.endpointId] || evt.endpointId;
+            const formattedType = evt.type.replace(/_/g, ' ');
+            const message = `${formattedType}: ${endpointName}${evt.latency !== undefined ? ` (${evt.latency}ms)` : ''}`;
+            if (evt.status === 'down' || evt.status === 'degraded') {
+              toast.error(message);
+            } else {
+              toast.info(message);
+            }
+          }
+        } catch {
+          // ignore parse errors
+        }
+      };
+
+      ws.onerror = () => {
+        // silent fail — panel still works with REST data
+      };
+
+      return () => {
+        ws.close();
+      };
+    } catch {
+      // WebSocket not available
+    }
+  }, []);
 
   // Build sparkline data per endpoint from health history
   const sparklineMap = useMemo(() => {

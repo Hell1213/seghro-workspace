@@ -1,8 +1,8 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V9 — SaaS-Complete: Pricing, CSS enhancements, Activity API, Lazy Loading, Tab Polish**
-- Page renders with 48+ component files (optimized with lazy loading)
+**Phase: V10 — Changelog Section, Hero Enhancement, Footer Social Proof**
+- Page renders with 49+ component files (optimized with lazy loading)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
 - All 9 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity)
@@ -20,6 +20,57 @@
 - **V7**: Page skeleton loading, real-time toast notifications for WebSocket alerts
 - **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
 - **V9**: Pricing section (3-tier SaaS), 9 new CSS utilities, tab bar polish, Activity API, lazy loading, CSS fix
+- **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row + accent bar
+
+---
+
+## V10 Session — Completed Modifications (v10-1/v10-3/v10-4)
+
+### 1. New Feature: Changelog Landing Section
+- Created `src/components/landing/ChangelogSection.tsx`
+- Vertical timeline layout with 6 release entries (v2.0 → v1.0)
+- 2-column desktop layout: version badges on left timeline, release cards on right
+- v2.0 highlighted with red accent + "NEW" badge; others use gray accent
+- Feature tags using shadcn Badge component with `variant="outline"`
+- Framer Motion staggered entrance animation (containerVariants/itemVariants)
+- Section header with GitBranchHorizontal icon badge, gradient "new" text
+- `glass-card card-lift` classes on release cards
+- `'use client'` directive for client-side animation
+
+### 2. Hero Section Enhancements
+- Added subtle animated gradient mesh/glow div behind hero content (two blurred circles: red-500/[0.07] + gray-500/[0.05])
+- Added trust indicator row below CTA buttons: "99.9% Uptime SLA" (Shield), "SOC 2 Compliant" (Zap), "GDPR Ready" (Globe)
+- Trust row uses `text-xs text-gray-400 dark:text-gray-500` styling
+- Secondary "Read the Docs" button now links to `#docs` via `asChild` + `<a>`
+- Primary CTA already had `btn-glow` class for hover glow effect
+
+### 3. Footer Social Proof Enhancements
+- Replaced old gradient accent line with stronger `via-[#dc2626]/50` gradient bar
+- Added social proof row with 4 items: Star (4.9/5 Product Hunt), Github (10K+ Stars), Users (2,000+ Teams), Activity (99.9% Uptime)
+- Social proof row separated by `border-b` with `pb-6`/`pt-8` spacing
+- Added "Production-grade AI agent observability" tagline below Sentinel logo
+- Upgraded footer links data structure to support `href` for navigation
+- Added `Changelog` to Resources section with `#changelog` href
+- Product section links now use proper anchor hrefs (Features, Pricing, Integrations, Changelog, Docs)
+
+### 4. Page Integration
+- Added lazy-loaded dynamic import for `ChangelogSection` in `page.tsx`
+- Inserted between IntegrationSection and CtaSection with `section-divider` before it
+- Wrapped in `motion.div` with fade-in animation (matching existing pattern)
+
+### Files Modified
+- `src/components/landing/ChangelogSection.tsx` ✨ NEW (timeline with 6 releases)
+- `src/components/landing/HeroSection.tsx` ✏️ MODIFIED (gradient mesh, trust indicators, docs link)
+- `src/components/landing/Footer.tsx` ✏️ MODIFIED (social proof, accent bar, tagline, link hrefs)
+- `src/app/page.tsx` ✏️ MODIFIED (ChangelogSection import + integration)
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: GET / 200 (all routes returning 200)
+- ✅ Changelog section renders with timeline layout and staggered animations
+- ✅ Hero trust indicators visible below CTA buttons
+- ✅ Footer social proof row displays with icons
+- ✅ No existing functionality broken
 
 ---
 
@@ -536,3 +587,47 @@ Edited `src/components/landing/Navbar.tsx`:
 - ✅ Activity Timeline loads data from API with loading skeleton
 - ✅ Below-fold sections lazy loaded with placeholder divs
 - ✅ No existing functionality broken
+
+## V10 Session — v10-2/v10-5/v10-6 (Backend + UX Enhancements)
+
+### 1. Enhanced Health Event Streamer (Task v10-2)
+- **File**: `mini-services/alert-streamer/index.ts`
+- Added second `setInterval` (8s) inside the WebSocket connection handler
+- Sends `api_health_event` messages with nested `event` payload containing realistic status changes:
+  - `health_check_passed` — healthy status with 50-550ms latency
+  - `latency_spike` — degraded status with 500-2000ms latency
+  - `health_check_failed` — down status for ep-tavily
+  - `circuit_breaker_state` — random state transitions (closed/half-open/open)
+- Both intervals properly cleaned up on `ws.close` and `ws.error`
+- Message structure: `{ type: 'api_health_event', event: { type, endpointId, latency, status } }`
+
+### 2. API Health Panel WebSocket Connection (Task v10-5)
+- **File**: `src/components/dashboard/ApiHealthPanel.tsx`
+- Added `ENDPOINT_NAMES` map for human-readable endpoint labels
+- Added `useEffect` with WebSocket connection to `ws://localhost:3001/?XTransformPort=3001`
+- Listens for `api_health_event` messages and shows toast notifications via `sonner`
+- Error/degraded statuses → `toast.error()`, healthy → `toast.info()`
+- Format: `"health check passed: Tavily Search (234ms)"`
+- Proper try/catch error handling and WebSocket cleanup on unmount
+- Existing REST data fetching remains intact (no regression)
+
+### 3. Command Palette Keyboard Shortcuts Section (Task v10-6)
+- **File**: `src/components/ui/CommandPalette.tsx`
+- Added `BookOpen`, `CreditCard`, `Heart` Lucide icon imports
+- Extended `CommandItem.group` union type to include `'shortcuts'`
+- Added `'shortcuts'` to `GROUP_ORDER`, `GROUP_LABELS`, and `GROUP_ICON` mappings
+- Added 6 keyboard shortcut items with `group: 'shortcuts'`:
+  - Go to Dashboard (LayoutDashboard) — scrolls to #dashboard
+  - Open Documentation (BookOpen) — scrolls to #docs
+  - View Pricing (CreditCard) — scrolls to #pricing
+  - API Health Tab (Heart) — sets hash to #dashboard-api-health
+  - Toggle Dark Mode (Moon) — clicks theme toggle button
+  - Search Agents (Search) — sets hash to #dashboard-traces
+- Keyboard Shortcuts group appears at bottom of no-query view AND in filtered search results
+- All existing CommandPalette functionality preserved
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: All routes 200, compilation clean
+- ✅ Alert streamer restarted and running on port 3001
+- ✅ No existing functionality broken (CommandPalette, ApiHealthPanel, alert-streamer)

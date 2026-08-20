@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
-import { ArrowDown, Activity, Zap, ShieldCheck } from 'lucide-react';
+import { ArrowDown, Activity, Zap, ShieldCheck, Shield, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ParticleCanvas from '@/components/ui/ParticleCanvas';
 import { useState, useEffect } from 'react';
@@ -131,6 +131,11 @@ export function HeroSection() {
       {/* Floating gradient orbs */}
       <div className="absolute top-20 right-[15%] w-72 h-72 rounded-full bg-red-500/[0.04] blur-[80px] animate-float" />
       <div className="absolute bottom-32 left-[10%] w-56 h-56 rounded-full bg-gray-400/[0.06] blur-[60px] animate-float [animation-delay:2s]" />
+      {/* Subtle animated gradient mesh / glow */}
+      <div className="absolute -z-10 inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-red-500/[0.07] blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-gray-500/[0.05] blur-3xl" />
+      </div>
 
       <motion.div
         style={{ y, opacity }}
@@ -194,9 +199,31 @@ export function HeroSection() {
                 variant="outline"
                 size="lg"
                 className="border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 px-7"
+                asChild
               >
-                Read the Docs
+                <a href="#docs">Read the Docs</a>
               </Button>
+            </motion.div>
+
+            {/* Trust indicator row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.8 }}
+              className="mt-6 flex items-center justify-center gap-4 sm:gap-6"
+            >
+              <div className="flex items-center gap-1.5">
+                <Shield className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                <span className="text-xs text-gray-400 dark:text-gray-500">99.9% Uptime SLA</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                <span className="text-xs text-gray-400 dark:text-gray-500">SOC 2 Compliant</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Globe className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+                <span className="text-xs text-gray-400 dark:text-gray-500">GDPR Ready</span>
+              </div>
             </motion.div>
 
             <motion.div

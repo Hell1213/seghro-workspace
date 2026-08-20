@@ -21,6 +21,9 @@ import {
   Clock,
   Zap,
   Command,
+  BookOpen,
+  CreditCard,
+  Heart,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { toast } from 'sonner';
@@ -42,7 +45,7 @@ interface CommandItem {
   label: string;
   secondary?: string;
   icon: React.ElementType;
-  group: 'navigation' | 'agents' | 'traces' | 'issues';
+  group: 'navigation' | 'agents' | 'traces' | 'issues' | 'shortcuts';
   action: () => void;
 }
 
@@ -99,6 +102,7 @@ const GROUP_ICON: Record<string, React.ElementType> = {
   Issues: AlertTriangle,
   Recent: Clock,
   'Quick Actions': Zap,
+  'Keyboard Shortcuts': Command,
 };
 
 const GROUP_ORDER: CommandItem['group'][] = [
@@ -106,6 +110,7 @@ const GROUP_ORDER: CommandItem['group'][] = [
   'agents',
   'traces',
   'issues',
+  'shortcuts',
 ];
 
 const GROUP_LABELS: Record<CommandItem['group'], string> = {
@@ -113,6 +118,7 @@ const GROUP_LABELS: Record<CommandItem['group'], string> = {
   agents: 'Agents',
   traces: 'Traces',
   issues: 'Issues',
+  shortcuts: 'Keyboard Shortcuts',
 };
 
 /* ------------------------------------------------------------------ */
@@ -227,6 +233,71 @@ function CommandPalettePanel({
           });
         }
 
+        // Keyboard Shortcuts
+        built.push(
+          {
+            id: 'shortcut-dashboard',
+            label: 'Go to Dashboard',
+            icon: LayoutDashboard,
+            group: 'shortcuts',
+            action: () => {
+              document.querySelector('#dashboard')?.scrollIntoView({ behavior: 'smooth' });
+              onClose();
+            },
+          },
+          {
+            id: 'shortcut-docs',
+            label: 'Open Documentation',
+            icon: BookOpen,
+            group: 'shortcuts',
+            action: () => {
+              document.querySelector('#docs')?.scrollIntoView({ behavior: 'smooth' });
+              onClose();
+            },
+          },
+          {
+            id: 'shortcut-pricing',
+            label: 'View Pricing',
+            icon: CreditCard,
+            group: 'shortcuts',
+            action: () => {
+              document.querySelector('#pricing')?.scrollIntoView({ behavior: 'smooth' });
+              onClose();
+            },
+          },
+          {
+            id: 'shortcut-api-health',
+            label: 'API Health Tab',
+            icon: Heart,
+            group: 'shortcuts',
+            action: () => {
+              window.location.hash = '#dashboard-api-health';
+              onClose();
+            },
+          },
+          {
+            id: 'shortcut-dark',
+            label: 'Toggle Dark Mode',
+            icon: Moon,
+            group: 'shortcuts',
+            action: () => {
+              const btn = document.querySelector('[aria-label="Toggle theme"]');
+              if (btn) (btn as HTMLElement).click();
+              onClose();
+            },
+          },
+          {
+            id: 'shortcut-search',
+            label: 'Search Agents',
+            icon: Search,
+            group: 'shortcuts',
+            action: () => {
+              window.location.hash = '#dashboard-traces';
+              onClose();
+            },
+          },
+        );
+
         setItems(built);
       })
       .catch(() => {
@@ -336,6 +407,13 @@ function CommandPalettePanel({
       groups.push({ title: 'Recent', items: recentItems });
     }
     groups.push({ title: 'Quick Actions', items: quickActions });
+
+    // Keyboard Shortcuts always at bottom
+    const shortcutItems = items.filter((i) => i.group === 'shortcuts');
+    if (shortcutItems.length > 0) {
+      groups.push({ title: 'Keyboard Shortcuts', items: shortcutItems });
+    }
+
     return groups;
   })();
 
