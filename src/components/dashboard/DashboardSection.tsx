@@ -8,7 +8,11 @@ import {
   AlertTriangle,
   Bell,
   Bot,
+  Search,
+  Filter,
+  X,
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { MetricCards } from './MetricCards';
 import { AgentGrid } from './AgentGrid';
 import { TraceViewer } from './TraceViewer';
@@ -89,6 +93,35 @@ export function DashboardSection() {
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Search and filter state
+  const [issueSearch, setIssueSearch] = useState('');
+  const [issueSeverityFilter, setIssueSeverityFilter] = useState<string>('all');
+  const [issueStatusFilter, setIssueStatusFilter] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // WebSocket for real-time alerts
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    try {
+      ws = new WebSocket('ws://localhost:3001/?XTransformPort=3001');
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'new_alert') {
+            setAlertItems((prev) => [data.alert, ...prev].slice(0, 20));
+          }
+        } catch (e) {
+          // ignore parse errors
+        }
+      };
+    } catch (e) {
+      // WebSocket not available, that's ok
+    }
+    return () => {
+      if (ws) ws.close();
+    };
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -117,6 +150,16 @@ export function DashboardSection() {
   const filteredTraces = selectedAgentId
     ? traces.filter((t) => t.agentId === selectedAgentId)
     : traces;
+
+  const filteredIssues = issues.filter((issue) => {
+    const matchesSearch = !issueSearch ||
+      issue.title.toLowerCase().includes(issueSearch.toLowerCase()) ||
+      issue.agentName.toLowerCase().includes(issueSearch.toLowerCase()) ||
+      issue.description.toLowerCase().includes(issueSearch.toLowerCase());
+    const matchesSeverity = issueSeverityFilter === 'all' || issue.severity === issueSeverityFilter;
+    const matchesStatus = issueStatusFilter === 'all' || issue.status === issueStatusFilter;
+    return matchesSearch && matchesSeverity && matchesStatus;
+  });
 
   return (
     <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50">
@@ -264,14 +307,94 @@ export function DashboardSection() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                       <div className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
                         <h3 className="text-sm font-semibold text-gray-900">Detected Issues</h3>
-                        <span className="text-xs text-gray-400">({issues.length})</span>
+                        <span className="text-xs text-gray-400">({filteredIssues.length}/{issues.length})</span>
+                      </div>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                          <Input
+                            placeholder="Search issues..."
+                            value={issueSearch}
+                            onChange={(e) => setIssueSearch(e.target.value)}
+                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                          />
+                          {issueSearch && (
+                            <button
+                              onClick={() => setIssueSearch('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2"
+                            >
+                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                            </button>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => setShowFilters(!showFilters)}
+                          className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
+                            showFilters
+                              ? 'bg-[#dc2626] text-white border-[#dc2626]'
+                              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <Filter className="h-3.5 w-3.5" />
+                          Filters
+                        </button>
                       </div>
                     </div>
-                    <IssuesPanel issues={issues} />
+
+                    {showFilters && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 border border-gray-100"
+                      >
+                        <span className="text-[11px] text-gray-500 font-medium">Severity:</span>
+                        {['all', 'P0', 'P1', 'P2'].map((sev) => (
+                          <button
+                            key={sev}
+                            onClick={() => setIssueSeverityFilter(sev)}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                              issueSeverityFilter === sev
+                                ? sev === 'P0' ? 'bg-[#dc2626] text-white'
+                                  : sev === 'P1' ? 'bg-amber-500 text-white'
+                                  : sev === 'P2' ? 'bg-gray-500 text-white'
+                                  : 'bg-gray-200 text-gray-700'
+                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            {sev === 'all' ? 'All' : sev}
+                          </button>
+                        ))}
+                        <div className="w-px h-4 bg-gray-200 mx-1" />
+                        <span className="text-[11px] text-gray-500 font-medium">Status:</span>
+                        {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
+                          <button
+                            key={stat}
+                            onClick={() => setIssueStatusFilter(stat)}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+                              issueStatusFilter === stat
+                                ? 'bg-[#dc2626] text-white'
+                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+
+                    {filteredIssues.length === 0 ? (
+                      <div className="text-center py-12 text-gray-400">
+                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                        <p className="text-sm">No issues match your filters</p>
+                      </div>
+                    ) : (
+                      <IssuesPanel issues={filteredIssues} />
+                    )}
                   </motion.div>
                 )}
 

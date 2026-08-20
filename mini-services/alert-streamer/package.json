@@ -1,0 +1,11 @@
+{
+  "name": "alert-streamer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun --hot index.ts"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

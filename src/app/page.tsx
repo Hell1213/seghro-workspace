@@ -5,8 +5,11 @@ import { Navbar } from '@/components/landing/Navbar';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { HowItWorks } from '@/components/landing/HowItWorks';
-import { IntegrationSection } from '@/components/landing/IntegrationSection';
+import { StatsSection } from '@/components/landing/StatsSection';
 import { DashboardSection } from '@/components/dashboard/DashboardSection';
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
+import { IntegrationSection } from '@/components/landing/IntegrationSection';
+import { CtaSection } from '@/components/landing/CtaSection';
 import { Footer } from '@/components/landing/Footer';
 
 export default function Home() {
@@ -41,6 +44,15 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
+          <StatsSection />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           <DashboardSection />
         </motion.div>
 
@@ -50,7 +62,25 @@ export default function Home() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
+          <TestimonialsSection />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           <IntegrationSection />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <CtaSection />
         </motion.div>
       </main>
 
