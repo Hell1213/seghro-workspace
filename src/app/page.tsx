@@ -16,6 +16,7 @@ import { Footer } from '@/components/landing/Footer';
 import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette';
 import { ScrollProgress } from '@/components/ui/ScrollProgress';
 import { BackToTop } from '@/components/ui/BackToTop';
+import DashboardTour from '@/components/ui/DashboardTour';
 import { useAppStore } from '@/lib/store';
 
 export default function Home() {
@@ -123,6 +124,7 @@ export default function Home() {
       <Footer />
 
       <BackToTop />
+      <DashboardTour />
 
       <CommandPalette
         open={open}

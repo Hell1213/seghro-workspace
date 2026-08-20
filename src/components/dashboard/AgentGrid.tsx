@@ -45,7 +45,7 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.4 }}
             onClick={() => onSelect(agent)}
-            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-lg hover:shadow-red-50 dark:hover:shadow-red-950/20 transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden"
+            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden card-lift"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">

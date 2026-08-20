@@ -1,8 +1,8 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V4 — Command palette, scroll UX, activity timeline, enhanced styling, section dividers**
-- Page renders ~100KB+ HTML (35 headings, single H1, clean semantic structure)
+**Phase: V5 — Particle canvas, typing animation, CSV export, onboarding tour, dashboard URL state, enhanced micro-interactions**
+- Page renders ~110KB+ HTML (35 headings, single H1, clean semantic structure)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
 - All API routes functional (agents, traces, issues, alerts, metrics)
@@ -12,167 +12,167 @@
 - Issue resolution workflow (Open → Investigating → Resolved) verified working
 - Newsletter section with email subscription toast
 - Command Palette (⌘K) with fuzzy search, keyboard nav, quick actions, recent items
-- Scroll progress bar + Back-to-Top button
+- Scroll progress bar + Back-to-Top button (with glow pulse)
 - Activity Timeline in Alerts tab
-- 9+ landing sections + 4-tab working dashboard + enhanced styling
-- 26+ component files total
+- 9+ landing sections + 4-tab working dashboard + comprehensive styling
+- 32+ component files total
+- **NEW: Particle canvas background in hero**
+- **NEW: Typing animation on hero subtitle**
+- **NEW: CSV export for traces and issues**
+- **NEW: Onboarding tour with 5 steps**
+- **NEW: Dashboard URL state (tabs bookmarkable via hash)**
+- **NEW: Mini sparklines in metric cards on hover**
+- **NEW: 10+ new CSS animation utilities**
 
 ---
 
-## V4 Session — Completed Modifications
+## V5 Session — Completed Modifications
 
-### 1. Bug Fixes: Heading Spacing (5 files)
-- Fixed 5 remaining `{' '}` non-breaking space issues in headings:
-  - `HowItWorks.tsx`: "in four steps" (was "infour")
-  - `DashboardSection.tsx`: "The observability" (was "Theobservability")
-  - `TestimonialsSection.tsx`: "by engineering" (was "byengineering")
-  - `IntegrationSection.tsx`: "your existing" (was "yourexisting")
-  - `CtaSection.tsx`: "your agents" (was "youragents")
-- Pattern: whitespace before a `<span>` on the next line gets lost in JSX; fixed with `{'\u00A0'}` before the span
-- Verified via agent-browser `document.querySelectorAll('h2').textContent` — all headings now correct
+### 1. New Feature: Particle Canvas Background (Hero)
+- Created `src/components/ui/ParticleCanvas.tsx`
+- Canvas-based particle network with 50 floating dots (desktop) / 25 (mobile)
+- Red particles (#dc2626) with connection lines between nearby particles (120px threshold)
+- Mouse repulsion interaction within 100px radius
+- Dark mode brightness adjustment (checks `document.documentElement.classList.contains('dark')`)
+- DPR-aware rendering for sharp display on Retina screens
+- Performance optimized: distSq check before sqrt, cleanup on unmount
+- Integrated into HeroSection as first background layer (z-0, pointer-events-none)
 
-### 2. New Feature: Command Palette (⌘K)
-- Created `src/components/ui/CommandPalette.tsx` (~590 lines)
-- **Architecture**: `CommandPalettePanel` (inner, mounts fresh each open) + `CommandPalette` wrapper (AnimatePresence) + `useCommandPalette()` hook
-- **Keyboard shortcut**: Cmd+K / Ctrl+K global listener
-- **Navbar trigger**: Fake search bar with ⌘K badge between nav links and Documentation
-- **Glass-morphism panel**: backdrop-blur-xl, red accent highlights, Framer Motion scale+fade animations
-- **4 search groups**: Navigation (9 sections), Agents (6), Traces (8), Issues (6)
-- **Fuzzy search**: Case-insensitive substring matching on label and secondary text
-- **Keyboard navigation**: ↑↓ arrows, Enter to select, Escape to close, auto scroll-into-view
-- **Quick Actions** (empty search): Go to Dashboard, View Issues, View Alerts, Toggle Dark Mode, Copy Install Command
-- **Recent items**: localStorage persistence (max 5), shown above Quick Actions
-- **Agent selection**: Dispatches to Zustand store, smooth-scrolls to #dashboard
-- Added section IDs: hero, stats, newsletter, cta
+### 2. New Feature: Typing Animation (Hero Subtitle)
+- Added `TypingText` component inline in `HeroSection.tsx`
+- Configurable delay (800ms), speed (18ms per char)
+- Red blinking cursor (uses `.animate-blink`) that disappears when typing completes
+- `min-h-[3.5rem]` on container to prevent layout shift
 
-### 3. New Feature: Scroll Progress Indicator
-- Created `src/components/ui/ScrollProgress.tsx`
-- 3px red (#dc2626) bar at top of viewport (fixed z-50)
-- useScroll + useMotionValueEvent + useSpring for smooth tracking
-- Red glow box-shadow, fades in >1% scroll
+### 3. New Feature: CSV Export
+- Created `src/lib/export-utils.ts` — utility with `exportToCSV()`, `formatDate()`, `formatDuration()`
+- Created `src/components/ui/ExportButton.tsx` — dropdown button using shadcn DropdownMenu
+- ExportButton added to **Traces tab** (exports traceId, agentId, status, duration, tokens, date)
+- ExportButton added to **Issues tab** (exports agentName, title, severity, status, failureRate, affectedRuns, date)
+- Proper CSV escaping for commas, quotes, and newlines
+- Browser download via Blob + URL.createObjectURL
 
-### 4. New Feature: Back-to-Top Button
-- Created `src/components/ui/BackToTop.tsx`
-- Floating red circular button, bottom-right (fixed z-40)
-- Appears after 600px scroll, AnimatePresence fade+slide-up
-- whileHover scale(1.1), whileTap scale(0.95), smooth scroll-to-top
+### 4. New Feature: Dashboard URL State
+- Dashboard tabs are now bookmarkable via URL hash (`#dashboard-traces`, `#dashboard-issues`, etc.)
+- On component mount, reads URL hash and sets the active tab
+- Tab clicks update URL via `window.history.replaceState()`
+- Hash format: `#dashboard-{tabId}` (overview, traces, issues, alerts)
 
-### 5. New Feature: Activity Timeline (Alerts Tab)
-- Created `src/components/dashboard/ActivityTimeline.tsx`
-- 12 mock activity events spanning last 24h
-- 7 event types: agent_status_change, issue_detected, issue_resolved, alert_fired, alert_acknowledged, mcp_fix_run, eval_completed
-- Vertical timeline with colored icon dots, relative timestamps
-- Critical items have red text + pulse animation
-- Framer Motion staggered entrance (0.06s delay)
-- Alerts tab now 2-column: Activity Timeline (left 40%) + AlertFeed (right 60%)
+### 5. New Feature: Onboarding Tour
+- Created `src/components/ui/DashboardTour.tsx` (~405 lines)
+- **5 tour steps**: Key Metrics → Agent Grid → Analytics Charts → MCP Fix Workflow → Dashboard Tabs
+- Floating "Take Tour" button (bottom-left, Compass icon, z-50)
+- IntersectionObserver on `#dashboard` to show/hide trigger button
+- Red outline highlight (3px solid, 4px offset) with dark overlay (box-shadow cutout)
+- Tooltip with title, description, step counter (1/5), Next/Prev/Skip/Finish
+- Framer Motion scale+fade animations, auto-scroll, viewport clamping
+- Arrow/caret pointing toward target element
+- sessionStorage persistence (`sentinel-tour-done`)
+- Added `data-tour` attributes to DashboardSection: metrics, agents, charts, mcp, tabs
 
-### 6. Styling Improvements
+### 6. New Feature: Mini Sparklines in Metric Cards
+- Added `MiniSparkline` canvas component in `MetricCards.tsx`
+- 12-point random sparkline drawn on 60x24 canvas
+- Red for negative trends, green for positive
+- Area fill with low opacity gradient
+- End dot indicator
+- Appears on hover with opacity transition (300ms)
+- DPR-aware rendering
 
-#### CSS Enhancements (globals.css)
-- Added `@keyframes gradient-shift` + `.animate-gradient` (shifting gradient background)
-- Added `@keyframes border-rotate` + `.animated-border` (rotating gradient border using CSS mask)
-  - Dark mode variant with adjusted red/grey colors
-- Added `@keyframes blink` + `.animate-blink` (terminal cursor blink effect)
-- Added `@keyframes pulse-ring` + `.animate-pulse-ring` (expanding ring for critical status indicators)
-- Added `.section-divider` (gradient line: transparent → grey → red → grey → transparent)
-  - Dark mode variant with darker colors
-- Added `::selection` styling (red tint for text selection)
-- Added `html { scroll-behavior: smooth }` for native smooth scrolling
+### 7. Styling Improvements (globals.css — 10+ new utilities)
 
-#### Section Dividers (page.tsx)
-- Added 5 `.section-divider` elements between landing sections:
-  - After Hero → before Features
-  - After Features → before How It Works
-  - After Stats → before Dashboard
-  - After Dashboard → before Testimonials
-  - After Newsletter → before Integrations
+#### New CSS Animations
+- `@keyframes glow-pulse` + `.animate-glow-pulse` — pulsing red glow (used on Back-to-Top button)
+- `@keyframes slide-up-fade` + `.animate-slide-up-fade` — generic entrance animation
+- `@keyframes scale-in` + `.animate-scale-in` — scale entrance
+- `@keyframes count-up` + `.animate-count-up` — number reveal
+- `@keyframes text-reveal` + `.animate-text-reveal` — clip-path text reveal
+- `@keyframes text-shimmer-move` + `.text-shimmer` — gradient text shimmer animation
 
-#### HeroSection Enhancements
-- Added 2 floating gradient orbs (red and grey) with `animate-float` animation
-- Orbs use blur-[80px] and blur-[60px] for soft depth effect
+#### New CSS Utility Classes
+- `.glass-card` — enhanced glass-morphism with dark mode variant
+- `.btn-glow` — inner glow overlay on hover (applied to hero + CTA buttons)
+- `.dashboard-scroll` — custom red-tinted thin scrollbar (applied to activity timeline)
+- `.status-glow-active/critical/degraded` — colored glow shadows for status indicators
+- `.card-lift` — unified hover lift effect with red-tinted shadow (applied to features, agents, metrics)
+- `.focus-ring` — consistent red focus-visible ring for accessibility
+- `.bg-dot-pattern-red` — alternative dot grid with red dots
 
-#### FeaturesSection Enhancements
-- Added 2 subtle gradient mesh blobs (red top-left, grey bottom-right) for depth
+#### Component Enhancements
+- **FeaturesSection**: Replaced inline hover styles with `.card-lift` class
+- **AgentGrid**: Applied `.card-lift` for consistent lift effect
+- **MetricCards**: Applied `.card-lift`, added sparklines on hover
+- **HeroSection**: Applied `.btn-glow` to primary CTA button
+- **CtaSection**: Applied `.btn-glow` to primary CTA button
+- **BackToTop**: Applied `.animate-glow-pulse` for breathing glow effect
+- **Activity Timeline container**: Applied `.dashboard-scroll` for themed scrollbar
 
-#### DashboardSection Enhancements
-- Applied `.animated-border` class (rotating gradient border) to the dashboard container
-- Replaced static border-gray-200 with animated rotating red/grey gradient border
+---
 
-#### MetricCards Enhancements
-- Added shimmer overlay on hover (`.shimmer` animation, opacity 0→1 on group hover)
-- Added `hover:border-red-100 dark:hover:border-red-900/40` border color change
-- Added `relative overflow-hidden` for proper shimmer containment
-
-#### AgentGrid Enhancements
-- Added `hover:-translate-y-0.5` for subtle lift effect
-- Added `relative overflow-hidden` for potential future effects
-- Critical agents now have expanding pulse ring animation (`.animate-pulse-ring`)
-
-#### HowItWorks Enhancements
-- Added blinking cursor effect (`.animate-blink`) after code block text
-- Red-tinted cursor for brand consistency
-
-#### StatsSection Enhancements
-- Enhanced hover shadow: dual-layer glow (30px + 60px) for more dramatic effect
-- Added `hover:-translate-y-1` for lift animation
-- Changed border glow from 30% to 40% opacity
-
-#### Footer Enhancements
-- Added gradient accent line at top (`bg-gradient-to-r from-transparent via-[#dc2626]/40 to-transparent`)
-- Social links now turn red on hover with `hover:-translate-y-0.5` lift effect
-
-## Full File Inventory (26 component files)
+## Full File Inventory (32+ component files)
 
 ### Landing Components (11 files)
-- `src/components/landing/Navbar.tsx` (updated: search trigger, ⌘K badge)
-- `src/components/landing/HeroSection.tsx` (updated: floating orbs, id="hero")
-- `src/components/landing/FeaturesSection.tsx` (updated: gradient mesh blobs)
-- `src/components/landing/HowItWorks.tsx` (updated: blinking cursor)
-- `src/components/landing/StatsSection.tsx` (updated: enhanced hover glow, id="stats")
+- `src/components/landing/Navbar.tsx` (search trigger, ⌘K badge)
+- `src/components/landing/HeroSection.tsx` (V5: particle canvas, typing animation, btn-glow)
+- `src/components/landing/FeaturesSection.tsx` (V5: card-lift)
+- `src/components/landing/HowItWorks.tsx` (blinking cursor)
+- `src/components/landing/StatsSection.tsx` (enhanced hover glow, animated counters)
 - `src/components/landing/IntegrationSection.tsx`
 - `src/components/landing/TestimonialsSection.tsx`
-- `src/components/landing/NewsletterSection.tsx` (updated: id="newsletter")
-- `src/components/landing/CtaSection.tsx` (updated: id="cta")
-- `src/components/landing/Footer.tsx` (updated: gradient accent line, social hover)
+- `src/components/landing/NewsletterSection.tsx`
+- `src/components/landing/CtaSection.tsx` (V5: btn-glow)
+- `src/components/landing/Footer.tsx` (gradient accent line, social hover)
 
-### Dashboard Components (10 files)
-- `src/components/dashboard/DashboardSection.tsx` (updated: animated border, alerts 2-col layout, ActivityTimeline)
+### Dashboard Components (11 files)
+- `src/components/dashboard/DashboardSection.tsx` (V5: URL state, export buttons, data-tour attrs, dashboard-scroll)
 - `src/components/dashboard/AgentDetailSheet.tsx`
-- `src/components/dashboard/MetricCards.tsx` (updated: shimmer hover, border color)
-- `src/components/dashboard/AgentGrid.tsx` (updated: lift effect, pulse ring for critical)
+- `src/components/dashboard/MetricCards.tsx` (V5: mini sparklines, card-lift)
+- `src/components/dashboard/AgentGrid.tsx` (V5: card-lift)
 - `src/components/dashboard/TraceViewer.tsx`
 - `src/components/dashboard/IssuesPanel.tsx`
 - `src/components/dashboard/AlertFeed.tsx`
-- `src/components/dashboard/ActivityTimeline.tsx` ✨ NEW
+- `src/components/dashboard/ActivityTimeline.tsx`
 - `src/components/dashboard/MetricsCharts.tsx`
 - `src/components/dashboard/McpPanel.tsx`
 - `src/components/dashboard/DashboardSkeleton.tsx`
 
-### UI Components (3 new files)
-- `src/components/ui/CommandPalette.tsx` ✨ NEW
-- `src/components/ui/ScrollProgress.tsx` ✨ NEW
-- `src/components/ui/BackToTop.tsx` ✨ NEW
+### UI Components (7 files)
+- `src/components/ui/CommandPalette.tsx`
+- `src/components/ui/ScrollProgress.tsx`
+- `src/components/ui/BackToTop.tsx` (V5: glow-pulse)
+- `src/components/ui/ParticleCanvas.tsx` ✨ NEW V5
+- `src/components/ui/ExportButton.tsx` ✨ NEW V5
+- `src/components/ui/DashboardTour.tsx` ✨ NEW V5
+
+### Utilities
+- `src/lib/export-utils.ts` ✨ NEW V5
 
 ### Mini Services
 - `mini-services/alert-streamer/index.ts`
 - `mini-services/alert-streamer/package.json`
 
 ### Core Files
-- `src/app/page.tsx` (updated: section dividers, ScrollProgress, BackToTop, CommandPalette)
+- `src/app/page.tsx` (V5: DashboardTour integration)
 - `src/app/layout.tsx`
-- `src/app/globals.css` (updated: new animations, section-divider, selection, smooth scroll)
+- `src/app/globals.css` (V5: 10+ new animations/utilities)
+
+---
 
 ## Verification Results
 - ✅ ESLint: Zero errors
 - ✅ Page: HTTP 200, compiles and renders
 - ✅ Zero JS errors (verified via agent-browser console)
 - ✅ All heading text spacing correct (verified via DOM textContent)
-- ✅ Command Palette: Opens via navbar click, shows quick actions, closes with Escape
-- ✅ Scroll Progress: Present in DOM, renders correctly
-- ✅ Back-to-Top: Present in DOM, renders correctly
-- ✅ Activity Timeline: Renders in alerts tab with 2-column layout
-- ✅ Animated border: Applied to dashboard container
-- ✅ Section dividers: 5 dividers present between sections
+- ✅ Command Palette: Opens, search, keyboard nav, close with Escape
+- ✅ Scroll Progress: Present and renders correctly
+- ✅ Back-to-Top: Present with glow-pulse animation
+- ✅ Activity Timeline: Renders in alerts tab with 2-column layout + dashboard-scroll
+- ✅ Particle Canvas: Renders in hero section (canvas element, z-0)
+- ✅ Typing Animation: Hero subtitle types character by character with red cursor
+- ✅ CSV Export: ExportButton present in traces and issues tabs
+- ✅ URL State: Hash updates when switching tabs
+- ✅ Onboarding Tour: Component mounted, trigger button rendered
+- ✅ Mini Sparklines: Canvas sparklines render in metric cards
 - ✅ Dark mode: Toggle works, no visual regressions
 - ✅ Mobile responsive: Tested on iPhone 14 viewport
 - ✅ API routes: All 5 returning 200
@@ -183,13 +183,14 @@
 - Minor: Command palette keyboard shortcut (Ctrl+K) doesn't trigger via agent-browser's synthetic events (works in real browsers)
 - Minor: Agent detail sheet sparkline uses randomly seeded data (could use real API data)
 - Minor: Activity timeline uses hardcoded mock data (no API endpoint yet)
+- Minor: Onboarding tour may not trigger perfectly on very fast scroll-by
 
 ## Priority Recommendations for Next Phase
 1. **Performance optimization** — lazy load below-fold sections with Next.js dynamic imports
-2. **Export/Share** — export traces/issues as CSV/PDF
-3. **Real agent detail API** — fetch historical trace data for the sparkline
-4. **Onboarding tour** — guided tooltip system for first-time visitors
-5. **Page-level loading skeleton** — skeleton UI while JS hydrates
-6. **API for Activity Timeline** — backend endpoint for real activity events
-7. **Search in command palette** — also search by agent status, issue severity
-8. **Dashboard URL routing** — make tabs bookmarkable with URL params
+2. **Real agent detail API** — fetch historical trace data for the sparkline
+3. **API for Activity Timeline** — backend endpoint for real activity events
+4. **Page-level loading skeleton** — skeleton UI while JS hydrates
+5. **Export to PDF** — generate styled PDF reports for traces/issues
+6. **Search in command palette** — also search by agent status, issue severity
+7. **Agent comparison view** — side-by-side agent performance comparison
+8. **Dashboard filters persistence** — save filter state to URL or localStorage

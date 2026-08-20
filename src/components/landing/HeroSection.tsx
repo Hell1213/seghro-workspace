@@ -4,6 +4,35 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { ArrowDown, Activity, Zap, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ParticleCanvas from '@/components/ui/ParticleCanvas';
+import { useState, useEffect } from 'react';
+
+function TypingText({ text, delay = 0, speed = 30, className }: { text: string; delay?: number; speed?: number; className?: string }) {
+  const [displayed, setDisplayed] = useState('');
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    if (displayed.length < text.length) {
+      const t = setTimeout(() => setDisplayed(text.slice(0, displayed.length + 1)), speed);
+      return () => clearTimeout(t);
+    }
+  }, [started, displayed, text, speed]);
+
+  return (
+    <span className={className}>
+      {displayed}
+      {displayed.length < text.length && (
+        <span className="inline-block w-[2px] h-[1em] bg-[#dc2626] ml-0.5 animate-blink align-middle" />
+      )}
+    </span>
+  );
+}
 
 function AnimatedTrace() {
   const spans = [
@@ -93,6 +122,8 @@ export function HeroSection() {
 
   return (
     <section id="hero" ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
+      {/* Particle network */}
+      <ParticleCanvas />
       {/* Background grid + noise texture */}
       <div className="absolute inset-0 bg-grid-pattern dark:opacity-30" />
       <div className="absolute inset-0 bg-noise dark:opacity-30" />
@@ -137,11 +168,13 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="mt-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl"
+              className="mt-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl min-h-[3.5rem]"
             >
-              Surface silent failures, pull context across traces, and improve
-              your agent before users churn. Real-time observability for
-              production AI systems.
+              <TypingText
+                text="Surface silent failures, pull context across traces, and improve your agent before users churn. Real-time observability for production AI systems."
+                delay={800}
+                speed={18}
+              />
             </motion.p>
 
             <motion.div
@@ -152,7 +185,7 @@ export function HeroSection() {
             >
               <Button
                 size="lg"
-                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02]"
+                className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-7 shadow-lg shadow-red-200 hover:shadow-red-300 transition-all hover:scale-[1.02] btn-glow"
               >
                 <Activity className="mr-2 h-4 w-4 self-center" />
                 View Live Dashboard

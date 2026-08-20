@@ -116,7 +116,7 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-lg hover:shadow-red-100/30 dark:hover:shadow-red-900/20 hover:border-red-200 dark:hover:border-red-900/50 transition-all duration-300 hover:-translate-y-0.5"
+              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 transition-all duration-300 card-lift overflow-hidden"
             >
               <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border ${feature.color} mb-4 transition-transform group-hover:scale-110`}> 
                 <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />

@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { ExportButton } from '@/components/ui/ExportButton';
 import { MetricCards } from './MetricCards';
 import { AgentGrid } from './AgentGrid';
 import { TraceViewer } from './TraceViewer';
@@ -89,6 +90,19 @@ export function DashboardSection() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+
+  // Sync tab to URL hash
+  useEffect(() => {
+    const hash = window.location.hash.replace('#dashboard-', '').replace('#', '');
+    if (['overview', 'traces', 'issues', 'alerts'].includes(hash)) {
+      setActiveTab(hash as TabId);
+    }
+  }, []);
+
+  const handleTabChange = (tab: TabId) => {
+    setActiveTab(tab);
+    window.history.replaceState(null, '', `#dashboard-${tab}`);
+  };
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
@@ -220,14 +234,14 @@ export function DashboardSection() {
           {/* Dashboard header with tabs */}
           <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+              <div data-tour="tabs" className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => handleTabChange(tab.id)}
                       className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
                         isActive
                           ? 'text-[#dc2626] border-[#dc2626]'
@@ -270,7 +284,11 @@ export function DashboardSection() {
                     animate={{ opacity: 1 }}
                     className="space-y-6"
                   >
-                    {metrics?.cards && <MetricCards cards={metrics.cards} />}
+                    {metrics?.cards && (
+                      <div data-tour="metrics">
+                        <MetricCards cards={metrics.cards} />
+                      </div>
+                    )}
 
                     <div className="grid lg:grid-cols-3 gap-6">
                       <div className="lg:col-span-2">
@@ -279,20 +297,22 @@ export function DashboardSection() {
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
                           <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
                         </div>
-                        <AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} />
+                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} /></div>
                       </div>
                       <div>
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
-                        <McpPanel />
+                        <div data-tour="mcp"><McpPanel /></div>
                       </div>
                     </div>
 
                     {metrics?.timeSeries && metrics?.severityBreakdown && metrics?.frameworkDistribution && (
-                      <MetricsCharts
-                        timeSeries={metrics.timeSeries}
-                        severity={metrics.severityBreakdown}
-                        frameworks={metrics.frameworkDistribution}
-                      />
+                      <div data-tour="charts">
+                        <MetricsCharts
+                          timeSeries={metrics.timeSeries}
+                          severity={metrics.severityBreakdown}
+                          frameworks={metrics.frameworkDistribution}
+                        />
+                      </div>
                     )}
                   </motion.div>
                 )}
@@ -309,22 +329,30 @@ export function DashboardSection() {
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
                         <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
                       </div>
-                      <div className="relative w-full sm:w-auto">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
-                        <Input
-                          placeholder="Search traces..."
-                          value={traceSearch}
-                          onChange={(e) => setTraceSearch(e.target.value)}
-                          className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+                          <Input
+                            placeholder="Search traces..."
+                            value={traceSearch}
+                            onChange={(e) => setTraceSearch(e.target.value)}
+                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+                          />
+                          {traceSearch && (
+                            <button
+                              onClick={() => setTraceSearch('')}
+                              className="absolute right-2 top-1/2 -translate-y-1/2"
+                            >
+                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+                            </button>
+                          )}
+                        </div>
+                        <ExportButton
+                          data={filteredTraces as unknown as Record<string, unknown>[]}
+                          filename="sentinel-traces"
+                          columns={['traceId', 'agentId', 'status', 'duration', 'inputTokens', 'outputTokens', 'createdAt']}
+                          label="Export"
                         />
-                        {traceSearch && (
-                          <button
-                            onClick={() => setTraceSearch('')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2"
-                          >
-                            <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
-                          </button>
-                        )}
                       </div>
                     </div>
 
@@ -406,6 +434,12 @@ export function DashboardSection() {
                           <Filter className="h-3.5 w-3.5" />
                           Filters
                         </button>
+                        <ExportButton
+                          data={filteredIssues as unknown as Record<string, unknown>[]}
+                          filename="sentinel-issues"
+                          columns={['agentName', 'title', 'severity', 'status', 'failureRate', 'affectedRuns', 'createdAt']}
+                          label="Export"
+                        />
                       </div>
                     </div>
 
@@ -474,7 +508,7 @@ export function DashboardSection() {
                           <Clock className="h-4 w-4 text-gray-400" />
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
                         </div>
-                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto">
+                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">
                           <ActivityTimeline />
                         </div>
                       </div>
