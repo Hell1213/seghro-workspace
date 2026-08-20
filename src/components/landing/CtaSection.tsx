@@ -10,7 +10,7 @@ export function CtaSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="relative py-24 sm:py-32 overflow-hidden">
+    <section id="cta" className="relative py-24 sm:py-32 overflow-hidden">
       {/* Animated red gradient mesh background */}
       <div className="absolute inset-0 bg-white dark:bg-gray-950" />
       <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-[#dc2626]/8 rounded-full blur-[150px] animate-pulse" />
@@ -24,7 +24,7 @@ export function CtaSection() {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-6">
-            Start monitoring your 
+            Start monitoring your{'\u00A0'}
             <span className="text-gradient">agents today</span>
           </h2>
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-10">

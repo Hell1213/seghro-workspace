@@ -45,13 +45,18 @@ export function AgentGrid({ agents, onSelect }: { agents: Agent[]; onSelect: (ag
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, duration: 0.4 }}
             onClick={() => onSelect(agent)}
-            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-lg hover:shadow-red-50 dark:hover:shadow-red-950/20 transition-all duration-300"
+            className="group cursor-pointer rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-lg hover:shadow-red-50 dark:hover:shadow-red-950/20 transition-all duration-300 hover:-translate-y-0.5 relative overflow-hidden"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2.5">
                 <div className={`relative flex h-9 w-9 items-center justify-center rounded-lg bg-gray-50 dark:bg-gray-800 group-hover:bg-red-50 dark:group-hover:bg-red-950/30 transition-colors`}>
                   <Bot className="h-4.5 w-4.5 text-gray-400 group-hover:text-[#dc2626] transition-colors" />
-                  <div className={`absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ${cfg.color} ${agent.status === 'critical' ? 'animate-pulse' : ''}`} />
+                  <div className="relative">
+                    {agent.status === 'critical' && (
+                      <span className="absolute inset-0 rounded-full bg-red-500/30 animate-pulse-ring" />
+                    )}
+                    <div className={`relative h-2.5 w-2.5 rounded-full ${cfg.color} ${agent.status === 'critical' ? 'animate-pulse' : ''}`} />
+                  </div>
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 font-mono">{agent.name}</h3>

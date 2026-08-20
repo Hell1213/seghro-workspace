@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Navbar } from '@/components/landing/Navbar';
 import { HeroSection } from '@/components/landing/HeroSection';
@@ -12,14 +13,31 @@ import { NewsletterSection } from '@/components/landing/NewsletterSection';
 import { IntegrationSection } from '@/components/landing/IntegrationSection';
 import { CtaSection } from '@/components/landing/CtaSection';
 import { Footer } from '@/components/landing/Footer';
+import { CommandPalette, useCommandPalette } from '@/components/ui/CommandPalette';
+import { ScrollProgress } from '@/components/ui/ScrollProgress';
+import { BackToTop } from '@/components/ui/BackToTop';
+import { useAppStore } from '@/lib/store';
 
 export default function Home() {
+  const { open, close, toggle } = useCommandPalette();
+  const setSelectedAgent = useAppStore((s) => s.setSelectedAgent);
+
+  const handleSelectAgent = useCallback(
+    (agentId: string) => {
+      setSelectedAgent(agentId);
+    },
+    [setSelectedAgent]
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <Navbar />
+      <ScrollProgress />
+      <Navbar onSearchClick={toggle} />
 
       <main className="flex-1">
         <HeroSection />
+
+        <div className="section-divider max-w-7xl mx-auto" />
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -29,6 +47,8 @@ export default function Home() {
         >
           <FeaturesSection />
         </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -48,6 +68,8 @@ export default function Home() {
           <StatsSection />
         </motion.div>
 
+        <div className="section-divider max-w-7xl mx-auto" />
+
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -56,6 +78,8 @@ export default function Home() {
         >
           <DashboardSection />
         </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -74,6 +98,8 @@ export default function Home() {
         >
           <NewsletterSection />
         </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -95,6 +121,14 @@ export default function Home() {
       </main>
 
       <Footer />
+
+      <BackToTop />
+
+      <CommandPalette
+        open={open}
+        onClose={close}
+        onSelectAgent={handleSelectAgent}
+      />
     </div>
   );
 }

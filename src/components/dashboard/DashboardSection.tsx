@@ -8,6 +8,7 @@ import {
   AlertTriangle,
   Bell,
   Bot,
+  Clock,
   Search,
   Filter,
   X,
@@ -18,6 +19,7 @@ import { AgentGrid } from './AgentGrid';
 import { TraceViewer } from './TraceViewer';
 import { IssuesPanel } from './IssuesPanel';
 import { AlertFeed } from './AlertFeed';
+import { ActivityTimeline } from './ActivityTimeline';
 import { MetricsCharts } from './MetricsCharts';
 import { McpPanel } from './McpPanel';
 import { AgentDetailSheet } from './AgentDetailSheet';
@@ -199,7 +201,7 @@ export function DashboardSection() {
             Live Demo
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            The 
+            The{'\u00A0'}
             <span className="text-gradient">observability dashboard</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
@@ -213,7 +215,7 @@ export function DashboardSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
+          className="animated-border rounded-2xl bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
         >
           {/* Dashboard header with tabs */}
           <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
@@ -466,7 +468,20 @@ export function DashboardSection() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <AlertFeed alerts={alertItems} />
+                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                      <div className="lg:col-span-2">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Clock className="h-4 w-4 text-gray-400" />
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
+                        </div>
+                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto">
+                          <ActivityTimeline />
+                        </div>
+                      </div>
+                      <div className="lg:col-span-3">
+                        <AlertFeed alerts={alertItems} />
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </>

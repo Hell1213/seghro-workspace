@@ -99,7 +99,7 @@ export function StatsSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section className="relative py-24 sm:py-32 bg-gray-950 overflow-hidden">
+    <section id="stats" className="relative py-24 sm:py-32 bg-gray-950 overflow-hidden">
       {/* Red glow accents */}
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#dc2626]/10 rounded-full blur-[120px]" />
       <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[#dc2626]/8 rounded-full blur-[100px]" />
@@ -130,7 +130,7 @@ export function StatsSection() {
             <motion.div
               key={stat.label}
               variants={itemVariants}
-              className="relative group rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm p-6 text-center hover:border-[#dc2626]/30 transition-all duration-300 hover:shadow-[0_0_24px_rgba(220,38,38,0.08)]"
+              className="relative group rounded-2xl border border-gray-800 bg-gray-900/50 backdrop-blur-sm p-6 text-center hover:border-[#dc2626]/40 transition-all duration-300 hover:shadow-[0_0_30px_rgba(220,38,38,0.1),0_0_60px_rgba(220,38,38,0.04)] hover:-translate-y-1"
             >
               {/* Red accent top bar */}
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-[#dc2626] rounded-full group-hover:w-3/4 transition-all duration-500" />

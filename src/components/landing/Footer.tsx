@@ -12,7 +12,9 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+    <footer className="relative border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950">
+      {/* Gradient accent line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#dc2626]/40 to-transparent" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {/* Brand */}
@@ -27,10 +29,10 @@ export function Footer() {
               Production monitoring for AI agents. Catch silent failures before your users do.
             </p>
             <div className="flex items-center gap-2">
-              <a href="#" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <a href="#" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 dark:text-gray-500 hover:text-[#dc2626] dark:hover:text-red-400 transition-all duration-200 hover:-translate-y-0.5">
                 <Twitter className="h-4 w-4" />
               </a>
-              <a href="#" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <a href="#" className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-gray-400 dark:text-gray-500 hover:text-[#dc2626] dark:hover:text-red-400 transition-all duration-200 hover:-translate-y-0.5">
                 <Github className="h-4 w-4" />
               </a>
             </div>

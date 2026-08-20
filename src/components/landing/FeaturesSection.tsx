@@ -86,6 +86,9 @@ export function FeaturesSection() {
   return (
     <section id="features" className="relative py-24 sm:py-32 dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
+      {/* Subtle gradient mesh */}
+      <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/[0.02] blur-[100px] rounded-full" />
+      <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gray-500/[0.03] blur-[80px] rounded-full" />
       <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

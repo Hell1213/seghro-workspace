@@ -2,11 +2,15 @@
 
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Shield, Menu, X, Moon, Sun } from 'lucide-react';
+import { Shield, Menu, X, Moon, Sun, Search } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
-export function Navbar() {
+interface NavbarProps {
+  onSearchClick?: () => void;
+}
+
+export function Navbar({ onSearchClick }: NavbarProps) {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -67,6 +71,17 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={onSearchClick}
+              className="flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/50 px-3 py-1.5 text-sm text-gray-400 dark:text-gray-500 transition-colors hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-500 dark:hover:text-gray-400 cursor-pointer"
+              aria-label="Open command palette"
+            >
+              <Search className="h-3.5 w-3.5" />
+              <span className="hidden lg:inline">Search agents, traces, issues...</span>
+              <kbd className="ml-4 hidden sm:inline-flex items-center gap-0.5 rounded border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-1.5 py-0.5 text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </button>
             <Button variant="ghost" className="text-sm text-gray-600 dark:text-gray-400 hover:text-[#dc2626]">
               Documentation
             </Button>

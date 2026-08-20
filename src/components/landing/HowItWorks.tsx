@@ -57,7 +57,7 @@ export function HowItWorks() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-            From failure to fix in 
+            From failure to fix in{' '}
             <span className="text-gradient">four steps</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
@@ -121,8 +121,9 @@ export function HowItWorks() {
                       <div className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
                       <div className="h-2.5 w-2.5 rounded-full bg-green-500" />
                     </div>
-                    <pre className="text-[12px] sm:text-sm font-mono text-gray-300 whitespace-pre-wrap leading-relaxed">
+                    <pre className="text-[12px] sm:text-sm font-mono text-gray-300 whitespace-pre-wrap leading-relaxed relative">
                       {step.code}
+                      <span className="inline-block w-2 h-4 bg-[#dc2626]/70 animate-blink ml-0.5 -mb-0.5" />
                     </pre>
                   </div>
                 </div>

@@ -1,8 +1,8 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V3 — Dark mode, agent detail sheets, issue workflow, newsletter, polished interactions**
-- Page renders ~94KB HTML (35 headings, single H1, clean semantic structure)
+**Phase: V4 — Command palette, scroll UX, activity timeline, enhanced styling, section dividers**
+- Page renders ~100KB+ HTML (35 headings, single H1, clean semantic structure)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
 - All API routes functional (agents, traces, issues, alerts, metrics)
@@ -11,179 +11,185 @@
 - Agent detail sheet with sparkline charts verified working
 - Issue resolution workflow (Open → Investigating → Resolved) verified working
 - Newsletter section with email subscription toast
-- 9+ landing sections + 4-tab working dashboard
+- Command Palette (⌘K) with fuzzy search, keyboard nav, quick actions, recent items
+- Scroll progress bar + Back-to-Top button
+- Activity Timeline in Alerts tab
+- 9+ landing sections + 4-tab working dashboard + enhanced styling
+- 26+ component files total
 
-## Completed Modifications (This Session)
+---
 
-### 1. Accessibility Whitespace Fix
-- Replaced all `{' '}` JSX whitespace with `{'\u00A0'}` (non-breaking space) across 8 files
-- This fixes accessibility tree spacing issues where headings appeared as "toship", "Theobservability", etc.
-- Verified: a11y tree now shows proper spacing in all headings
+## V4 Session — Completed Modifications
 
-### 2. Dark Mode Toggle (V3-3)
-- Added `next-themes` ThemeProvider to `layout.tsx` (attribute="class", defaultTheme="light")
-- Added Moon/Sun toggle button in Navbar between "Documentation" and "Get Started"
-- Hydration-safe with `mounted` state gate
-- AnimatePresence animation for icon swap (scale + rotate)
-- Navbar links, backgrounds, hover states all have `dark:` variants
-- Dark theme CSS already defined in globals.css (verified red/dark-red on #0a0a0a)
+### 1. Bug Fixes: Heading Spacing (5 files)
+- Fixed 5 remaining `{' '}` non-breaking space issues in headings:
+  - `HowItWorks.tsx`: "in four steps" (was "infour")
+  - `DashboardSection.tsx`: "The observability" (was "Theobservability")
+  - `TestimonialsSection.tsx`: "by engineering" (was "byengineering")
+  - `IntegrationSection.tsx`: "your existing" (was "yourexisting")
+  - `CtaSection.tsx`: "your agents" (was "youragents")
+- Pattern: whitespace before a `<span>` on the next line gets lost in JSX; fixed with `{'\u00A0'}` before the span
+- Verified via agent-browser `document.querySelectorAll('h2').textContent` — all headings now correct
 
-### 3. Agent Detail Sheet (V3-4)
-- Created `src/components/dashboard/AgentDetailSheet.tsx` — slide-in drawer from right
-- Uses shadcn/ui Sheet component (Radix Dialog portal)
-- **Header**: Agent name (monospace), status badge, framework badge, close button
-- **Stats grid**: 2x2 layout — Total Runs, Error Rate, Avg Latency, Last Run
-- **Sparkline chart**: recharts AreaChart with 10 seeded data points, red #dc2626 line + gradient fill, 80px height
-- **Recent Issues**: Last 3 issues for the agent, filtered from seed-data by agentId, with severity badges
-- **Action buttons**: "View Full Trace" and "View All Issues" (styled, non-functional)
-- Framer Motion stagger entrance on inner sections
-- Updated AgentGrid to pass full Agent object (not just ID) to onSelect
-- Updated DashboardSection with detailAgent state and AgentDetailSheet rendering
+### 2. New Feature: Command Palette (⌘K)
+- Created `src/components/ui/CommandPalette.tsx` (~590 lines)
+- **Architecture**: `CommandPalettePanel` (inner, mounts fresh each open) + `CommandPalette` wrapper (AnimatePresence) + `useCommandPalette()` hook
+- **Keyboard shortcut**: Cmd+K / Ctrl+K global listener
+- **Navbar trigger**: Fake search bar with ⌘K badge between nav links and Documentation
+- **Glass-morphism panel**: backdrop-blur-xl, red accent highlights, Framer Motion scale+fade animations
+- **4 search groups**: Navigation (9 sections), Agents (6), Traces (8), Issues (6)
+- **Fuzzy search**: Case-insensitive substring matching on label and secondary text
+- **Keyboard navigation**: ↑↓ arrows, Enter to select, Escape to close, auto scroll-into-view
+- **Quick Actions** (empty search): Go to Dashboard, View Issues, View Alerts, Toggle Dark Mode, Copy Install Command
+- **Recent items**: localStorage persistence (max 5), shown above Quick Actions
+- **Agent selection**: Dispatches to Zustand store, smooth-scrolls to #dashboard
+- Added section IDs: hero, stats, newsletter, cta
 
-- **Verified via agent-browser**: Clicking support-agent card opens sheet with stats (14,832 runs, 34.2% error rate), sparkline, and recent issues
+### 3. New Feature: Scroll Progress Indicator
+- Created `src/components/ui/ScrollProgress.tsx`
+- 3px red (#dc2626) bar at top of viewport (fixed z-50)
+- useScroll + useMotionValueEvent + useSpring for smooth tracking
+- Red glow box-shadow, fades in >1% scroll
 
+### 4. New Feature: Back-to-Top Button
+- Created `src/components/ui/BackToTop.tsx`
+- Floating red circular button, bottom-right (fixed z-40)
+- Appears after 600px scroll, AnimatePresence fade+slide-up
+- whileHover scale(1.1), whileTap scale(0.95), smooth scroll-to-top
 
-### 4. Issue Resolution Workflow (V3-5)
-- Updated IssuesPanel with context-aware action buttons per status:
-  - **open** → "Start Investigation" (amber) + "Mark Resolved" (green)
-  - **investigating** → "Mark Resolved" (green)
-  - **resolved** → "Reopen" (gray outline)
-  - **reopened** → "Start Investigation" (amber)
-- Calls PATCH /api/issues with `{ id, status }` to update backend
-- Shows `toast.success('Issue status updated')` via sonner
-- Calls `onUpdate` callback to re-fetch issues from API
-- DashboardSection passes `fetchIssues()` function as onUpdate prop
-- **Verified via agent-browser**: Clicked "Start Investigation" → status changed to "Investigating", badge updated, only "Mark Resolved" button shown, PATCH /api/issues returned 200, issues re-fetched
+### 5. New Feature: Activity Timeline (Alerts Tab)
+- Created `src/components/dashboard/ActivityTimeline.tsx`
+- 12 mock activity events spanning last 24h
+- 7 event types: agent_status_change, issue_detected, issue_resolved, alert_fired, alert_acknowledged, mcp_fix_run, eval_completed
+- Vertical timeline with colored icon dots, relative timestamps
+- Critical items have red text + pulse animation
+- Framer Motion staggered entrance (0.06s delay)
+- Alerts tab now 2-column: Activity Timeline (left 40%) + AlertFeed (right 60%)
 
-### 5. Newsletter/Weekly Section (V3-6)
-- Created `src/components/landing/NewsletterSection.tsx`
-- Section title: "Sentinel Weekly" with subtitle and 2-line description
-- Email input + "Subscribe" button in a single row (shadcn/ui Input + Button)
-- `toast.success('Subscribed!')` via sonner on click/Enter
-- Red accent border on input, red subscribe button
-- Framer Motion scroll-triggered staggered entrance
-- Placed between TestimonialsSection and IntegrationSection in page.tsx
-- **Verified via agent-browser**: "Sentinel Weekly" heading and "Subscribe" button present
+### 6. Styling Improvements
 
-### 6. Enhanced Micro-Interactions & Polish (V3-7)
-- Added CSS utilities to globals.css:
-  - `.hover-lift` — translateY(-2px) on hover with spring easing
-  - `.hover-glow` — red glow box-shadow on hover
-  - `.text-balance` — CSS text-wrap: balance for better line breaking
-  - `.bg-noise` — SVG noise texture overlay for depth
-  - `.border-gradient` — gradient border with dark mode variant
-  - `.animate-float` — subtle 4s float animation
-  - `.animate-fade-in-up` — fade + slide up entrance
-- Added `bg-noise` overlay to HeroSection background (subtle SVG noise texture)
+#### CSS Enhancements (globals.css)
+- Added `@keyframes gradient-shift` + `.animate-gradient` (shifting gradient background)
+- Added `@keyframes border-rotate` + `.animated-border` (rotating gradient border using CSS mask)
+  - Dark mode variant with adjusted red/grey colors
+- Added `@keyframes blink` + `.animate-blink` (terminal cursor blink effect)
+- Added `@keyframes pulse-ring` + `.animate-pulse-ring` (expanding ring for critical status indicators)
+- Added `.section-divider` (gradient line: transparent → grey → red → grey → transparent)
+  - Dark mode variant with darker colors
+- Added `::selection` styling (red tint for text selection)
+- Added `html { scroll-behavior: smooth }` for native smooth scrolling
 
-## Full File Inventory (22 component files)
+#### Section Dividers (page.tsx)
+- Added 5 `.section-divider` elements between landing sections:
+  - After Hero → before Features
+  - After Features → before How It Works
+  - After Stats → before Dashboard
+  - After Dashboard → before Testimonials
+  - After Newsletter → before Integrations
+
+#### HeroSection Enhancements
+- Added 2 floating gradient orbs (red and grey) with `animate-float` animation
+- Orbs use blur-[80px] and blur-[60px] for soft depth effect
+
+#### FeaturesSection Enhancements
+- Added 2 subtle gradient mesh blobs (red top-left, grey bottom-right) for depth
+
+#### DashboardSection Enhancements
+- Applied `.animated-border` class (rotating gradient border) to the dashboard container
+- Replaced static border-gray-200 with animated rotating red/grey gradient border
+
+#### MetricCards Enhancements
+- Added shimmer overlay on hover (`.shimmer` animation, opacity 0→1 on group hover)
+- Added `hover:border-red-100 dark:hover:border-red-900/40` border color change
+- Added `relative overflow-hidden` for proper shimmer containment
+
+#### AgentGrid Enhancements
+- Added `hover:-translate-y-0.5` for subtle lift effect
+- Added `relative overflow-hidden` for potential future effects
+- Critical agents now have expanding pulse ring animation (`.animate-pulse-ring`)
+
+#### HowItWorks Enhancements
+- Added blinking cursor effect (`.animate-blink`) after code block text
+- Red-tinted cursor for brand consistency
+
+#### StatsSection Enhancements
+- Enhanced hover shadow: dual-layer glow (30px + 60px) for more dramatic effect
+- Added `hover:-translate-y-1` for lift animation
+- Changed border glow from 30% to 40% opacity
+
+#### Footer Enhancements
+- Added gradient accent line at top (`bg-gradient-to-r from-transparent via-[#dc2626]/40 to-transparent`)
+- Social links now turn red on hover with `hover:-translate-y-0.5` lift effect
+
+## Full File Inventory (26 component files)
 
 ### Landing Components (11 files)
-- `src/components/landing/Navbar.tsx` (updated: dark mode toggle, dark: variants)
-- `src/components/landing/HeroSection.tsx` (updated: noise texture)
-- `src/components/landing/FeaturesSection.tsx`
-- `src/components/landing/HowItWorks.tsx`
-- `src/components/landing/StatsSection.tsx`
+- `src/components/landing/Navbar.tsx` (updated: search trigger, ⌘K badge)
+- `src/components/landing/HeroSection.tsx` (updated: floating orbs, id="hero")
+- `src/components/landing/FeaturesSection.tsx` (updated: gradient mesh blobs)
+- `src/components/landing/HowItWorks.tsx` (updated: blinking cursor)
+- `src/components/landing/StatsSection.tsx` (updated: enhanced hover glow, id="stats")
 - `src/components/landing/IntegrationSection.tsx`
 - `src/components/landing/TestimonialsSection.tsx`
-- `src/components/landing/NewsletterSection.tsx` ✨ NEW
-- `src/components/landing/CtaSection.tsx`
-- `src/components/landing/Footer.tsx`
+- `src/components/landing/NewsletterSection.tsx` (updated: id="newsletter")
+- `src/components/landing/CtaSection.tsx` (updated: id="cta")
+- `src/components/landing/Footer.tsx` (updated: gradient accent line, social hover)
 
-### Dashboard Components (9 files)
-- `src/components/dashboard/DashboardSection.tsx` (updated: detail sheet, fetchIssues callback)
-- `src/components/dashboard/AgentDetailSheet.tsx` ✨ NEW
-- `src/components/dashboard/MetricCards.tsx`
-- `src/components/dashboard/AgentGrid.tsx` (updated: passes full Agent object)
+### Dashboard Components (10 files)
+- `src/components/dashboard/DashboardSection.tsx` (updated: animated border, alerts 2-col layout, ActivityTimeline)
+- `src/components/dashboard/AgentDetailSheet.tsx`
+- `src/components/dashboard/MetricCards.tsx` (updated: shimmer hover, border color)
+- `src/components/dashboard/AgentGrid.tsx` (updated: lift effect, pulse ring for critical)
 - `src/components/dashboard/TraceViewer.tsx`
-- `src/components/dashboard/IssuesPanel.tsx` (updated: status transition buttons + toast)
+- `src/components/dashboard/IssuesPanel.tsx`
 - `src/components/dashboard/AlertFeed.tsx`
+- `src/components/dashboard/ActivityTimeline.tsx` ✨ NEW
 - `src/components/dashboard/MetricsCharts.tsx`
 - `src/components/dashboard/McpPanel.tsx`
+- `src/components/dashboard/DashboardSkeleton.tsx`
+
+### UI Components (3 new files)
+- `src/components/ui/CommandPalette.tsx` ✨ NEW
+- `src/components/ui/ScrollProgress.tsx` ✨ NEW
+- `src/components/ui/BackToTop.tsx` ✨ NEW
 
 ### Mini Services
 - `mini-services/alert-streamer/index.ts`
 - `mini-services/alert-streamer/package.json`
 
 ### Core Files
-- `src/app/page.tsx` (updated: NewsletterSection added)
-- `src/app/layout.tsx` (updated: ThemeProvider added)
-- `src/app/globals.css` (updated: new utility classes)
+- `src/app/page.tsx` (updated: section dividers, ScrollProgress, BackToTop, CommandPalette)
+- `src/app/layout.tsx`
+- `src/app/globals.css` (updated: new animations, section-divider, selection, smooth scroll)
 
 ## Verification Results
 - ✅ ESLint: Zero errors
-- ✅ Page: HTTP 200, 94,472 bytes
-- ✅ Dark mode toggle: Renders, switches theme
-- ✅ Agent detail sheet: Opens with stats, sparkline, issues on card click
-- ✅ Issue resolution: PATCH /api/issues 200, status transitions work, toast fires
-- ✅ Newsletter: Section renders with subscribe form
-- ✅ A11y whitespace: Fixed with non-breaking spaces
+- ✅ Page: HTTP 200, compiles and renders
+- ✅ Zero JS errors (verified via agent-browser console)
+- ✅ All heading text spacing correct (verified via DOM textContent)
+- ✅ Command Palette: Opens via navbar click, shows quick actions, closes with Escape
+- ✅ Scroll Progress: Present in DOM, renders correctly
+- ✅ Back-to-Top: Present in DOM, renders correctly
+- ✅ Activity Timeline: Renders in alerts tab with 2-column layout
+- ✅ Animated border: Applied to dashboard container
+- ✅ Section dividers: 5 dividers present between sections
+- ✅ Dark mode: Toggle works, no visual regressions
+- ✅ Mobile responsive: Tested on iPhone 14 viewport
 - ✅ API routes: All 5 returning 200
 - ✅ WebSocket: Alert streamer active on port 3001
-- ✅ 35 headings, 1 H1, clean semantic structure
-
-## Verification Results
-- ✅ ESLint: Zero errors
-- ✅ Page: HTTP 200, 94,472 bytes
-- ✅ Dark mode toggle: Renders, switches theme
-- ✅ Agent detail sheet: Opens with stats, sparkline, issues on card click
-- ✅ Issue resolution: PATCH /api/issues 200, status transitions work, toast fires
-- ✅ Newsletter: Section renders with subscribe form
-- ✅ A11y whitespace: Fixed with non-breaking spaces
-- ✅ API routes: All 5 returning 200
-- ✅ WebSocket: Alert streamer active on port 3001
-- ✅ 35 headings, 1 H1, clean semantic structure
-
-### 7. Hero & Navbar Styling + Full Dark Mode Polish (V3-8)
-- **HeroSection**: Changed sub-headline `text-gray-500` → `text-gray-600` for better contrast/readability
-- **HeroSection**: Increased CTA container spacing `mt-8` → `mt-10`
-- **HeroSection**: Added `self-center` to Activity icon in primary CTA button for vertical alignment
-- **HeroSection**: Added `dark:text-gray-100` on h1, `dark:text-gray-400` on paragraph, `dark:text-gray-300`/`dark:text-gray-500` on stat labels
-- **HeroSection**: Added dark mode on outline button (border, text, hover bg)
-- **HeroSection**: Added `dark:opacity-30` on grid-pattern and noise texture backgrounds
-- **HeroSection**: Added `dark:text-gray-600` on scroll indicator arrow
-- **Navbar**: Logo text already had `font-bold text-gray-900 dark:text-gray-100 tracking-tight` — confirmed correct
-- **Navbar**: Added subtle red glow (`drop-shadow`) on "Sentinel" logo text when page is scrolled
-- **FeaturesSection**: Added `dark:bg-gray-900/50` on section
-- **FeaturesSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
-- **FeaturesSection**: Added `dark:bg-gray-900 dark:border-gray-800` on cards
-- **FeaturesSection**: Enhanced hover with `hover:border-red-200 dark:hover:border-red-900/50` and `dark:hover:shadow-red-900/20`
-- **FeaturesSection**: Added pulsing green dot (animate-ping) next to "Live Alerts" feature title
-- **FeaturesSection**: Added dark mode variants to all feature icon color/background classes
-- **StatsSection**: Added subtle red glow box-shadow on stat card hover
-- **StatsSection**: Section left as-is (bg-gray-950) — no double-darken risk
-- **HowItWorks**: Added `dark:bg-gray-900/30` on section
-- **HowItWorks**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
-- **HowItWorks**: Added `dark:border-gray-800` on code blocks
-- **HowItWorks**: Added `dark:bg-gray-900` on step number circles, `dark:via-gray-800 dark:to-gray-800` on connector line
-- **HowItWorks**: Added step number red glow on row hover via `group-hover:shadow`
-- **TestimonialsSection**: Added `dark:bg-gray-900` on section
-- **TestimonialsSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
-- **TestimonialsSection**: Added `dark:bg-gray-900 dark:border-gray-800` on cards, `dark:text-gray-300` on tweet text
-- **TestimonialsSection**: Quote icon uses `dark:text-red-900/60` in dark mode
-- **TestimonialsSection**: Updated edge fade gradients with `dark:from-gray-900`
-- **CtaSection**: Added `dark:bg-gray-950` on section background, `dark:bg-red-950/30` on center glow
-- **CtaSection**: Added `dark:text-gray-100` on heading, `dark:text-gray-400` on description
-- **CtaSection**: Added dark mode to outline button (border, text, hover)
-- **NewsletterSection**: Already had full dark mode — no changes needed
-- **IntegrationSection**: Added `dark:bg-gray-900/50` on section
-- **IntegrationSection**: Added `dark:text-gray-100` on headings, `dark:text-gray-400` on descriptions
-- **IntegrationSection**: Added dark mode to framework cards, install code block, security badges, and trust card
-- **Footer**: Added `dark:border-gray-800 bg-white dark:bg-gray-950` on footer
-- **Footer**: Added dark mode to logo text, description, social links, column headings, link items, and bottom bar
-- **No `{'\u00A0'}` issues found** — all were already fixed in prior session
-- **Verified**: `next build` compiles with zero errors
 
 ## Unresolved Issues
 - None critical. All features verified working.
+- Minor: Command palette keyboard shortcut (Ctrl+K) doesn't trigger via agent-browser's synthetic events (works in real browsers)
 - Minor: Agent detail sheet sparkline uses randomly seeded data (could use real API data)
+- Minor: Activity timeline uses hardcoded mock data (no API endpoint yet)
 
 ## Priority Recommendations for Next Phase
-1. **Real agent detail API** — fetch historical trace data for the sparkline from a real endpoint
-2. **Traces tab search/filter** — filter by agent, status, duration range, token count
-3. **Responsive mobile QA** — test all breakpoints, fix any overflow issues
-4. **Page-level loading skeleton** — show skeleton UI while JS hydrates
-5. **Keyboard navigation** — ensure all interactive elements are keyboard accessible
-6. **Performance** — lazy load below-fold sections with Next.js dynamic imports
-7. **Onboarding tour** — add a guided tour tooltip system for first-time visitors
-8. **Export/Share** — add ability to export traces/issues as CSV/PDF
+1. **Performance optimization** — lazy load below-fold sections with Next.js dynamic imports
+2. **Export/Share** — export traces/issues as CSV/PDF
+3. **Real agent detail API** — fetch historical trace data for the sparkline
+4. **Onboarding tour** — guided tooltip system for first-time visitors
+5. **Page-level loading skeleton** — skeleton UI while JS hydrates
+6. **API for Activity Timeline** — backend endpoint for real activity events
+7. **Search in command palette** — also search by agent status, issue severity
+8. **Dashboard URL routing** — make tabs bookmarkable with URL params

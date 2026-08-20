@@ -17,7 +17,7 @@ export function NewsletterSection() {
   };
 
   return (
-    <section className="relative py-20 sm:py-24 bg-white dark:bg-[#0a0a0a] overflow-hidden">
+    <section id="newsletter" className="relative py-20 sm:py-24 bg-white dark:bg-[#0a0a0a] overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           className="relative rounded-2xl border border-red-100 dark:border-red-900/30 bg-gradient-to-br from-white via-white to-red-50/50 dark:from-[#141414] dark:via-[#141414] dark:to-red-950/20 p-8 sm:p-12 lg:p-16"

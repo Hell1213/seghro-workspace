@@ -92,11 +92,14 @@ export function HeroSection() {
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   return (
-    <section ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
+    <section id="hero" ref={ref} className="relative min-h-screen flex items-center overflow-hidden pt-16">
       {/* Background grid + noise texture */}
       <div className="absolute inset-0 bg-grid-pattern dark:opacity-30" />
       <div className="absolute inset-0 bg-noise dark:opacity-30" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-red-500/5 blur-[120px]" />
+      {/* Floating gradient orbs */}
+      <div className="absolute top-20 right-[15%] w-72 h-72 rounded-full bg-red-500/[0.04] blur-[80px] animate-float" />
+      <div className="absolute bottom-32 left-[10%] w-56 h-56 rounded-full bg-gray-400/[0.06] blur-[60px] animate-float [animation-delay:2s]" />
 
       <motion.div
         style={{ y, opacity }}
