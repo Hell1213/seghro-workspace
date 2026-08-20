@@ -591,6 +591,92 @@
   z-index: 0;
 }
 
+@keyframes status-shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.status-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.12) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: status-shimmer-sweep 3s ease-in-out infinite;
+}
+.dark .status-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.06) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: status-shimmer-sweep 3s ease-in-out infinite;
+}
+
+/* Glass border — 1px border with glassmorphism effect */
+.glass-border {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+.dark .glass-border {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Pulsing green status dot */
+.pulse-dot-green {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8px;
+  height: 8px;
+}
+.pulse-dot-green::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: #22c55e;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.pulse-dot-green::after {
+  content: '';
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #22c55e;
+}
+
+/* Pulsing red status dot */
+.pulse-dot-red {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8px;
+  height: 8px;
+}
+.pulse-dot-red::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background-color: #ef4444;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.pulse-dot-red::after {
+  content: '';
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: #ef4444;
+}
+
+/* Slide in from right animation */
+@keyframes slideInFromRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInFromRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Dot grid pattern (alternative) */
 .bg-dot-pattern-red {
   background-image: radial-gradient(circle, rgba(220, 38, 38, 0.12) 1px, transparent 1px);

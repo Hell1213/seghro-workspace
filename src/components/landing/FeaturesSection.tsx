@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useInView, useMotionValue, useSpring, type MotionValue } from 'framer-motion';
+import { useRef, useCallback, type MouseEvent, type ReactNode } from 'react';
 import { Search, Bell, Wrench, BarChart3, Eye, GitBranch } from 'lucide-react';
 
 const features = [
@@ -65,19 +65,146 @@ const containerVariants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.12,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
   visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
   },
 };
+
+/* ------------------------------------------------------------------ */
+/*  Feature Card  –  magnetic tilt + glow + accent + number indicator  */
+/* ------------------------------------------------------------------ */
+
+const MAX_TILT = 3; // degrees
+const SPRING_CONFIG = { stiffness: 300, damping: 30, mass: 0.5 };
+const GLOW_SIZE = 150;
+
+interface FeatureCardProps {
+  feature: (typeof features)[number];
+  index: number;
+  children: ReactNode;
+}
+
+function FeatureCard({ feature, index, children }: FeatureCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Motion values for the 3D tilt
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  // Spring-smoothed versions
+  const smoothRotateX = useSpring(rotateX, SPRING_CONFIG);
+  const smoothRotateY = useSpring(rotateY, SPRING_CONFIG);
+
+  // Glow position (raw pixel offset from top-left of card)
+  const glowX = useMotionValue(0);
+  const glowY = useMotionValue(0);
+  const smoothGlowX = useSpring(glowX, { stiffness: 400, damping: 35, mass: 0.3 });
+  const smoothGlowY = useSpring(glowY, { stiffness: 400, damping: 35, mass: 0.3 });
+
+  // Accent line width factor (0 → 1) based on cursor X proximity to center
+  const accentWidthFactor = useMotionValue(0);
+  const smoothAccentWidth = useSpring(accentWidthFactor, { stiffness: 250, damping: 28, mass: 0.4 });
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent<HTMLDivElement>) => {
+      const card = cardRef.current;
+      if (!card) return;
+
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      // Normalize to -1…+1 then scale to max tilt
+      const normX = (x - centerX) / centerX;
+      const normY = (y - centerY) / centerY;
+
+      rotateY.set(normX * MAX_TILT);
+      rotateX.set(-normY * MAX_TILT);
+
+      // Glow follows cursor
+      glowX.set(x - GLOW_SIZE / 2);
+      glowY.set(y - GLOW_SIZE / 2);
+
+      // Accent width: wider when cursor is near horizontal center
+      const distFromCenter = Math.abs(normX);
+      const widthFactor = 1 - distFromCenter; // 1 at center, 0 at edges
+      accentWidthFactor.set(widthFactor);
+    },
+    [rotateX, rotateY, glowX, glowY, accentWidthFactor],
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+    accentWidthFactor.set(0);
+  }, [rotateX, rotateY, accentWidthFactor]);
+
+  const cardNumber = String(index + 1).padStart(2, '0');
+
+  return (
+    <motion.div
+      ref={cardRef}
+      variants={itemVariants}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        perspective: 800,
+        rotateX: smoothRotateX,
+        rotateY: smoothRotateY,
+        transformStyle: 'preserve-3d',
+      }}
+      className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 card-lift overflow-hidden cursor-default"
+    >
+      {/* Card number indicator */}
+      <span className="pointer-events-none absolute top-3 right-4 select-none text-6xl font-black text-gray-900/[0.03] dark:text-white/[0.03] leading-none">
+        {cardNumber}
+      </span>
+
+      {/* Glow that follows cursor */}
+      <motion.div
+        className="pointer-events-none absolute z-0 rounded-full"
+        style={{
+          width: GLOW_SIZE,
+          height: GLOW_SIZE,
+          x: smoothGlowX,
+          y: smoothGlowY,
+          background:
+            'radial-gradient(circle, rgba(220,38,38,0.15) 0%, rgba(220,38,38,0.05) 40%, transparent 70%)',
+        }}
+        aria-hidden
+      />
+
+      {/* Card content */}
+      <div className="relative z-10">
+        {children}
+      </div>
+
+      {/* Enhanced bottom accent line */}
+      <motion.div
+        className="absolute bottom-0 left-6 h-0.5 bg-gradient-to-r from-[#dc2626] to-transparent rounded-full origin-left"
+        style={{
+          scaleX: smoothAccentWidth,
+        }}
+        aria-hidden
+      />
+    </motion.div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Features Section                                                   */
+/* ------------------------------------------------------------------ */
 
 export function FeaturesSection() {
   const ref = useRef<HTMLDivElement>(null);
@@ -112,15 +239,17 @@ export function FeaturesSection() {
           animate={isInView ? 'visible' : 'hidden'}
           className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5"
         >
-          {features.map((feature) => (
-            <motion.div
-              key={feature.title}
-              variants={itemVariants}
-              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 transition-all duration-300 card-lift overflow-hidden"
-            >
-              <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border ${feature.color} mb-4 transition-transform group-hover:scale-110`}> 
+          {features.map((feature, idx) => (
+            <FeatureCard key={feature.title} feature={feature} index={idx}>
+              {/* Icon with micro-animation */}
+              <motion.div
+                whileHover={{ scale: [1, 1.15, 1.05] }}
+                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
+                className={`inline-flex h-11 w-11 items-center justify-center rounded-xl border ${feature.color} mb-4`}
+              >
                 <feature.icon className={`h-5 w-5 ${feature.iconColor}`} />
-              </div>
+              </motion.div>
+
               <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
                 {feature.title}
                 {'live' in feature && feature.live && (
@@ -133,9 +262,7 @@ export function FeaturesSection() {
               <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                 {feature.description}
               </p>
-              {/* Hover accent line */}
-              <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-gradient-to-r from-[#dc2626] to-transparent rounded-full scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500" />
-            </motion.div>
+            </FeatureCard>
           ))}
         </motion.div>
       </div>

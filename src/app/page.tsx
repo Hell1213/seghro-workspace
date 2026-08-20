@@ -53,6 +53,10 @@ const ChangelogSection = dynamic(
   () => import('@/components/landing/ChangelogSection').then(m => ({ default: m.ChangelogSection })),
   { loading: () => <div className="h-96" />, ssr: false }
 );
+const StatusSection = dynamic(
+  () => import('@/components/landing/StatusSection').then(m => ({ default: m.StatusSection })),
+  { loading: () => <div className="h-96" />, ssr: false }
+);
 
 export default function Home() {
   const { open, close, toggle } = useCommandPalette();
@@ -177,6 +181,17 @@ export default function Home() {
           transition={{ duration: 0.8 }}
         >
           <ChangelogSection />
+        </motion.div>
+
+        <div className="section-divider max-w-7xl mx-auto" />
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <StatusSection />
         </motion.div>
 
         <motion.div

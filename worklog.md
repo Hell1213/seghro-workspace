@@ -1,26 +1,21 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V10 — Changelog Section, Hero Enhancement, Footer Social Proof**
-- Page renders with 49+ component files (optimized with lazy loading)
+**Phase: V11 — Status Page, Live Metric Charts, Magnetic Hover, Agent Detail Tabs, Enhanced Footer**
+- Page renders with 51+ component files (optimized with lazy loading)
 - Dev server compiles and serves HTTP 200
 - ESLint passes with zero errors
 - All 9 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity)
 - WebSocket real-time alert streaming on port 3001
 - Dark mode fully functional with theme toggle
-- Agent detail sheet with sparkline charts verified working
-- Issue resolution workflow (Open → Investigating → Resolved) verified working
-- Newsletter section with email subscription toast
-- Command Palette (⌘K) with fuzzy search, keyboard nav, quick actions, recent items
-- Scroll progress bar + Back-to-Top button (with glow pulse)
-- Activity Timeline fetches real data from /api/activity with loading skeleton
-- 11+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
+- 12+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
 - **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
 - **V6**: Agent comparison panel, trace waterfall Gantt chart, navbar polish, filter persistence
 - **V7**: Page skeleton loading, real-time toast notifications for WebSocket alerts
 - **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
 - **V9**: Pricing section (3-tier SaaS), 9 new CSS utilities, tab bar polish, Activity API, lazy loading, CSS fix
 - **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row + accent bar
+- **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer (status indicator, newsletter inline, 5 social icons), 6 new CSS utilities
 
 ---
 
@@ -631,3 +626,228 @@ Edited `src/components/landing/Navbar.tsx`:
 - ✅ Dev server: All routes 200, compilation clean
 - ✅ Alert streamer restarted and running on port 3001
 - ✅ No existing functionality broken (CommandPalette, ApiHealthPanel, alert-streamer)
+
+---
+
+## V11 Task 4a — Enhanced Footer Component
+
+### Changes Made
+1. **Live System Status Indicator**: Added a pulsing green dot badge ("All Systems Operational") above the social proof row, using `badge-pulse` class with `animate-ping` for the dot.
+2. **Inline Newsletter Input**: Added email Input + Subscribe Button (with `btn-glow` red accent) directly inside the footer brand column, replacing the need for a separate NewsletterSection. Includes email validation and toast feedback via sonner.
+3. **Enhanced Social Links**: Added LinkedIn, YouTube, and Discord (custom SVG) icons alongside existing Twitter/GitHub. Styled in a row with `hover:scale-110`, color transition to red, and `-translate-y-0.5` hover lift.
+4. **Footer Animations**: Added Framer Motion `whileInView` entrance animation on the footer (fade-in + slide-up) with staggered children via `footerVariants` and `itemVariants`.
+5. **Footer Background Enhancement**: Added two subtle blurred gradient circles (`bg-[#dc2626]/[0.03]` and `bg-gray-400/[0.04]`) as gradient mesh overlay, plus `bg-noise` class for texture. Both with `pointer-events-none` and `absolute inset-0`.
+6. **Status Page Link**: Updated the 'Status' entry in Resources to include `href: '#status'`.
+7. **Copyright Enhancement**: Added a red dot separator (`h-1 w-1 rounded-full bg-[#dc2626]`) and "Built with ❤️ for AI reliability" text after the copyright year.
+
+### Technical Details
+- Footer remains a named export `{ Footer }` with `'use client'` directive
+- Uses shadcn/ui `Input` and `Button` components for newsletter
+- Custom `DiscordIcon` SVG component (Lucide doesn't include Discord)
+- All content is real, meaningful text — no placeholders
+- `viewport={{ once: true, amount: 0.1 }}` for performant scroll-triggered animation
+- Toast notifications via `sonner` for subscribe success/error
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles clean, all routes 200
+- ✅ No existing functionality broken
+
+---
+
+## Task 4b — Live Animated Mini Area Charts in MetricCards
+
+### Summary
+Enhanced the `MetricCards` component to replace canvas-based hover-only sparklines with always-visible, live-updating Recharts mini area charts.
+
+### Changes Made
+- **File modified**: `src/components/dashboard/MetricCards.tsx`
+- **Replaced**: `MiniSparkline` (canvas + `useRef`) → `MiniAreaChart` (Recharts `AreaChart` + `Area` + `ResponsiveContainer` + `YAxis`)
+- **Live data**: Each card has its own 12-point time-series via `useLiveChartData` custom hook, updating every 5 seconds with a sliding window
+- **Color coding**: Red gradient fill (`#dc2626`) for negative metrics (Open Issues, Avg Error Rate), green gradient fill (`#22c55e`) for positive metrics
+- **Gradient definition**: `<defs><linearGradient>` with `stopOpacity` from 0.25 → 0.02
+- **Smooth curves**: `type="monotone"` on `Area` component, `animationDuration={1200}`, `animationEasing="ease-in-out"`
+- **Always visible**: Removed `opacity-0 group-hover:opacity-100`; charts show at `opacity-60` and increase to `opacity-100` on card hover
+- **Card styling**: Added `hover:shadow-[0_2px_0_0_#dc2626]` for red glow bottom border on hover
+- **Extracted**: `MetricCardInner` component to isolate per-card state (each card manages its own `useLiveChartData`)
+- **No axes/labels/tooltips**: `YAxis` hidden with `domain={[0, 100]}`, purely visual decoration
+- **Chart dimensions**: 30px height, 100% width via `ResponsiveContainer`
+- **Preserved**: All existing functionality (icons, trend arrows, values, shimmer effect, `card-lift`, staggered animation)
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles clean, `GET /` returns 200 (475ms compile)
+- ✅ No existing functionality broken
+- ✅ Export remains `{ MetricCards }`, `'use client'` directive present
+
+### 6. Task 4c — FeaturesSection Advanced Micro-Interactions
+- **File**: `src/components/landing/FeaturesSection.tsx`
+- **Changes**:
+  - **Magnetic Hover Effect**: 3D perspective tilt (±3deg) on card hover using `useMotionValue` + `useSpring` for smooth interpolation. `onMouseMove` calculates cursor offset from card center; `onMouseLeave` resets to flat.
+  - **Glow Follows Cursor**: 150px radial gradient glow div (`rgba(220,38,38,0.15)`) follows cursor with spring-smoothed positioning, `pointer-events-none absolute`.
+  - **Icon Micro-animation**: `whileHover={{ scale: [1, 1.15, 1.05] }}` with spring config for a subtle bounce effect on icon container.
+  - **Card Number Indicator**: Semi-transparent numbers (01-06) at top-right of each card, styled `text-6xl font-black text-gray-900/[0.03] dark:text-white/[0.03]`.
+  - **Enhanced Bottom Accent Line**: Width driven by `smoothAccentWidth` spring — wider when cursor is near horizontal center, collapses to 0 on leave. Gradient preserved (`from-[#dc2626] to-transparent`).
+  - **Stagger Enhancement**: Increased to 0.12s, added `scale: 0.95 → 1` to `itemVariants`.
+  - Extracted `FeatureCard` sub-component (per-card motion values to avoid shared state)
+- **Preserved**: All existing data, section structure, export `{ FeaturesSection }`, `'use client'` directive
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles clean, `GET /` returns 200
+- ✅ No existing functionality broken
+- ✅ Export remains `{ FeaturesSection }`, `'use client'` directive present
+
+---
+
+## V11 Session — Real-Time Status Page (Task 4e)
+
+### 1. New Component: `src/components/landing/StatusSection.tsx`
+- Professional status/uptime monitoring landing section with named export `{ StatusSection }` and `'use client'` directive
+- **Section Header**: Badge with Activity icon ("System Status"), H2 with text-gradient ("Real-time infrastructure health"), subtitle paragraph
+- **Overall Status Banner**: Large pill badge showing 'All Systems Operational' with pulsing green dot (animate-ping). Tooltip on hover: 'Last checked: 12 seconds ago'. Uses `glass-border` and `status-shimmer` CSS classes
+- **Service Status Grid**: 3-column responsive grid (1/2/3 cols) of 6 service cards:
+  - API Gateway, Trace Pipeline, Alert Engine, MCP Integration (Degraded), Dashboard UI, Data Pipeline
+  - Each card: service name, status badge (Operational/Degraded), uptime %, avg latency, canvas sparkline (80×10px), last incident time
+  - All Operational except MCP Integration (Degraded, amber border, elevated latency 156ms)
+  - Style: `glass-card card-lift` with status-colored 3px left border (green/amber/gray)
+- **90-Day Uptime Bar**: 90 small 4×4px squares with color coding: green (>99.9%), amber (99-99.9%), red (<99%). 3 red + 5 amber squares at fixed positions, rest green. Tooltip per square showing date + exact percentage. Legend row included
+- **Incidents Summary Table**: 3 recent incidents with columns: Time, Service, Duration, Status (Resolved/Monitoring). Status shown as colored pill badges with dot indicators
+- **Sparkline**: Canvas-based mini chart component with devicePixelRatio support, drawing 10-point line charts
+- **Animations**: Framer Motion `useInView` scroll-triggered animations with staggered children (0.08s), fade-in-up variants
+
+### 2. New CSS Utilities: `src/app/globals.css`
+Added before the last comment block ("Dot grid pattern (alternative)"):
+- `.status-shimmer` — White-to-transparent gradient sweep every 3s for status indicators (dark mode variant)
+- `.glass-border` — 1px glassmorphism border (`border-white/20`, `backdrop-blur-[1px]`, dark variant `border-white/10`)
+- `.pulse-dot-green` — 8px pulsing green dot with `::before` ping animation ring
+- `.pulse-dot-red` — 8px pulsing red dot with `::before` ping animation ring
+- `.text-balance` — Already existed in codebase (line 203), skipped duplicate
+- `@keyframes slideInFromRight` + `.animate-slide-in-right` — 0.4s slide-from-right animation for toasts/notifications
+
+### 3. Page Integration: `src/app/page.tsx`
+- Added `const StatusSection = dynamic(...)` lazy import with 96px loading placeholder
+- Inserted `StatusSection` between `ChangelogSection` and `CtaSection`
+- Wrapped in `motion.div` with scroll-triggered fade (`initial: opacity 0, whileInView: opacity 1, viewport once: true, duration 0.8`)
+- Preceded by `<div className="section-divider max-w-7xl mx-auto" />`
+
+### Verification
+- ✅ ESLint: Zero errors
+- ✅ Dev server: Compiles clean, `GET /` returns 200
+- ✅ All existing functionality preserved
+- ✅ Named export `{ StatusSection }` with `'use client'` directive
+---
+
+## V11 Session — Completed Modifications
+
+### QA Assessment (Pre-Development)
+- ✅ ESLint: Zero errors
+- ✅ Page: HTTP 200, compiles and renders
+- ✅ Zero JS errors (verified via agent-browser console, clean reload)
+- ✅ All 5 dashboard tabs work (Overview, Traces, Issues, Alerts, API Health)
+- ✅ All 9 API routes return 200
+- ✅ Dark mode: Toggle works correctly
+- ✅ Mobile responsive: iPhone 14 viewport tested
+- ✅ Pre-existing warning: scroll container position (non-blocking)
+- ✅ GitBranchHorizontal import already fixed to GitBranch in ChangelogSection.tsx
+
+### 1. Enhanced Footer (Task 4a)
+- **File Modified**: `src/components/landing/Footer.tsx`
+- Added live system status indicator with badge-pulse green dot ('All Systems Operational')
+- Added inline newsletter email input + subscribe button with Send icon and btn-glow
+- Enhanced social links: 5 icons (Twitter, GitHub, LinkedIn, YouTube, Discord) with hover scale/color transition
+- Added Framer Motion whileInView entrance animations with staggered children
+- Added gradient mesh background (2 blurred circles) + bg-noise texture
+- Status link in Resources now points to '#status'
+- Copyright enhanced with red dot separator + 'Built with ❤️ for AI reliability'
+
+### 2. Live Metric Mini-Charts (Task 4b)
+- **File Modified**: `src/components/dashboard/MetricCards.tsx`
+- Replaced canvas-based MiniSparkline with Recharts AreaChart (30px height, always visible)
+- Uses `useLiveChartData` custom hook: 12-point time-series data, updates every 5 seconds
+- Red gradient for negative metrics, green gradient for positive metrics
+- Smooth animation (1200ms ease-in-out) on data transitions
+- Added `hover:shadow-[0_2px_0_0_#dc2626]` red glow bottom border on card hover
+- Charts always visible at 60% opacity, brighten to 100% on hover
+
+### 3. Feature Cards Magnetic Hover (Task 4c)
+- **File Modified**: `src/components/landing/FeaturesSection.tsx`
+- Extracted `FeatureCard` sub-component with per-card motion values
+- 3D tilt effect: useMotionValue + useSpring for smooth ±3° rotateX/rotateY
+- Cursor-following radial gradient glow (150px, red at 15% opacity)
+- Icon micro-animation: whileHover scale bounce [1 → 1.15 → 1.05]
+- Card number indicator: semi-transparent '01'-'06' at top-right
+- Dynamic bottom accent line width based on cursor X position
+- Stagger increased to 0.12s, added scale 0.95→1 to item variants
+
+### 4. Agent Detail Sheet Sub-Tabs (Task 4d)
+- **File Modified**: `src/components/dashboard/AgentDetailSheet.tsx`
+- Added shadcn Tabs with 3 sub-tabs: Overview, Activity, Performance
+- **Activity Tab**: 8 mock events in vertical timeline with colored dots, icons (FileSearch/AlertTriangle/CheckCircle2/Wrench), titles, descriptions, timestamps
+- **Performance Tab**: 4 mini stat cards (Total Runs 7d, Avg Success Rate, Best/Worst Day) + Recharts BarChart (Daily Runs, color-coded by error rate) + Recharts AreaChart (Error Rate %, red gradient)
+- Red accent tab styling: `data-[state=active]:border-b-[#dc2626] data-[state=active]:text-[#dc2626]`
+- Seeded random data generator for consistent per-agent charts
+- Props interface unchanged, export remains `{ AgentDetailSheet }`
+
+### 5. Real-Time Status Page Section (Task 4e)
+- **File Created**: `src/components/landing/StatusSection.tsx`
+- Overall status banner: 'All Systems Operational' with pulsing green dot + glass-border + status-shimmer
+- 6 service cards in 3-column grid: API Gateway, Trace Pipeline, Alert Engine, MCP Integration (Degraded), Dashboard UI, Data Pipeline
+- Each card: status badge, uptime %, latency, canvas sparkline (80×10px), last incident time
+- 90-day uptime visualization: 90 colored squares (4×4px) with tooltips showing date + percentage
+- Incidents summary table: 3 recent incidents with time, service, duration, status badges
+- Framer Motion scroll-triggered staggered animations
+
+### 6. New CSS Utilities
+- **File Modified**: `src/app/globals.css`
+- `.status-shimmer` — 3s white-to-transparent gradient sweep for status indicators
+- `.glass-border` — 1px glassmorphism border with dark mode support
+- `.pulse-dot-green` / `.pulse-dot-red` — 8px pulsing status dots with ping ring
+- `@keyframes slideInFromRight` + `.animate-slide-in-right` — slide-from-right animation
+
+### 7. Page Integration & Navbar Update
+- **File Modified**: `src/app/page.tsx`
+- Added StatusSection as lazy-loaded dynamic import between ChangelogSection and CtaSection
+- **File Modified**: `src/components/landing/Navbar.tsx`
+- Added 'Status' link to navLinks (href: '#status')
+
+### File Inventory
+- `src/components/landing/Footer.tsx` ✏️ MODIFIED
+- `src/components/dashboard/MetricCards.tsx` ✏️ MODIFIED
+- `src/components/landing/FeaturesSection.tsx` ✏️ MODIFIED
+- `src/components/dashboard/AgentDetailSheet.tsx` ✏️ MODIFIED
+- `src/components/landing/StatusSection.tsx` ✨ NEW
+- `src/app/globals.css` ✏️ MODIFIED
+- `src/app/page.tsx` ✏️ MODIFIED
+- `src/components/landing/Navbar.tsx` ✏️ MODIFIED
+
+### Verification Results
+- ✅ ESLint: Zero errors
+- ✅ Page: HTTP 200, compiles and renders
+- ✅ Zero JS errors (verified via agent-browser console after clean reload)
+- ✅ All 5 dashboard tabs work (Overview with live charts, Traces, Issues, Alerts, API Health)
+- ✅ Agent detail sheet: 3 sub-tabs (Overview, Activity, Performance) verified
+- ✅ Activity tab: 8 events with timeline, colored dots, icons, timestamps
+- ✅ Performance tab: 4 stat cards + 2 Recharts charts (BarChart + AreaChart)
+- ✅ Status section: 6 service cards, 90-day uptime grid, incidents table
+- ✅ Features section: magnetic 3D tilt, cursor-following glow, card numbers
+- ✅ Footer: status indicator, inline newsletter, 5 social icons, animations
+- ✅ Navbar: 'Status' link added
+- ✅ Metric cards: 6 live-updating Recharts area charts (5s interval)
+- ✅ Dark mode: All new components render correctly
+- ✅ Mobile responsive: iPhone 14 viewport tested
+- ✅ 9 Recharts instances on page (6 metric cards + 3 from dashboard charts)
+
+### Unresolved Issues
+- Minor: Pre-existing scroll container position warning (non-blocking)
+- Minor: Command palette keyboard shortcut (Ctrl+K) doesn't trigger via agent-browser's synthetic events (works in real browsers)
+
+### Priority Recommendations for Next Phase
+1. **Real database backend** — Prisma CRUD for agents, traces, issues (replace mock data)
+2. **NextAuth.js authentication** — User login, team workspaces
+3. **WebSocket real-time health push** — Already partially implemented for API Health tab
+4. **PDF export** — Generate styled PDF reports for traces/issues
+5. **Multi-agent comparison for 3+ agents** — Extend to table view
+6. **API rate limiting middleware** — SaaS-grade request throttling
+7. **Onboarding tour improvements** — Step for new Status section
+8. **A/B testing infrastructure** — Feature flags for SaaS tier management

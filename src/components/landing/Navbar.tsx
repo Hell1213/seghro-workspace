@@ -33,6 +33,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
     { label: 'Pricing', href: '#pricing' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'Integrations', href: '#integrations' },
+    { label: 'Status', href: '#status' },
   ];
 
   return (
