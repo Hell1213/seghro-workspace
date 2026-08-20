@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("active")
+  framework   String?
+  lastRunAt   DateTime?
+  totalRuns   Int      @default(0)
+  errorRate   Float    @default(0)
+  avgLatency  Float    @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  traces      Trace[]
+  issues      Issue[]
+}
+
+model Trace {
+  id          String   @id @default(cuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id])
+  traceId     String
+  status      String   @default("success")
+  duration    Float
+  inputTokens Int      @default(0)
+  outputTokens Int     @default(0)
+  metadata    String?
+  createdAt   DateTime @default(now())
+  spans       Span[]
+}
+
+model Span {
+  id          String   @id @default(cuid())
+  traceId     String
+  trace       Trace    @relation(fields: [traceId], references: [id])
+  name        String
+  type        String?
+  status      String   @default("success")
+  duration    Float
+  startTime   Float
+  inputTokens Int      @default(0)
+  outputTokens Int     @default(0)
+  model       String?
+  tool        String?
+  children    String?
+  createdAt   DateTime @default(now())
+}
+
+model Issue {
+  id          String   @id @default(cuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id])
+  title       String
+  description String?
+  severity    String   @default("P1")
+  status      String   @default("open")
+  affectedRuns Int     @default(0)
+  totalRuns   Int      @default(0)
+  failureRate Float    @default(0)
+  rootCause   String?
+  suggestedFix String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Alert {
+  id          String   @id @default(cuid())
+  issueId     String?
+  agentId     String?
+  channel     String   @default("slack")
+  title       String
+  message     String?
+  severity    String   @default("warning")
+  status      String   @default("unread")
+  createdAt   DateTime @default(now())
+}
+
+model Metric {
+  id          String   @id @default(cuid())
+  agentId     String?
+  name        String
+  value       Float
+  timestamp   DateTime @default(now())
+  labels      String?
+}
