@@ -14,7 +14,22 @@ export function Navbar({ onSearchClick }: NavbarProps) {
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
+  // Instant theme switch — disable all CSS transitions during class swap to prevent flash/blink
+  const handleThemeToggle = () => {
+    const root = document.documentElement;
+    root.classList.add('theme-switching');
+    // Force reflow so the browser registers the class before theme change
+    void root.offsetHeight;
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    // Re-enable transitions after paint
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        root.classList.remove('theme-switching');
+      });
+    });
+  };
   const [mounted, setMounted] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
 
@@ -54,7 +69,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 ${
         scrolled
           ? 'bg-white/92 dark:bg-[#0a0a0a]/92 shadow-sm shadow-gray-200/50 dark:shadow-gray-900/50 border-b border-gray-100/50 dark:border-gray-800/50'
           : 'bg-transparent'
@@ -74,7 +89,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
               <Shield className="h-4.5 w-4.5 text-white" />
               <span className="absolute inset-0 rounded-lg bg-[#dc2626] animate-ping opacity-20" />
             </div>
-            <span className={`text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-all duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}>
+            <span className={`text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-[text-shadow,drop-shadow] duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}>
               Sentinel
             </span>
           </motion.div>
@@ -122,38 +137,17 @@ export function Navbar({ onSearchClick }: NavbarProps) {
             {/* Theme toggle */}
             {mounted && (
               <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="h-8 w-8 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors focus-ring shrink-0"
+                onClick={handleThemeToggle}
+                className="relative h-8 w-8 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 focus-ring shrink-0"
                 aria-label="Toggle theme"
               >
-                <AnimatePresence mode="wait">
-                  {theme === 'dark' ? (
-                    <motion.div
-                      key="sun"
-                      initial={{ scale: 0, rotate: -90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: 90 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <Sun className="h-4 w-4" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="moon"
-                      initial={{ scale: 0, rotate: 90 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      exit={{ scale: 0, rotate: -90 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <Moon className="h-4 w-4" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <Sun className={`h-4 w-4 absolute transition-all duration-200 ${theme === 'dark' ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50 pointer-events-none'}`} />
+                <Moon className={`h-4 w-4 absolute transition-all duration-200 ${theme === 'dark' ? 'opacity-0 -rotate-90 scale-50 pointer-events-none' : 'opacity-100 rotate-0 scale-100'}`} />
               </button>
             )}
 
             {/* Get Started CTA — visible on md+ */}
-            <Button className="hidden md:inline-flex bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-4 lg:px-5 shadow-md shadow-red-200 hover:shadow-red-300 transition-all btn-glow shrink-0">
+            <Button className="hidden md:inline-flex bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-4 lg:px-5 shadow-md shadow-red-200 hover:shadow-red-300 btn-glow shrink-0">
               Get Started
             </Button>
 

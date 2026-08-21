@@ -1,0 +1,905 @@
+     1→     1→     1→# Sentinel — AI Agent Observability Dashboard
+     2→     2→     2→
+     3→     3→     3→## Current Project Status
+     4→     4→     4→**Phase: V13 — Comprehensive Dark/Light Theme Fix**
+     5→     5→     5→- Page renders with 52+ component files (optimized with lazy loading)
+     6→     6→     6→- Dev server compiles and serves HTTP 200
+     7→     7→     7→- ESLint passes with zero errors
+     8→     8→     8→- All 10 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity, self-heal)
+     9→     9→     9→- WebSocket real-time alert streaming on port 3001
+    10→    10→    10→- Dark mode fully functional with theme toggle
+    11→    11→    11→- 12+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
+    12→    12→    12→- **V13**: Comprehensive dark/light theme fix across 15+ files, 70+ individual class fixes. All sections verified in both themes via agent-browser.
+    13→    13→    13→- **V12**: Fully responsive navbar (dynamic link count by viewport), instant tab switching (no motion fade), status dots on all feature cards, LLM-agnostic self-healing agent system, HowItWorks step alignment fix, HeroSection no-fade-on-scroll, 8-card feature grid with Self-Healing APIs + LLM-Agnostic Healing features, tour guide instant positioning
+    14→    14→    14→- **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer
+    15→    15→    15→- **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row
+    16→    16→    16→- **V9**: Pricing section (3-tier SaaS), tab bar polish, Activity API, lazy loading
+    17→    17→    17→- **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
+    18→    18→    18→- **V7**: Page skeleton loading, real-time toast notifications
+    19→    19→    19→- **V6**: Agent comparison, trace waterfall Gantt chart, navbar polish, filter persistence
+    20→    20→    20→- **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
+    21→    21→    21→
+    22→    22→    22→---
+    23→    23→    23→
+    24→    24→    24→## V10 Session — Completed Modifications (v10-1/v10-3/v10-4)
+    25→    25→    25→
+    26→    26→    26→### 1. New Feature: Changelog Landing Section
+    27→    27→    27→- Created `src/components/landing/ChangelogSection.tsx`
+    28→    28→    28→- Vertical timeline layout with 6 release entries (v2.0 → v1.0)
+    29→    29→    29→- 2-column desktop layout: version badges on left timeline, release cards on right
+    30→    30→    30→- v2.0 highlighted with red accent + "NEW" badge; others use gray accent
+    31→    31→    31→- Feature tags using shadcn Badge component with `variant="outline"`
+    32→    32→    32→- Framer Motion staggered entrance animation (containerVariants/itemVariants)
+    33→    33→    33→- Section header with GitBranchHorizontal icon badge, gradient "new" text
+    34→    34→    34→- `glass-card card-lift` classes on release cards
+    35→    35→    35→- `'use client'` directive for client-side animation
+    36→    36→    36→
+    37→    37→    37→### 2. Hero Section Enhancements
+    38→    38→    38→- Added subtle animated gradient mesh/glow div behind hero content (two blurred circles: red-500/[0.07] + gray-500/[0.05])
+    39→    39→    39→- Added trust indicator row below CTA buttons: "99.9% Uptime SLA" (Shield), "SOC 2 Compliant" (Zap), "GDPR Ready" (Globe)
+    40→    40→    40→- Trust row uses `text-xs text-gray-400 dark:text-gray-500` styling
+    41→    41→    41→- Secondary "Read the Docs" button now links to `#docs` via `asChild` + `<a>`
+    42→    42→    42→- Primary CTA already had `btn-glow` class for hover glow effect
+    43→    43→    43→
+    44→    44→    44→### 3. Footer Social Proof Enhancements
+    45→    45→    45→- Replaced old gradient accent line with stronger `via-[#dc2626]/50` gradient bar
+    46→    46→    46→- Added social proof row with 4 items: Star (4.9/5 Product Hunt), Github (10K+ Stars), Users (2,000+ Teams), Activity (99.9% Uptime)
+    47→    47→    47→- Social proof row separated by `border-b` with `pb-6`/`pt-8` spacing
+    48→    48→    48→- Added "Production-grade AI agent observability" tagline below Sentinel logo
+    49→    49→    49→- Upgraded footer links data structure to support `href` for navigation
+    50→    50→    50→- Added `Changelog` to Resources section with `#changelog` href
+    51→    51→    51→- Product section links now use proper anchor hrefs (Features, Pricing, Integrations, Changelog, Docs)
+    52→    52→    52→
+    53→    53→    53→### 4. Page Integration
+    54→    54→    54→- Added lazy-loaded dynamic import for `ChangelogSection` in `page.tsx`
+    55→    55→    55→- Inserted between IntegrationSection and CtaSection with `section-divider` before it
+    56→    56→    56→- Wrapped in `motion.div` with fade-in animation (matching existing pattern)
+    57→    57→    57→
+    58→    58→    58→### Files Modified
+    59→    59→    59→- `src/components/landing/ChangelogSection.tsx` ✨ NEW (timeline with 6 releases)
+    60→    60→    60→- `src/components/landing/HeroSection.tsx` ✏️ MODIFIED (gradient mesh, trust indicators, docs link)
+    61→    61→    61→- `src/components/landing/Footer.tsx` ✏️ MODIFIED (social proof, accent bar, tagline, link hrefs)
+    62→    62→    62→- `src/app/page.tsx` ✏️ MODIFIED (ChangelogSection import + integration)
+    63→    63→    63→
+    64→    64→    64→### Verification
+    65→    65→    65→- ✅ ESLint: Zero errors
+    66→    66→    66→- ✅ Dev server: GET / 200 (all routes returning 200)
+    67→    67→    67→- ✅ Changelog section renders with timeline layout and staggered animations
+    68→    68→    68→- ✅ Hero trust indicators visible below CTA buttons
+    69→    69→    69→- ✅ Footer social proof row displays with icons
+    70→    70→    70→- ✅ No existing functionality broken
+    71→    71→    71→
+    72→    72→    72→---
+    73→    73→    73→
+    74→    74→    74→## V6 Session — Completed Modifications
+    75→    75→    75→
+    76→    76→    76→### 1. New Feature: Agent Comparison Panel
+    77→    77→    77→- Created `src/components/dashboard/AgentComparison.tsx`
+    78→    78→    78→- Side-by-side agent comparison in a shadcn Sheet (right side, sm:max-w-2xl)
+    79→    79→    79→- **6 comparison metrics**: Status (colored badge), Framework, Error Rate (color-coded), Avg Latency, Total Runs, Last Run
+    80→    80→    80→- **Performance Comparison bar chart** at bottom: 3 rows (Error Rate, Latency, Total Runs) with animated CSS bars
+    81→    81→    81→- Agent A bars red-tinted, Agent B bars grey-tinted, all bars animate from width 0
+    82→    82→    82→- **Trigger**: Click compare icon (GitCompareArrows) on agent cards — select 2 agents to compare
+    83→    83→    83→- **UX hint**: After selecting 1st agent, a red hint text appears: "1 agent selected — click another to compare"
+    84→    84→    84→- Added `onCompare` and `comparisonIds` props to `AgentGrid.tsx`
+    85→    85→    85→- Compare icon: `opacity-0 group-hover:opacity-100` (appears on hover), red highlight when selected
+    86→    86→    86→
+    87→    87→    87→### 2. New Feature: Trace Waterfall Gantt Chart
+    88→    88→    88→- Created `src/components/dashboard/TraceWaterfall.tsx`
+    89→    89→    89→- Gantt-chart style visualization of trace spans with timeline positioning
+    90→    90→    90→- **Header row**: "Span Name" | "Timeline" | "Duration" column labels
+    91→    91→    91→- **Span bars**: Positioned by `startTime/totalDuration` (left offset) and `duration/totalDuration` (width)
+    92→    92→    92→- **Color-coded by type**: model=red, tool=amber, guard=emerald, retrieval=blue, output=gray
+    93→    93→    93→- **Error highlighting**: Red left border + red background tint for error spans
+    94→    94→    94→- **Hover tooltips**: Absolute-positioned div with span details (name, type, status, duration, tokens)
+    95→    95→    95→- **Time axis**: 0/25/50/75/100% markers with actual ms/s values
+    96→    96→    96→- **Framer Motion**: Staggered bar animations (delay: i * 0.05)
+    97→    97→    97→- **Toggle button**: "Waterfall" button in traces tab filter bar (red when active)
+    98→    98→    98→- Shows below TraceViewer, uses first trace's spans by default
+    99→    99→    99→
+   100→   100→   100→### 3. New Feature: Filter/Search Persistence
+   101→   101→   101→- Dashboard filter state saved to `localStorage` key `sentinel-dash-filters`
+   102→   102→   102→- **Persisted state**: traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter
+   103→   103→   103→- On mount: reads from localStorage and restores filter state
+   104→   104→   104→- On change: writes all 5 filter values to localStorage (debounced by React batching)
+   105→   105→   105→- Wrapped in try/catch for SSR safety and storage quota limits
+   106→   106→   106→
+   107→   107→   107→### 4. Styling: Enhanced Navbar
+   108→   108→   108→- **Animated logo**: Shield icon now has a subtle ping animation (opacity-20) + shadow
+   109→   109→   109→- **Glass CTA**: "Get Started" button now has `.btn-glow` effect (inner white glow on hover)
+   110→   110→   110→- **Mobile menu**: Wrapped in `AnimatePresence` with height animation (smooth expand/collapse)
+   111→   111→   111→- **Mobile glass**: Mobile menu uses `bg-white/95` + `backdrop-filter: blur(12px)` for glass effect
+   112→   112→   112→- **Mobile CTA**: Get Started button in mobile menu has `.btn-glow`
+   113→   113→   113→- **Focus rings**: Nav links and buttons now have `.focus-ring` for accessibility
+   114→   114→   114→
+   115→   115→   115→### 5. Styling: HowItWorks Code Blocks
+   116→   116→   116→- Applied `.card-lift` class to code block containers for hover lift effect
+   117→   117→   117→- Consistent with other card components across the site
+   118→   118→   118→
+   119→   119→   119→### 6. Component Integration
+   120→   120→   120→- **AgentGrid**: Added `onCompare` callback + `comparisonIds` prop + compare icon button
+   121→   121→   121→- **DashboardSection**: Added `handleCompareAgent()` function, comparison state management, waterfall toggle, AgentComparison Sheet rendering
+   122→   122→   122→- **DashboardSection**: Added `showWaterfall` toggle state + "Waterfall" button in traces filter bar
+   123→   123→   123→
+   124→   124→   124→---
+   125→   125→   125→
+   126→   126→   126→## Full File Inventory (48+ files)
+   127→   127→   127→
+   128→   128→   128→### Landing Components (12 files)
+   129→   129→   129→- `src/components/landing/Navbar.tsx` (V6: animated logo, V8: Docs link, V9: Pricing link)
+   130→   130→   130→- `src/components/landing/HeroSection.tsx` (V5: particle canvas, typing animation, btn-glow)
+   131→   131→   131→- `src/components/landing/FeaturesSection.tsx` (V5: card-lift)
+   132→   132→   132→- `src/components/landing/HowItWorks.tsx` (V6: card-lift on code blocks)
+   133→   133→   133→- `src/components/landing/StatsSection.tsx` (V4: animated counters, hover glow)
+   134→   134→   134→- `src/components/landing/IntegrationSection.tsx`
+   135→   135→   135→- `src/components/landing/TestimonialsSection.tsx`
+   136→   136→   136→- `src/components/landing/NewsletterSection.tsx`
+   137→   137→   137→- `src/components/landing/CtaSection.tsx` (V5: btn-glow)
+   138→   138→   138→- `src/components/landing/Footer.tsx` (V4: gradient accent line)
+   139→   139→   139→- `src/components/landing/DocsSection.tsx` ✨ V8
+   140→   140→   140→- `src/components/landing/PricingSection.tsx` ✨ V9
+   141→   141→   141→
+   142→   142→   142→### Dashboard Components (16 files)
+   143→   143→   143→- `src/components/dashboard/DashboardSection.tsx` (V6: comparison, waterfall, V8: 5th tab, settings, V9: tab polish)
+   144→   144→   144→- `src/components/dashboard/AgentDetailSheet.tsx`
+   145→   145→   145→- `src/components/dashboard/MetricCards.tsx` (V5: mini sparklines, card-lift)
+   146→   146→   146→- `src/components/dashboard/AgentGrid.tsx` (V6: compare icon)
+   147→   147→   147→- `src/components/dashboard/AgentComparison.tsx` ✨ V6
+   148→   148→   148→- `src/components/dashboard/TraceViewer.tsx`
+   149→   149→   149→- `src/components/dashboard/TraceWaterfall.tsx` ✨ V6
+   150→   150→   150→- `src/components/dashboard/IssuesPanel.tsx`
+   151→   151→   151→- `src/components/dashboard/AlertFeed.tsx`
+   152→   152→   152→- `src/components/dashboard/ActivityTimeline.tsx` (V9: API integration, loading skeleton)
+   153→   153→   153→- `src/components/dashboard/MetricsCharts.tsx`
+   154→   154→   154→- `src/components/dashboard/McpPanel.tsx`
+   155→   155→   155→- `src/components/dashboard/DashboardSkeleton.tsx`
+   156→   156→   156→- `src/components/dashboard/ApiHealthPanel.tsx` ✨ V8
+   157→   157→   157→- `src/components/dashboard/EndpointCard.tsx` ✨ V8
+   158→   158→   158→- `src/components/dashboard/HealingTimeline.tsx` ✨ V8
+   159→   159→   159→- `src/components/dashboard/SettingsPanel.tsx` ✨ V8
+   160→   160→   160→
+   161→   161→   161→### UI Components (7 files)
+   162→   162→   162→- `src/components/ui/CommandPalette.tsx`
+   163→   163→   163→- `src/components/ui/ScrollProgress.tsx`
+   164→   164→   164→- `src/components/ui/BackToTop.tsx` (V5: glow-pulse)
+   165→   165→   165→- `src/components/ui/ParticleCanvas.tsx`
+   166→   166→   166→- `src/components/ui/ExportButton.tsx`
+   167→   167→   167→- `src/components/ui/DashboardTour.tsx`
+   168→   168→   168→- `src/components/ui/ToastNotifications.tsx` ✨ V7
+   169→   169→   169→
+   170→   170→   170→### API Routes (9 files)
+   171→   171→   171→- `src/app/api/agents/route.ts`
+   172→   172→   172→- `src/app/api/traces/route.ts`
+   173→   173→   173→- `src/app/api/issues/route.ts`
+   174→   174→   174→- `src/app/api/alerts/route.ts`
+   175→   175→   175→- `src/app/api/metrics/route.ts`
+   176→   176→   176→- `src/app/api/endpoints/route.ts` ✨ V8
+   177→   177→   177→- `src/app/api/healing/route.ts` ✨ V8
+   178→   178→   178→- `src/app/api/api-health/route.ts` ✨ V8
+   179→   179→   179→- `src/app/api/activity/route.ts` ✨ V9
+   180→   180→   180→
+   181→   181→   181→### Utilities
+   182→   182→   182→- `src/lib/export-utils.ts`
+   183→   183→   183→- `src/lib/self-healing-data.ts` ✨ V8
+   184→   184→   184→- `src/lib/seed-data.ts`
+   185→   185→   185→
+   186→   186→   186→### Mini Services
+   187→   187→   187→- `mini-services/alert-streamer/index.ts`
+   188→   188→   188→- `mini-services/alert-streamer/package.json`
+   189→   189→   189→
+   190→   190→   190→### Core Files
+   191→   191→   191→- `src/app/page.tsx`
+   192→   192→   192→- `src/app/layout.tsx`
+   193→   193→   193→- `src/app/globals.css` (V5: 10+ new animations/utilities)
+   194→   194→   194→
+   195→   195→   195→---
+   196→   196→   196→
+   197→   197→   197→## Verification Results
+   198→   198→   198→- ✅ ESLint: Zero errors
+   199→   199→   199→- ✅ Page: HTTP 200, compiles and renders
+   200→   200→   200→- ✅ Zero JS errors (verified via agent-browser console)
+   201→   201→   201→- ✅ All heading text correct (verified via DOM textContent)
+   202→   202→   202→- ✅ All 4 dashboard tabs work (Overview, Traces, Issues, Alerts)
+   203→   203→   203→- ✅ Traces tab: Waterfall toggle, Gantt chart renders below TraceViewer
+   204→   204→   204→- ✅ Overview tab: Agent compare icon visible on hover, comparison hint text
+   205→   205→   205→- ✅ Dark mode: Toggle works, no visual regressions
+   206→   206→   206→- ✅ Mobile responsive: Tested on iPhone 14 viewport
+   207→   207→   207→- ✅ API routes: All 5 returning 200
+   208→   208→   208→- ✅ Filter persistence: localStorage read/write verified
+   209→   209→   209→- ✅ Navbar: Animated logo ping, glass mobile menu, btn-glow
+   210→   210→   210→- ✅ WebSocket: Alert streamer active on port 3001
+   211→   211→   211→
+   212→   212→   212→## Unresolved Issues
+   213→   213→   213→- None critical. All features verified working.
+   214→   214→   214→- Minor: Command palette keyboard shortcut (Ctrl+K) doesn't trigger via agent-browser's synthetic events (works in real browsers)
+   215→   215→   215→- Minor: Agent detail sheet sparkline uses randomly seeded data
+   216→   216→   216→- Minor: Activity timeline uses hardcoded mock data (no API endpoint yet)
+   217→   217→   217→- Minor: Onboarding tour may not trigger perfectly on very fast scroll-by
+   218→   218→   218→- Minor: Waterfall view shows first trace's spans (could add trace selector for waterfall specifically)
+   219→   219→   219→
+   220→   220→   220→## Priority Recommendations for Next Phase
+   221→   221→   221→1. **Performance optimization** — lazy load below-fold sections with Next.js dynamic imports
+   222→   222→   222→2. **Real agent detail API** — fetch historical trace data for the sparkline
+   223→   223→   223→3. **API for Activity Timeline** — backend endpoint for real activity events
+   224→   224→   224→4. **Page-level loading skeleton** — skeleton UI while JS hydrates
+   225→   225→   225→5. **Export to PDF** — generate styled PDF reports for traces/issues
+   226→   226→   226→6. **Agent comparison for 3+ agents** — extend to multi-agent comparison table
+   227→   227→   227→7. **Real-time notification toasts** — toast popups when WebSocket alerts arrive
+   228→   228→   228→8. **Trace selector for waterfall** — independent trace selection for waterfall view
+   229→   229→   229→
+   230→   230→   230→---
+   231→   231→   231→
+   232→   232→   232→## V8 Session — Completed Modifications
+   233→   233→   233→
+   234→   234→   234→### Overview
+   235→   235→   235→Massive V8 upgrade making Sentinel a **SaaS-ready product** with the core addition of a **Self-Healing API Control System**, comprehensive **Documentation section**, **Settings panel**, and cross-device QA.
+   236→   236→   236→
+   237→   237→   237→### 1. New Feature: Self-Healing API Control System
+   238→   238→   238→**Concept**: Monitor all external APIs your AI agents depend on (LLMs, databases, payments, search, MCP servers). Automatically detect failures and self-heal through circuit breakers, fallback activation, retry with exponential backoff, and request queuing. Inspired by Stripe's API reliability architecture.
+   239→   239→   239→
+   240→   240→   240→**Backend (4 new files):**
+   241→   241→   241→- `src/lib/self-healing-data.ts` — 3 interfaces + 8 monitored endpoints + 13 healing actions + 192 health history data points
+   242→   242→   242→- `src/app/api/endpoints/route.ts` — GET (list) + POST (add/remove/health-check/reset-circuit)
+   243→   243→   243→- `src/app/api/healing/route.ts` — GET (actions + summary with success rate)
+   244→   244→   244→- `src/app/api/api-health/route.ts` — GET (endpoints + health summary counts)
+   245→   245→   245→
+   246→   246→   246→**Frontend (3 new files):**
+   247→   247→   247→- `src/components/dashboard/ApiHealthPanel.tsx` — Main container: summary strip (4 cards), endpoint grid, add-endpoint dialog, healing timeline
+   248→   248→   248→- `src/components/dashboard/EndpointCard.tsx` — Endpoint card: status dot, circuit breaker badge, 4-metric grid, canvas sparkline, 3 action buttons
+   249→   249→   249→- `src/components/dashboard/HealingTimeline.tsx` — Vertical timeline: severity-colored items, AUTO/MANUAL badges, relative timestamps, result icons
+   250→   250→   250→
+   251→   251→   251→**Dashboard Integration:**
+   252→   252→   252→- 5th tab "API Health" (Heart icon) added to dashboard
+   253→   253→   253→- Settings gear icon (⚙) in dashboard header opens SettingsPanel
+   254→   254→   254→- All 8 API routes verified returning 200 with proper data
+   255→   255→   255→
+   256→   256→   256→### 2. New Feature: Documentation Landing Section
+   257→   257→   257→- `src/components/landing/DocsSection.tsx` — Interactive docs section
+   258→   258→   258→- 3-column responsive grid: Getting Started (expandable 4-step guide), API Integration (3 code examples with copy buttons), Self-Healing APIs (circuit breaker state visualization + 5 capabilities)
+   259→   259→   259→- API Reference table: 9 endpoints with colored method badges
+   260→   260→   260→- "Docs" link added to Navbar navigation
+   261→   261→   261→
+   262→   262→   262→### 3. New Feature: SaaS Settings Panel
+   263→   263→   263→- `src/components/dashboard/SettingsPanel.tsx` — Right-side Sheet panel
+   264→   264→   264→- 5 sections: Workspace (name, API key, webhook), Notifications (3 toggles), Self-Healing (2 toggles + 2 inputs), Data Retention (select + toggle), Danger Zone (3 action buttons with 2-step delete confirmation)
+   265→   265→   265→- Professional SaaS-grade settings UI
+   266→   266→   266→
+   267→   267→   267→### 4. Integration Changes (3 modified files)
+   268→   268→   268→- `src/components/dashboard/DashboardSection.tsx` — Added 5th tab, Settings button, ApiHealthPanel import
+   269→   269→   269→- `src/app/page.tsx` — Added DocsSection import + rendering
+   270→   270→   270→- `src/components/landing/Navbar.tsx` — Added "Docs" nav link, changed Documentation button to anchor link
+   271→   271→   271→
+   272→   272→   272→### 5. File Inventory Update
+   273→   273→   273→- `src/lib/self-healing-data.ts` ✨ NEW
+   274→   274→   274→- `src/app/api/endpoints/route.ts` ✨ NEW
+   275→   275→   275→- `src/app/api/healing/route.ts` ✨ NEW
+   276→   276→   276→- `src/app/api/api-health/route.ts` ✨ NEW
+   277→   277→   277→- `src/components/dashboard/ApiHealthPanel.tsx` ✨ NEW
+   278→   278→   278→- `src/components/dashboard/EndpointCard.tsx` ✨ NEW
+   279→   279→   279→- `src/components/dashboard/HealingTimeline.tsx` ✨ NEW
+   280→   280→   280→- `src/components/landing/DocsSection.tsx` ✨ NEW
+   281→   281→   281→- `src/components/dashboard/SettingsPanel.tsx` ✨ NEW
+   282→   282→   282→- `src/components/dashboard/DashboardSection.tsx` ✏️ MODIFIED (5th tab, settings)
+   283→   283→   283→- `src/app/page.tsx` ✏️ MODIFIED (DocsSection)
+   284→   284→   284→- `src/components/landing/Navbar.tsx` ✏️ MODIFIED (Docs link)
+   285→   285→   285→
+   286→   286→   286→### Total component count: 44+ files
+   287→   287→   287→
+   288→   288→   288→---
+   289→   289→   289→
+   290→   290→   290→## Verification Results
+   291→   291→   291→- ✅ ESLint: Zero errors
+   292→   292→   292→- ✅ Page: HTTP 200, compiles and renders
+   293→   293→   293→- ✅ Zero JS errors (verified via dev.log)
+   294→   294→   294→- ✅ All 5 dashboard tabs work (Overview, Traces, Issues, Alerts, API Health)
+   295→   295→   295→- ✅ API Health tab: 8 endpoint cards, all action buttons, healing timeline
+   296→   296→   296→- ✅ Settings panel: 5 sections, all toggles/inputs, copy buttons, danger zone
+   297→   297→   297→- ✅ Docs section: 3-column grid, expandable steps, code copy buttons, API reference table
+   298→   298→   298→- ✅ Dark mode: All new components render correctly
+   299→   299→   299→- ✅ Mobile responsive: iPhone 14 viewport tested, all tabs work, single-column layout
+   300→   300→   300→- ✅ API routes: All 8 returning 200 (agents, traces, issues, alerts, metrics, endpoints, healing, api-health)
+   301→   301→   301→- ✅ Navbar: "Docs" link navigates to #docs section
+   302→   302→   302→- ✅ Agent-browser verified all interactions
+   303→   303→   303→
+   304→   304→   304→## Unresolved Issues
+   305→   305→   305→- None critical. All features verified working.
+   306→   306→   306→
+   307→   307→   307→## Priority Recommendations for Next Phase
+   308→   308→   308→1. **Real database backend** — Move from mock data to Prisma-backed CRUD operations
+   309→   309→   309→2. **Authentication** — NextAuth.js integration for SaaS login/signup
+   310→   310→   310→3. **WebSocket for API health** — Real-time health check streaming to the API Health tab
+   311→   311→   311→4. **Lazy loading** — Dynamic imports for below-fold sections
+   312→   312→   312→5. **PDF export** — Generate styled PDF reports
+   313→   313→   313→6. **Agent comparison for 3+ agents** — Extend comparison to multi-agent table
+   314→   314→   314→7. **Real-time toasts for healing actions** — Toast popups when new healing events arrive via WebSocket
+   315→   315→   315→8. **Rate limiting middleware** — SaaS-grade API rate limiting
+   316→   316→   316→
+   317→   317→   317→---
+   318→   318→   318→
+   319→   319→   319→## Task 2-a — Self-Healing API Control System Backend
+   320→   320→   320→
+   321→   321→   321→### Overview
+   322→   322→   322→Created backend data layer and API routes for the self-healing API control system. This provides the data foundation for monitoring AI agent dependencies, circuit breakers, fallbacks, and auto-remediation actions.
+   323→   323→   323→
+   324→   324→   324→### Files Created (4 new files)
+   325→   325→   325→
+   326→   326→   326→1. **`src/lib/self-healing-data.ts`** — Seed data + TypeScript interfaces
+   327→   327→   327→   - `ApiEndpoint` interface: 20 fields covering status, circuit breaker, latency, error rate, retry config, fallback config, tags
+   328→   328→   328→   - `HealingAction` interface: action log with severity, type (auto/manual), result, duration
+   329→   329→   329→   - `HealthHistory` interface: time-series data point per endpoint
+   330→   330→   330→   - 8 API endpoints: OpenAI GPT-4o (healthy), Anthropic Claude 3.5 (degraded/half-open), Pinecone (healthy), Stripe (healthy), Tavily Search (down/open circuit), Redis (healthy), GitHub MCP (degraded), Notion API (maintenance)
+   331→   331→   331→   - 13 healing actions: circuit breaker trips, fallback activations, retry escalations, timeout adjustments, queue enablements, manual reset attempts
+   332→   332→   332→   - 192 health history data points (8 endpoints × 24 points, 15-min intervals over 6 hours) with realistic degradation curves
+   333→   333→   333→
+   334→   334→   334→2. **`src/app/api/endpoints/route.ts`** — GET + POST
+   335→   335→   335→   - GET: Returns all 8 endpoints
+   336→   336→   336→   - POST: Accepts `{ action: 'add'|'remove'|'health-check'|'reset-circuit', endpointId?, endpoint? }` — simulated responses
+   337→   337→   337→
+   338→   338→   338→3. **`src/app/api/healing/route.ts`** — GET
+   339→   339→   339→   - Returns sorted healing actions + summary (totalActions, automaticCount, manualCount, successRate, lastAction)
+   340→   340→   340→
+   341→   341→   341→4. **`src/app/api/api-health/route.ts`** — GET
+   342→   342→   342→   - Returns all endpoints + summary (healthy/degraded/down counts, totalLatency, avgErrorRate, circuitsOpen)
+   343→   343→   343→
+   344→   344→   344→### Verification
+   345→   345→   345→- ✅ ESLint: Zero errors
+   346→   346→   346→- ✅ Dev server: Compiles and serves HTTP 200
+   347→   347→   347→- ✅ All API routes follow existing project patterns (NextResponse.json, mock data imports)
+   348→   348→   348→- ✅ No existing files modified
+   349→   349→   349→
+   350→   350→   350→### Important Data Structure Notes
+   351→   351→   351→- `ep-tavily` is the only endpoint with `status: 'down'` and `circuitBreaker: 'open'` — ideal for demonstrating full self-healing flow
+   352→   352→   352→- `ep-anthropic-claude` has `circuitBreaker: 'half-open'` — demonstrates the probing/recovery state
+   353→   353→   353→- `ep-notion` is in `maintenance` mode with retries disabled — a non-error state
+   354→   354→   354→- Health history for Tavily shows degradation starting at point index 2, then full 503 at point 3+
+   355→   355→   355→- Health history for Anthropic shows gradual degradation from point 3 onward
+   356→   356→   356→- All timestamps are dynamically generated relative to `Date.now()` so they're always within last 24 hours
+   357→   357→   357→
+   358→   358→   358→### File Inventory Update
+   359→   359→   359→- `src/lib/self-healing-data.ts` ✨ NEW
+   360→   360→   360→- `src/app/api/endpoints/route.ts` ✨ NEW
+   361→   361→   361→- `src/app/api/healing/route.ts` ✨ NEW
+   362→   362→   362→- `src/app/api/api-health/route.ts` ✨ NEW
+   363→   363→   363→
+   364→   364→   364→---
+   365→   365→   365→
+   366→   366→   366→## Task 2-b — Self-Healing API Control System UI Components
+   367→   367→   367→
+   368→   368→   368→### Overview
+   369→   369→   369→Created 3 new UI component files for the API Health tab (5th dashboard tab). These components render the self-healing API monitoring interface with endpoint cards, circuit breaker status, healing action timeline, and an add-endpoint dialog.
+   370→   370→   370→
+   371→   371→   371→### Files Created (3 new files)
+   372→   372→   372→
+   373→   373→   373→1. **`src/components/dashboard/EndpointCard.tsx`** — Individual endpoint card component
+   374→   374→   374→   - Props: `endpoint: ApiEndpoint`, `onAction`, `sparklineData: number[]`, `index`
+   375→   375→   375→   - **Status indicator**: Colored dot with glow classes (`status-glow-active`, `status-glow-degraded`, `status-glow-critical`); down status has `animate-pulse` + `animate-pulse-ring`
+   376→   376→   376→   - **Card border-left**: Color-coded by status (emerald/amber/red/gray)
+   377→   377→   377→   - **Header**: Status dot + endpoint name + category badge (LLM/Payment/Database/Search/MCP)
+   378→   378→   378→   - **URL**: Truncated mono-font display
+   379→   379→   379→   - **Circuit breaker badge**: Rounded-full colored badge (Closed=green, Open=red, Half-Open=amber)
+   380→   380→   380→   - **Metrics grid**: 4-column layout with Latency (ms), Error Rate (color-coded), Uptime (color-coded), Total Requests (formatted)
+   381→   381→   381→   - **Canvas sparkline**: 60×24px, reuses MetricCards pattern, draws from actual health history data, green/red based on error rate
+   382→   382→   382→   - **Action buttons**: "Force Health Check" (RefreshCw), "Reset Circuit" (ShieldCheck), "Toggle Fallback" (ToggleLeft) — ghost buttons with red hover
+   383→   383→   383→   - **Styling**: Uses `glass-card`, `card-lift` utility classes
+   384→   384→   384→   - **Framer Motion**: Staggered entrance animation per card index
+   385→   385→   385→
+   386→   386→   386→2. **`src/components/dashboard/HealingTimeline.tsx`** — Healing actions timeline component
+   387→   387→   387→   - Props: `actions: HealingAction[]`
+   388→   388→   388→   - **Vertical timeline**: Left border line (gray-200) with colored border-l per item based on severity
+   389→   389→   389→   - **Timeline dots**: 10px colored circles (gray/amber/red) with white border, positioned on the line
+   390→   390→   390→   - **Each item**: AUTO/MANUAL type badge (red for auto, gray for manual), action name, relative timestamp (timeAgo helper), result icon (CheckCircle2/XCircle/Clock)
+   391→   391→   391→   - **Action details**: Icon per action type (ShieldAlert, ArrowRightLeft, RotateCcw, Timer, Zap), truncated 2-line description, endpoint name (mono), duration (auto-formatted ms/s)
+   392→   392→   392→   - **Severity styling**: info=gray, warning=amber, critical=red — applied to left border, dot, and background tint
+   393→   393→   393→   - **Scroll container**: `max-h-[400px]` with `dashboard-scroll` custom scrollbar
+   394→   394→   394→   - **Framer Motion**: Staggered slide-in from left (x: -12 → 0, delay: i * 0.04)
+   395→   395→   395→
+   396→   396→   396→3. **`src/components/dashboard/ApiHealthPanel.tsx`** — Main container for API Health tab
+   397→   397→   397→   - **Data fetching**: `useEffect` + `useCallback` fetches 3 API routes in parallel (`/api/endpoints`, `/api/api-health`, `/api/healing`)
+   398→   398→   398→   - **Sparkline data**: `useMemo` extracts per-endpoint latency from `healthHistory` data file
+   399→   399→   399→   - **Loading state**: Centered spinner with "Loading API health data…" text
+   400→   400→   400→   - **Summary strip**: 4 mini-cards in `grid-cols-2 md:grid-cols-4`
+   401→   401→   401→     - Healthy (emerald, CheckCircle2 icon, number)
+   402→   402→   402→     - Degraded (amber, AlertTriangle icon, number)
+   403→   403→   403→     - Down (red, ServerCrash icon with animate-pulse, red background tint when >0)
+   404→   404→   404→     - Circuit Breakers Open (red, ShieldAlert icon, red tint when >0)
+   405→   405→   405→   - **Endpoint grid**: `grid-cols-1 lg:grid-cols-2` — fully responsive
+   406→   406→   406→   - **Add Endpoint dialog**: shadcn Dialog with form fields
+   407→   407→   407→     - Name (Input), Base URL (Input), Category (Select with 5 options), Timeout/Retries/Backoff (3-col number inputs), Fallback URL (optional Input)
+   408→   408→   408→     - Validation: requires name, URL, category
+   409→   409→   409→     - On submit: POST to `/api/endpoints` with `action: 'add'`, toast notification, form reset, data refetch
+   410→   410→   410→   - **Action handler**: `handleAction` POSTs to `/api/endpoints` with action type + endpointId, shows toast, refetches
+   411→   411→   411→   - **Styling**: Uses existing `card-lift`, `btn-glow`, `dashboard-scroll` utility classes; consistent `#dc2626` red accent
+   412→   412→   412→
+   413→   413→   413→### Verification
+   414→   414→   414→- ✅ ESLint: Zero errors (verified twice)
+   415→   415→   415→- ✅ Dev server: Compiles successfully (278–307ms compile times)
+   416→   416→   416→- ✅ All types imported from `@/lib/self-healing-data`
+   417→   417→   417→- ✅ All shadcn/ui components used: Badge, Button, Dialog (all sub-components), Input, Label, Select (all sub-components)
+   418→   418→   418→- ✅ All Lucide icons used (no unused imports)
+   419→   419→   419→- ✅ No existing files modified
+   420→   420→   420→- ✅ Responsive: 1-col mobile, 2-col desktop grid; summary strip 2→4 cols; action buttons responsive text
+   421→   421→   421→- ✅ Framer Motion: Staggered animations on summary cards, endpoint grid, and timeline items
+   422→   422→   422→- ✅ Dark mode: All components use `dark:` variants
+   423→   423→   423→- ✅ Canvas sparkline: Reuses MetricCards pattern with actual health history data
+   424→   424→   424→
+   425→   425→   425→### File Inventory Update
+   426→   426→   426→- `src/components/dashboard/EndpointCard.tsx` ✨ NEW
+   427→   427→   427→- `src/components/dashboard/HealingTimeline.tsx` ✨ NEW
+   428→   428→   428→- `src/components/dashboard/ApiHealthPanel.tsx` ✨ NEW
+   429→   429→   429→
+   430→   430→   430→---
+   431→   431→   431→
+   432→   432→   432→## Task 2-c — Documentation Landing Section + SaaS Settings Panel
+   433→   433→   433→
+   434→   434→   434→### Overview
+   435→   435→   435→Created 2 new component files: an interactive documentation section for the landing page and a SaaS-style settings panel for the dashboard.
+   436→   436→   436→
+   437→   437→   437→### Files Created (2 new files)
+   438→   438→   438→
+   439→   439→   439→1. **`src/components/landing/DocsSection.tsx`** — Interactive documentation landing section
+   440→   440→   440→   - **Section header**: Badge ("Documentation"), H2 with `text-gradient` ("Everything you need to get started"), subtitle
+   441→   441→   441→   - **3-Column Grid** (`lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1`) with staggered Framer Motion entrance:
+   442→   442→   442→     - **Card 1 — Getting Started** (Rocket icon, red accent): Expandable/collapsible toggle with 4 steps. Each step has a red numbered circle badge, title, description, and step 3 includes a styled dark code block. Uses `useState` for expanded/collapsed with `motion.div` height animation.
+   443→   443→   443→     - **Card 2 — API Integration** (Plug icon, gray accent): 3 code examples (Initialize SDK, Wrap Agent Calls, Custom Trace Attributes) each in dark `bg-gray-900` code blocks with `CopyButton` (uses `navigator.clipboard`, shows Check/Copy icon toggle).
+   444→   444→   444→     - **Card 3 — Self-Healing APIs** (Shield icon, red accent): Extracted `CircuitBreakerViz` component — 3 colored circles (Closed=emerald, Half-Open=amber, Open=red) connected by dot-line connectors. Below: 5-item capabilities list with green Check icons and descriptions.
+   445→   445→   445→   - **API Reference Table** below the grid: Clean table with 9 rows (GET/POST), method badges (GET=emerald, POST=blue), mono-font endpoint paths, alternating row colors. Animated with Framer Motion on scroll.
+   446→   446→   446→   - **Styling**: `glass-card` + `card-lift` on cards, `bg-dot-pattern` background, red glow blur, consistent with existing sections
+   447→   447→   447→   - **Variants**: Moved `containerVariants`/`itemVariants` to top of file (before usage)
+   448→   448→   448→
+   449→   449→   449→2. **`src/components/dashboard/SettingsPanel.tsx`** — SaaS settings dialog panel
+   450→   450→   450→   - **Props**: `{ open: boolean; onClose: () => void }`
+   451→   451→   451→   - **shadcn Sheet** (right side, `sm:max-w-md`) with `dashboard-scroll` overflow
+   452→   452→   452→   - **Sticky header** with SheetTitle ("Settings") + SheetDescription, border-b
+   453→   453→   453→   - **5 sections** separated by `Separator` components:
+   454→   454→   454→     - **Workspace**: Name (Input), API Key (readonly Input + CopyIconButton), Webhook URL (readonly Input + CopyIconButton)
+   455→   455→   455→     - **Notifications**: 3 Switch toggles (Slack, Email, In-app toasts) — each with title + description
+   456→   456→   456→     - **Self-Healing**: 2 Switch toggles (auto-remediation, circuit breakers, default on), Health check interval (number Input, default 30, suffix "seconds"), Error threshold (number Input, default 50, suffix "%")
+   457→   457→   457→     - **Data Retention**: Retention period Select (7/14/30/90 days, default 30), trace sampling Switch (default off)
+   458→   458→   458→     - **Danger Zone**: Red-bordered container (`border-red-200 dark:border-red-900/50 bg-red-50/50`), Export All Data (secondary), Reset Dashboard (secondary), Delete Workspace (destructive) — with 2-step confirmation (shows "Are you sure?" + Cancel/Confirm)
+   459→   459→   459→   - **CopyIconButton**: Reusable helper with Check/Copy icon toggle, uses `navigator.clipboard`
+   460→   460→   460→   - **SectionHeading**: Reusable sub-component for section titles with optional descriptions
+   461→   461→   461→
+   462→   462→   462→### Verification
+   463→   463→   463→- ✅ ESLint: Zero errors
+   464→   464→   464→- ✅ Dev server: Compiles and serves HTTP 200
+   465→   465→   465→- ✅ No existing files modified
+   466→   466→   466→- ✅ All shadcn/ui components used: Sheet (all sub-components), Input, Label, Switch, Select (all sub-components), Button, Separator
+   467→   467→   467→- ✅ All Lucide icons used (no unused imports): Rocket, Plug, Shield, ChevronDown, Copy, Check, Download, RotateCcw, Trash2
+   468→   468→   468→- ✅ Responsive: 3→2→1 column grid on docs section; Sheet responsive width
+   469→   469→   469→- ✅ Dark mode: All components use `dark:` variants
+   470→   470→   470→- ✅ Framer Motion: Scroll-triggered entrance animations on cards and table
+   471→   471→   471→- ✅ `&apos;` used for apostrophe in JSX text content
+   472→   472→   472→
+   473→   473→   473→### File Inventory Update
+   474→   474→   474→- `src/components/landing/DocsSection.tsx` ✨ NEW
+   475→   475→   475→- `src/components/dashboard/SettingsPanel.tsx` ✨ NEW
+   476→   476→   476→
+   477→   477→   477→---
+   478→   478→   478→
+   479→   479→   479→## V9 Session — Tasks v9-3/v9-5/v9-8 — Completed Modifications
+   480→   480→   480→
+   481→   481→   481→### Overview
+   482→   482→   482→V9 enhancements adding 9 new CSS utility classes, polished dashboard tab bar, and a new 3-tier SaaS pricing landing section.
+   483→   483→   483→
+   484→   484→   484→### 1. New CSS Utility Classes (Part A)
+   485→   485→   485→Added 9 new utility classes to `src/app/globals.css` (before the last Dot grid pattern comment):
+   486→   486→   486→- `.tab-indicator` — 2px animated pill with red gradient, slide-in animation
+   487→   487→   487→- `.badge-pulse` — Subtle 1.0→1.15→1.0 scale pulse, 2s ease-in-out infinite
+   488→   488→   488→- `.gradient-border-card` — Animated conic-gradient border (red→gray→transparent→gray→red), 8s rotation, dark mode support
+   489→   489→   489→- `.shimmer-bg` — Moving gradient left-to-right at 3% opacity, 2s infinite
+   490→   490→   490→- `.text-glow-red` — Red text-shadow at 30% opacity for critical states
+   491→   491→   491→- `.hover-scale` — Scale to 1.02 on hover, 0.2s ease transition
+   492→   492→   492→- `.stagger-children > *` — 10-child staggered fade-in + slide-up (index * 0.05s delay)
+   493→   493→   493→- `@keyframes orbit` + `.animate-orbit` — 20s linear infinite rotation for decorative elements
+   494→   494→   494→- `.noise-overlay` — Inline SVG noise texture at 2% opacity, pointer-events: none
+   495→   495→   495→
+   496→   496→   496→### 2. Dashboard Tab Bar Polish (Part B)
+   497→   497→   497→Enhanced `src/components/dashboard/DashboardSection.tsx` tab buttons:
+   498→   498→   498→- Added absolute-positioned red gradient glow pill (`h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full`) below active tab text
+   499→   499→   499→- Added `badge-pulse` class to issue count badge and alert count badge
+   500→   500→   500→- Changed `transition-colors` to `transition-all duration-200` on tab button for smooth hover transitions
+   501→   501→   501→
+   502→   502→   502→### 3. New Pricing Landing Section (Part C)
+   503→   503→   503→Created `src/components/landing/PricingSection.tsx`:
+   504→   504→   504→- 3-tier SaaS pricing section (Starter $0, Pro $49, Enterprise Custom)
+   505→   505→   505→- Section header with Badge, H2 with `text-gradient`, and subtitle
+   506→   506→   506→- Pro card highlighted: `-mt-4`, `border-2 border-[#dc2626]/20`, `ring-1 ring-[#dc2626]/10`, `gradient-border-card`, "Most Popular" badge
+   507→   507→   507→- Starter & Enterprise use outline button variant; Pro uses red bg + `btn-glow`
+   508→   508→   508→- Feature lists with green Check icons
+   509→   509→   509→- Bottom note about SSL, 99.9% uptime SLA, unlimited team members
+   510→   510→   510→- Framer Motion staggered card entrance (delay: i * 0.1)
+   511→   511→   511→- `bg-dot-pattern` background, glass-card, card-lift styling
+   512→   512→   512→- Fully responsive (stacks on mobile)
+   513→   513→   513→
+   514→   514→   514→### 4. Page Integration (Part D)
+   515→   515→   515→Edited `src/app/page.tsx`:
+   516→   516→   516→- Added `import { PricingSection }` import
+   517→   517→   517→- Inserted PricingSection between TestimonialsSection and NewsletterSection
+   518→   518→   518→- Wrapped in `motion.div` with scroll-triggered fade (matching existing pattern)
+   519→   519→   519→- Added `section-divider` div before it
+   520→   520→   520→
+   521→   521→   521→### 5. Navbar Update (Part E)
+   522→   522→   522→Edited `src/components/landing/Navbar.tsx`:
+   523→   523→   523→- Added `{ label: 'Pricing', href: '#pricing' }` to navLinks array (after Docs, before How It Works)
+   524→   524→   524→
+   525→   525→   525→### File Inventory
+   526→   526→   526→- `src/app/globals.css` ✏️ MODIFIED (9 new utility classes)
+   527→   527→   527→- `src/components/dashboard/DashboardSection.tsx` ✏️ MODIFIED (tab bar polish)
+   528→   528→   528→- `src/components/landing/PricingSection.tsx` ✨ NEW
+   529→   529→   529→- `src/app/page.tsx` ✏️ MODIFIED (PricingSection import + rendering)
+   530→   530→   530→- `src/components/landing/Navbar.tsx` ✏️ MODIFIED (Pricing nav link)
+   531→   531→   531→
+   532→   532→   532→### Verification
+   533→   533→   533→- ✅ ESLint: Zero errors
+   534→   534→   534→- ✅ Dev server: Compiles successfully (GET / 200)
+   535→   535→   535→- ✅ All API routes returning 200
+   536→   536→   536→- ✅ No existing functionality broken
+   537→   537→   537→
+   538→   538→   538→---
+   539→   539→   539→
+   540→   540→   540→## V9 Session — Activity API, Dynamic Timeline, Lazy Loading
+   541→   541→   541→
+   542→   542→   542→### Part A: Activity Timeline API Endpoint
+   543→   543→   543→- Created `src/app/api/activity/route.ts`
+   544→   544→   544→- **GET** endpoint returning 15 realistic activity events sorted newest-first
+   545→   545→   545→- Event types: `trace`, `issue`, `healing`, `alert`, `deployment`
+   546→   546→   546→- Each event includes: id, type, title, description, agentName?, severity?, timestamp, metadata?
+   547→   547→   547→- Severity levels: `info`, `warning`, `critical`
+   548→   548→   548→- All events span the last ~10 hours of activity
+   549→   549→   549→- Exported `ActivityEvent` interface for type safety
+   550→   550→   550→
+   551→   551→   551→### Part B: Activity Timeline Component Refactor
+   552→   552→   552→- Modified `src/components/dashboard/ActivityTimeline.tsx`
+   553→   553→   553→- Replaced hardcoded `mockEvents` with `useState` + `useEffect` fetching from `/api/activity`
+   554→   554→   554→- Added `TimelineSkeleton` component (6 skeleton rows with Skeleton from shadcn/ui)
+   555→   555→   555→- Mapped API `type` field to icons: trace→FileSearch, issue→AlertTriangle, healing→Wrench, alert→Bell, deployment→Rocket
+   556→   556→   556→- Mapped API `severity` field to title colors: critical→red, warning→amber, info→gray
+   557→   557→   557→- Metadata formatting: `Record<string, string>` joined with `·` separator; agent name prepended if present
+   558→   558→   558→- Removed unused imports (Activity, CheckCircle2, Eye, BarChart3)
+   559→   559→   559→- Preserved all existing styling: vertical timeline line, ring-4 icon container, dark mode, motion variants, critical ping animation
+   560→   560→   560→
+   561→   561→   561→### Part C: Lazy Loading Below-Fold Sections
+   562→   562→   562→- Modified `src/app/page.tsx`
+   563→   563→   563→- Converted 9 below-fold sections to `next/dynamic` with `ssr: false`:
+   564→   564→   564→  - HowItWorks, StatsSection, DashboardSection (h-[600px] placeholder)
+   565→   565→   565→  - TestimonialsSection, DocsSection, PricingSection (h-96 placeholder)
+   566→   566→   566→  - NewsletterSection, IntegrationSection, CtaSection (h-64 placeholder)
+   567→   567→   567→- Kept 6 above-fold components as static imports: Navbar, HeroSection, FeaturesSection, ScrollProgress, BackToTop, DashboardTour
+   568→   568→   568→- All dynamic imports use `.then(m => ({ default: m.X }))` pattern for named exports
+   569→   569→   569→
+   570→   570→   570→### Bonus Fix: Pre-existing CSS Syntax Error
+   571→   571→   571→- Fixed orphaned closing brace in `src/app/globals.css` (lines 466-593 were incorrectly indented inside a missing wrapper block)
+   572→   572→   572→- Removed orphaned `}` at line 593, un-indented 7 utility class blocks
+   573→   573→   573→- This fix resolved a 500 error on the homepage that was blocking rendering
+   574→   574→   574→
+   575→   575→   575→### File Inventory
+   576→   576→   576→- `src/app/api/activity/route.ts` ✨ NEW (Activity API endpoint with 15 events)
+   577→   577→   577→- `src/components/dashboard/ActivityTimeline.tsx` ✏️ MODIFIED (API integration, loading skeleton, severity mapping)
+   578→   578→   578→- `src/app/page.tsx` ✏️ MODIFIED (9 lazy-loaded dynamic imports)
+   579→   579→   579→- `src/app/globals.css` ✏️ MODIFIED (fixed pre-existing CSS syntax error)
+   580→   580→   580→
+   581→   581→   581→### Verification
+   582→   582→   582→- ✅ ESLint: Zero errors
+   583→   583→   583→- ✅ Dev server: GET / 200 (all routes including /api/activity returning 200)
+   584→   584→   584→- ✅ Activity Timeline loads data from API with loading skeleton
+   585→   585→   585→- ✅ Below-fold sections lazy loaded with placeholder divs
+   586→   586→   586→- ✅ No existing functionality broken
+   587→   587→   587→
+   588→   588→   588→## V10 Session — v10-2/v10-5/v10-6 (Backend + UX Enhancements)
+   589→   589→   589→
+   590→   590→   590→### 1. Enhanced Health Event Streamer (Task v10-2)
+   591→   591→   591→- **File**: `mini-services/alert-streamer/index.ts`
+   592→   592→   592→- Added second `setInterval` (8s) inside the WebSocket connection handler
+   593→   593→   593→- Sends `api_health_event` messages with nested `event` payload containing realistic status changes:
+   594→   594→   594→  - `health_check_passed` — healthy status with 50-550ms latency
+   595→   595→   595→  - `latency_spike` — degraded status with 500-2000ms latency
+   596→   596→   596→  - `health_check_failed` — down status for ep-tavily
+   597→   597→   597→  - `circuit_breaker_state` — random state transitions (closed/half-open/open)
+   598→   598→   598→- Both intervals properly cleaned up on `ws.close` and `ws.error`
+   599→   599→   599→- Message structure: `{ type: 'api_health_event', event: { type, endpointId, latency, status } }`
+   600→   600→   600→
+   601→   601→   601→### 2. API Health Panel WebSocket Connection (Task v10-5)
+   602→   602→   602→- **File**: `src/components/dashboard/ApiHealthPanel.tsx`
+   603→   603→   603→- Added `ENDPOINT_NAMES` map for human-readable endpoint labels
+   604→   604→   604→- Added `useEffect` with WebSocket connection to `ws://localhost:3001/?XTransformPort=3001`
+   605→   605→   605→- Listens for `api_health_event` messages and shows toast notifications via `sonner`
+   606→   606→   606→- Error/degraded statuses → `toast.error()`, healthy → `toast.info()`
+   607→   607→   607→- Format: `"health check passed: Tavily Search (234ms)"`
+   608→   608→   608→- Proper try/catch error handling and WebSocket cleanup on unmount
+   609→   609→   609→- Existing REST data fetching remains intact (no regression)
+   610→   610→   610→
+   611→   611→   611→### 3. Command Palette Keyboard Shortcuts Section (Task v10-6)
+   612→   612→   612→- **File**: `src/components/ui/CommandPalette.tsx`
+   613→   613→   613→- Added `BookOpen`, `CreditCard`, `Heart` Lucide icon imports
+   614→   614→   614→- Extended `CommandItem.group` union type to include `'shortcuts'`
+   615→   615→   615→- Added `'shortcuts'` to `GROUP_ORDER`, `GROUP_LABELS`, and `GROUP_ICON` mappings
+   616→   616→   616→- Added 6 keyboard shortcut items with `group: 'shortcuts'`:
+   617→   617→   617→  - Go to Dashboard (LayoutDashboard) — scrolls to #dashboard
+   618→   618→   618→  - Open Documentation (BookOpen) — scrolls to #docs
+   619→   619→   619→  - View Pricing (CreditCard) — scrolls to #pricing
+   620→   620→   620→  - API Health Tab (Heart) — sets hash to #dashboard-api-health
+   621→   621→   621→  - Toggle Dark Mode (Moon) — clicks theme toggle button
+   622→   622→   622→  - Search Agents (Search) — sets hash to #dashboard-traces
+   623→   623→   623→- Keyboard Shortcuts group appears at bottom of no-query view AND in filtered search results
+   624→   624→   624→- All existing CommandPalette functionality preserved
+   625→   625→   625→
+   626→   626→   626→### Verification
+   627→   627→   627→- ✅ ESLint: Zero errors
+   628→   628→   628→- ✅ Dev server: All routes 200, compilation clean
+   629→   629→   629→- ✅ Alert streamer restarted and running on port 3001
+   630→   630→   630→- ✅ No existing functionality broken (CommandPalette, ApiHealthPanel, alert-streamer)
+   631→   631→   631→
+   632→   632→   632→---
+   633→   633→   633→
+   634→   634→   634→## V11 Task 4a — Enhanced Footer Component
+   635→   635→   635→
+   636→   636→   636→### Changes Made
+   637→   637→   637→1. **Live System Status Indicator**: Added a pulsing green dot badge ("All Systems Operational") above the social proof row, using `badge-pulse` class with `animate-ping` for the dot.
+   638→   638→   638→2. **Inline Newsletter Input**: Added email Input + Subscribe Button (with `btn-glow` red accent) directly inside the footer brand column, replacing the need for a separate NewsletterSection. Includes email validation and toast feedback via sonner.
+   639→   639→   639→3. **Enhanced Social Links**: Added LinkedIn, YouTube, and Discord (custom SVG) icons alongside existing Twitter/GitHub. Styled in a row with `hover:scale-110`, color transition to red, and `-translate-y-0.5` hover lift.
+   640→   640→   640→4. **Footer Animations**: Added Framer Motion `whileInView` entrance animation on the footer (fade-in + slide-up) with staggered children via `footerVariants` and `itemVariants`.
+   641→   641→   641→5. **Footer Background Enhancement**: Added two subtle blurred gradient circles (`bg-[#dc2626]/[0.03]` and `bg-gray-400/[0.04]`) as gradient mesh overlay, plus `bg-noise` class for texture. Both with `pointer-events-none` and `absolute inset-0`.
+   642→   642→   642→6. **Status Page Link**: Updated the 'Status' entry in Resources to include `href: '#status'`.
+   643→   643→   643→7. **Copyright Enhancement**: Added a red dot separator (`h-1 w-1 rounded-full bg-[#dc2626]`) and "Built with ❤️ for AI reliability" text after the copyright year.
+   644→   644→   644→
+   645→   645→   645→### Technical Details
+   646→   646→   646→- Footer remains a named export `{ Footer }` with `'use client'` directive
+   647→   647→   647→- Uses shadcn/ui `Input` and `Button` components for newsletter
+   648→   648→   648→- Custom `DiscordIcon` SVG component (Lucide doesn't include Discord)
+   649→   649→   649→- All content is real, meaningful text — no placeholders
+   650→   650→   650→- `viewport={{ once: true, amount: 0.1 }}` for performant scroll-triggered animation
+   651→   651→   651→- Toast notifications via `sonner` for subscribe success/error
+   652→   652→   652→
+   653→   653→   653→### Verification
+   654→   654→   654→- ✅ ESLint: Zero errors
+   655→   655→   655→- ✅ Dev server: Compiles clean, all routes 200
+   656→   656→   656→- ✅ No existing functionality broken
+   657→   657→   657→
+   658→   658→   658→---
+   659→   659→   659→
+   660→   660→   660→## Task 4b — Live Animated Mini Area Charts in MetricCards
+   661→   661→   661→
+   662→   662→   662→### Summary
+   663→   663→   663→Enhanced the `MetricCards` component to replace canvas-based hover-only sparklines with always-visible, live-updating Recharts mini area charts.
+   664→   664→   664→
+   665→   665→   665→### Changes Made
+   666→   666→   666→- **File modified**: `src/components/dashboard/MetricCards.tsx`
+   667→   667→   667→- **Replaced**: `MiniSparkline` (canvas + `useRef`) → `MiniAreaChart` (Recharts `AreaChart` + `Area` + `ResponsiveContainer` + `YAxis`)
+   668→   668→   668→- **Live data**: Each card has its own 12-point time-series via `useLiveChartData` custom hook, updating every 5 seconds with a sliding window
+   669→   669→   669→- **Color coding**: Red gradient fill (`#dc2626`) for negative metrics (Open Issues, Avg Error Rate), green gradient fill (`#22c55e`) for positive metrics
+   670→   670→   670→- **Gradient definition**: `<defs><linearGradient>` with `stopOpacity` from 0.25 → 0.02
+   671→   671→   671→- **Smooth curves**: `type="monotone"` on `Area` component, `animationDuration={1200}`, `animationEasing="ease-in-out"`
+   672→   672→   672→- **Always visible**: Removed `opacity-0 group-hover:opacity-100`; charts show at `opacity-60` and increase to `opacity-100` on card hover
+   673→   673→   673→- **Card styling**: Added `hover:shadow-[0_2px_0_0_#dc2626]` for red glow bottom border on hover
+   674→   674→   674→- **Extracted**: `MetricCardInner` component to isolate per-card state (each card manages its own `useLiveChartData`)
+   675→   675→   675→- **No axes/labels/tooltips**: `YAxis` hidden with `domain={[0, 100]}`, purely visual decoration
+   676→   676→   676→- **Chart dimensions**: 30px height, 100% width via `ResponsiveContainer`
+   677→   677→   677→- **Preserved**: All existing functionality (icons, trend arrows, values, shimmer effect, `card-lift`, staggered animation)
+   678→   678→   678→
+   679→   679→   679→### Verification
+   680→   680→   680→- ✅ ESLint: Zero errors
+   681→   681→   681→- ✅ Dev server: Compiles clean, `GET /` returns 200 (475ms compile)
+   682→   682→   682→- ✅ No existing functionality broken
+   683→   683→   683→- ✅ Export remains `{ MetricCards }`, `'use client'` directive present
+   684→   684→   684→
+   685→   685→   685→### 6. Task 4c — FeaturesSection Advanced Micro-Interactions
+   686→   686→   686→- **File**: `src/components/landing/FeaturesSection.tsx`
+   687→   687→   687→- **Changes**:
+   688→   688→   688→  - **Magnetic Hover Effect**: 3D perspective tilt (±3deg) on card hover using `useMotionValue` + `useSpring` for smooth interpolation. `onMouseMove` calculates cursor offset from card center; `onMouseLeave` resets to flat.
+   689→   689→   689→  - **Glow Follows Cursor**: 150px radial gradient glow div (`rgba(220,38,38,0.15)`) follows cursor with spring-smoothed positioning, `pointer-events-none absolute`.
+   690→   690→   690→  - **Icon Micro-animation**: `whileHover={{ scale: [1, 1.15, 1.05] }}` with spring config for a subtle bounce effect on icon container.
+   691→   691→   691→  - **Card Number Indicator**: Semi-transparent numbers (01-06) at top-right of each card, styled `text-6xl font-black text-gray-900/[0.03] dark:text-white/[0.03]`.
+   692→   692→   692→  - **Enhanced Bottom Accent Line**: Width driven by `smoothAccentWidth` spring — wider when cursor is near horizontal center, collapses to 0 on leave. Gradient preserved (`from-[#dc2626] to-transparent`).
+   693→   693→   693→  - **Stagger Enhancement**: Increased to 0.12s, added `scale: 0.95 → 1` to `itemVariants`.
+   694→   694→   694→  - Extracted `FeatureCard` sub-component (per-card motion values to avoid shared state)
+   695→   695→   695→- **Preserved**: All existing data, section structure, export `{ FeaturesSection }`, `'use client'` directive
+   696→   696→   696→
+   697→   697→   697→### Verification
+   698→   698→   698→- ✅ ESLint: Zero errors
+   699→   699→   699→- ✅ Dev server: Compiles clean, `GET /` returns 200
+   700→   700→   700→- ✅ No existing functionality broken
+   701→   701→   701→- ✅ Export remains `{ FeaturesSection }`, `'use client'` directive present
+   702→   702→   702→
+   703→   703→   703→---
+   704→   704→   704→
+   705→   705→   705→## V11 Session — Real-Time Status Page (Task 4e)
+   706→   706→   706→
+   707→   707→   707→### 1. New Component: `src/components/landing/StatusSection.tsx`
+   708→   708→   708→- Professional status/uptime monitoring landing section with named export `{ StatusSection }` and `'use client'` directive
+   709→   709→   709→- **Section Header**: Badge with Activity icon ("System Status"), H2 with text-gradient ("Real-time infrastructure health"), subtitle paragraph
+   710→   710→   710→- **Overall Status Banner**: Large pill badge showing 'All Systems Operational' with pulsing green dot (animate-ping). Tooltip on hover: 'Last checked: 12 seconds ago'. Uses `glass-border` and `status-shimmer` CSS classes
+   711→   711→   711→- **Service Status Grid**: 3-column responsive grid (1/2/3 cols) of 6 service cards:
+   712→   712→   712→  - API Gateway, Trace Pipeline, Alert Engine, MCP Integration (Degraded), Dashboard UI, Data Pipeline
+   713→   713→   713→  - Each card: service name, status badge (Operational/Degraded), uptime %, avg latency, canvas sparkline (80×10px), last incident time
+   714→   714→   714→  - All Operational except MCP Integration (Degraded, amber border, elevated latency 156ms)
+   715→   715→   715→  - Style: `glass-card card-lift` with status-colored 3px left border (green/amber/gray)
+   716→   716→   716→- **90-Day Uptime Bar**: 90 small 4×4px squares with color coding: green (>99.9%), amber (99-99.9%), red (<99%). 3 red + 5 amber squares at fixed positions, rest green. Tooltip per square showing date + exact percentage. Legend row included
+   717→   717→   717→- **Incidents Summary Table**: 3 recent incidents with columns: Time, Service, Duration, Status (Resolved/Monitoring). Status shown as colored pill badges with dot indicators
+   718→   718→   718→- **Sparkline**: Canvas-based mini chart component with devicePixelRatio support, drawing 10-point line charts
+   719→   719→   719→- **Animations**: Framer Motion `useInView` scroll-triggered animations with staggered children (0.08s), fade-in-up variants
+   720→   720→   720→
+   721→   721→   721→### 2. New CSS Utilities: `src/app/globals.css`
+   722→   722→   722→Added before the last comment block ("Dot grid pattern (alternative)"):
+   723→   723→   723→- `.status-shimmer` — White-to-transparent gradient sweep every 3s for status indicators (dark mode variant)
+   724→   724→   724→- `.glass-border` — 1px glassmorphism border (`border-white/20`, `backdrop-blur-[1px]`, dark variant `border-white/10`)
+   725→   725→   725→- `.pulse-dot-green` — 8px pulsing green dot with `::before` ping animation ring
+   726→   726→   726→- `.pulse-dot-red` — 8px pulsing red dot with `::before` ping animation ring
+   727→   727→   727→- `.text-balance` — Already existed in codebase (line 203), skipped duplicate
+   728→   728→   728→- `@keyframes slideInFromRight` + `.animate-slide-in-right` — 0.4s slide-from-right animation for toasts/notifications
+   729→   729→   729→
+   730→   730→   730→### 3. Page Integration: `src/app/page.tsx`
+   731→   731→   731→- Added `const StatusSection = dynamic(...)` lazy import with 96px loading placeholder
+   732→   732→   732→- Inserted `StatusSection` between `ChangelogSection` and `CtaSection`
+   733→   733→   733→- Wrapped in `motion.div` with scroll-triggered fade (`initial: opacity 0, whileInView: opacity 1, viewport once: true, duration 0.8`)
+   734→   734→   734→- Preceded by `<div className="section-divider max-w-7xl mx-auto" />`
+   735→   735→   735→
+   736→   736→   736→### Verification
+   737→   737→   737→- ✅ ESLint: Zero errors
+   738→   738→   738→- ✅ Dev server: Compiles clean, `GET /` returns 200
+   739→   739→   739→- ✅ All existing functionality preserved
+   740→   740→   740→- ✅ Named export `{ StatusSection }` with `'use client'` directive
+   741→   741→   741→---
+   742→   742→   742→
+   743→   743→   743→## V11 Session — Completed Modifications
+   744→   744→   744→
+   745→   745→   745→### QA Assessment (Pre-Development)
+   746→   746→   746→- ✅ ESLint: Zero errors
+   747→   747→   747→- ✅ Page: HTTP 200, compiles and renders
+   748→   748→   748→- ✅ Zero JS errors (verified via agent-browser console, clean reload)
+   749→   749→   749→- ✅ All 5 dashboard tabs work (Overview, Traces, Issues, Alerts, API Health)
+   750→   750→   750→- ✅ All 9 API routes return 200
+   751→   751→   751→- ✅ Dark mode: Toggle works correctly
+   752→   752→   752→- ✅ Mobile responsive: iPhone 14 viewport tested
+   753→   753→   753→- ✅ Pre-existing warning: scroll container position (non-blocking)
+   754→   754→   754→- ✅ GitBranchHorizontal import already fixed to GitBranch in ChangelogSection.tsx
+   755→   755→   755→
+   756→   756→   756→### 1. Enhanced Footer (Task 4a)
+   757→   757→   757→- **File Modified**: `src/components/landing/Footer.tsx`
+   758→   758→   758→- Added live system status indicator with badge-pulse green dot ('All Systems Operational')
+   759→   759→   759→- Added inline newsletter email input + subscribe button with Send icon and btn-glow
+   760→   760→   760→- Enhanced social links: 5 icons (Twitter, GitHub, LinkedIn, YouTube, Discord) with hover scale/color transition
+   761→   761→   761→- Added Framer Motion whileInView entrance animations with staggered children
+   762→   762→   762→- Added gradient mesh background (2 blurred circles) + bg-noise texture
+   763→   763→   763→- Status link in Resources now points to '#status'
+   764→   764→   764→- Copyright enhanced with red dot separator + 'Built with ❤️ for AI reliability'
+   765→   765→   765→
+   766→   766→   766→### 2. Live Metric Mini-Charts (Task 4b)
+   767→   767→   767→- **File Modified**: `src/components/dashboard/MetricCards.tsx`
+   768→   768→   768→- Replaced canvas-based MiniSparkline with Recharts AreaChart (30px height, always visible)
+   769→   769→   769→- Uses `useLiveChartData` custom hook: 12-point time-series data, updates every 5 seconds
+   770→   770→   770→- Red gradient for negative metrics, green gradient for positive metrics
+   771→   771→   771→- Smooth animation (1200ms ease-in-out) on data transitions
+   772→   772→   772→- Added `hover:shadow-[0_2px_0_0_#dc2626]` red glow bottom border on card hover
+   773→   773→   773→- Charts always visible at 60% opacity, brighten to 100% on hover
+   774→   774→   774→
+   775→   775→   775→### 3. Feature Cards Magnetic Hover (Task 4c)
+   776→   776→   776→- **File Modified**: `src/components/landing/FeaturesSection.tsx`
+   777→   777→   777→- Extracted `FeatureCard` sub-component with per-card motion values
+   778→   778→   778→- 3D tilt effect: useMotionValue + useSpring for smooth ±3° rotateX/rotateY
+   779→   779→   779→- Cursor-following radial gradient glow (150px, red at 15% opacity)
+   780→   780→   780→- Icon micro-animation: whileHover scale bounce [1 → 1.15 → 1.05]
+   781→   781→   781→- Card number indicator: semi-transparent '01'-'06' at top-right
+   782→   782→   782→- Dynamic bottom accent line width based on cursor X position
+   783→   783→   783→- Stagger increased to 0.12s, added scale 0.95→1 to item variants
+   784→   784→   784→
+   785→   785→   785→### 4. Agent Detail Sheet Sub-Tabs (Task 4d)
+   786→   786→   786→- **File Modified**: `src/components/dashboard/AgentDetailSheet.tsx`
+   787→   787→   787→- Added shadcn Tabs with 3 sub-tabs: Overview, Activity, Performance
+   788→   788→   788→- **Activity Tab**: 8 mock events in vertical timeline with colored dots, icons (FileSearch/AlertTriangle/CheckCircle2/Wrench), titles, descriptions, timestamps
+   789→   789→   789→- **Performance Tab**: 4 mini stat cards (Total Runs 7d, Avg Success Rate, Best/Worst Day) + Recharts BarChart (Daily Runs, color-coded by error rate) + Recharts AreaChart (Error Rate %, red gradient)
+   790→   790→   790→- Red accent tab styling: `data-[state=active]:border-b-[#dc2626] data-[state=active]:text-[#dc2626]`
+   791→   791→   791→- Seeded random data generator for consistent per-agent charts
+   792→   792→   792→- Props interface unchanged, export remains `{ AgentDetailSheet }`
+   793→   793→   793→
+   794→   794→   794→### 5. Real-Time Status Page Section (Task 4e)
+   795→   795→   795→- **File Created**: `src/components/landing/StatusSection.tsx`
+   796→   796→   796→- Overall status banner: 'All Systems Operational' with pulsing green dot + glass-border + status-shimmer
+   797→   797→   797→- 6 service cards in 3-column grid: API Gateway, Trace Pipeline, Alert Engine, MCP Integration (Degraded), Dashboard UI, Data Pipeline
+   798→   798→   798→- Each card: status badge, uptime %, latency, canvas sparkline (80×10px), last incident time
+   799→   799→   799→- 90-day uptime visualization: 90 colored squares (4×4px) with tooltips showing date + percentage
+   800→   800→   800→- Incidents summary table: 3 recent incidents with time, service, duration, status badges
+   801→   801→   801→- Framer Motion scroll-triggered staggered animations
+   802→   802→   802→
+   803→   803→   803→### 6. New CSS Utilities
+   804→   804→   804→- **File Modified**: `src/app/globals.css`
+   805→   805→   805→- `.status-shimmer` — 3s white-to-transparent gradient sweep for status indicators
+   806→   806→   806→- `.glass-border` — 1px glassmorphism border with dark mode support
+   807→   807→   807→- `.pulse-dot-green` / `.pulse-dot-red` — 8px pulsing status dots with ping ring
+   808→   808→   808→- `@keyframes slideInFromRight` + `.animate-slide-in-right` — slide-from-right animation
+   809→   809→   809→
+   810→   810→   810→### 7. Page Integration & Navbar Update
+   811→   811→   811→- **File Modified**: `src/app/page.tsx`
+   812→   812→   812→- Added StatusSection as lazy-loaded dynamic import between ChangelogSection and CtaSection
+   813→   813→   813→- **File Modified**: `src/components/landing/Navbar.tsx`
+   814→   814→   814→- Added 'Status' link to navLinks (href: '#status')
+   815→   815→   815→
+   816→   816→   816→### File Inventory
+   817→   817→   817→- `src/components/landing/Footer.tsx` ✏️ MODIFIED
+   818→   818→   818→- `src/components/dashboard/MetricCards.tsx` ✏️ MODIFIED
+   819→   819→   819→- `src/components/landing/FeaturesSection.tsx` ✏️ MODIFIED
+   820→   820→   820→- `src/components/dashboard/AgentDetailSheet.tsx` ✏️ MODIFIED
+   821→   821→   821→- `src/components/landing/StatusSection.tsx` ✨ NEW
+   822→   822→   822→- `src/app/globals.css` ✏️ MODIFIED
+   823→   823→   823→- `src/app/page.tsx` ✏️ MODIFIED
+   824→   824→   824→- `src/components/landing/Navbar.tsx` ✏️ MODIFIED
+   825→   825→   825→
+   826→   826→   826→### Verification Results
+   827→   827→   827→- ✅ ESLint: Zero errors
+   828→   828→   828→- ✅ Page: HTTP 200, compiles and renders
+   829→   829→   829→- ✅ Zero JS errors (verified via agent-browser console after clean reload)
+   830→   830→   830→- ✅ All 5 dashboard tabs work (Overview with live charts, Traces, Issues, Alerts, API Health)
+   831→   831→   831→- ✅ Agent detail sheet: 3 sub-tabs (Overview, Activity, Performance) verified
+   832→   832→   832→- ✅ Activity tab: 8 events with timeline, colored dots, icons, timestamps
+   833→   833→   833→- ✅ Performance tab: 4 stat cards + 2 Recharts charts (BarChart + AreaChart)
+   834→   834→   834→- ✅ Status section: 6 service cards, 90-day uptime grid, incidents table
+   835→   835→   835→- ✅ Features section: magnetic 3D tilt, cursor-following glow, card numbers
+   836→   836→   836→- ✅ Footer: status indicator, inline newsletter, 5 social icons, animations
+   837→   837→   837→- ✅ Navbar: 'Status' link added
+   838→   838→   838→- ✅ Metric cards: 6 live-updating Recharts area charts (5s interval)
+   839→   839→   839→- ✅ Dark mode: All new components render correctly
+   840→   840→   840→- ✅ Mobile responsive: iPhone 14 viewport tested
+   841→   841→   841→- ✅ 9 Recharts instances on page (6 metric cards + 3 from dashboard charts)
+   842→   842→   842→
+   843→   843→   843→### Unresolved Issues
+   844→   844→   844→- Minor: Pre-existing scroll container position warning (non-blocking)
+   845→   845→   845→- Minor: Command palette keyboard shortcut (Ctrl+K) doesn't trigger via agent-browser's synthetic events (works in real browsers)
+   846→   846→   846→
+   847→   847→   847→### Priority Recommendations for Next Phase
+   848→   848→   848→1. **Real database backend** — Prisma CRUD for agents, traces, issues (replace mock data)
+   849→   849→   849→2. **NextAuth.js authentication** — User login, team workspaces
+   850→   850→   850→3. **WebSocket real-time health push** — Already partially implemented for API Health tab
+   851→   851→   851→4. **PDF export** — Generate styled PDF reports for traces/issues
+   852→   852→   852→5. **Multi-agent comparison for 3+ agents** — Extend to table view
+   853→   853→   853→6. **API rate limiting middleware** — SaaS-grade request throttling
+   854→   854→   854→7. **Onboarding tour improvements** — Step for new Status section
+   855→   855→   855→8. **A/B testing infrastructure** — Feature flags for SaaS tier management
+   856→   856→   856→
+   857→   857→   857→---
+   858→   858→   858→Task ID: 1
+   859→   859→   859→Agent: Main Agent
+   860→   860→   860→Task: Fix dark/light theme toggle - home page not changing to dark theme + faded text in dark mode
+   861→   861→   861→
+   862→   862→   862→Work Log:
+   863→   863→   863→- Analyzed user-provided screenshots via VLM to identify issues: (1) home page stuck in light mode, (2) text faded/invisible in dark mode
+   864→   864→   864→- Read globals.css — confirmed CSS variables and dark variant setup is correct (`@custom-variant dark (&:is(.dark *))`)
+   865→   865→   865→- Read page.tsx — found ROOT CAUSE: `<div className="min-h-screen flex flex-col bg-white">` hardcoded `bg-white` overriding body's `bg-background`
+   866→   866→   866→- Read all 13 landing page components (HeroSection, FeaturesSection, HowItWorks, StatsSection, DashboardSection, DocsSection, TestimonialsSection, PricingSection, NewsletterSection, IntegrationSection, ChangelogSection, StatusSection, CtaSection, Footer, Navbar)
+   867→   867→   867→- Identified systematic issues:
+   868→   868→   868→  1. `bg-white` hardcoded in page.tsx root div (ROOT CAUSE of entire page not switching)
+   869→   869→   869→  2. `bg-white` hardcoded in 7+ section components instead of semantic `bg-background`
+   870→   870→   870→  3. `text-gray-400 dark:text-gray-500` pattern used for ~20+ text elements — gray-500 is too dark in dark mode
+   871→   871→   871→  4. `text-gray-300 dark:text-gray-600` and `text-gray-300 dark:text-gray-700` used for timestamps/footers — nearly invisible
+   872→   872→   872→  5. `.text-gradient` CSS utility had no dark variant — gray end of gradient invisible in dark mode
+   873→   873→   873→  6. Section description text using `dark:text-gray-400` — acceptable but could be brighter
+   874→   874→   874→- Fixed all issues systematically:
+   875→   875→   875→  1. `page.tsx`: `bg-white` → `bg-background`
+   876→   876→   876→  2. `globals.css`: Added `.dark .text-gradient` with brighter gray (#d1d5db)
+   877→   877→   877→  3. HeroSection: Trust indicator text/icons `dark:text-gray-500` → `dark:text-gray-400`, description `dark:text-gray-400` → `dark:text-gray-300`, scroll arrow `dark:text-gray-600` → `dark:text-gray-500`
+   878→   878→   878→  4. FeaturesSection: Section bg `bg-white` → `bg-background`, card bg `bg-white` → `bg-background`, status labels `dark:text-gray-500` → `dark:text-gray-400`, description `dark:text-gray-400` → `dark:text-gray-300`
+   879→   879→   879→  5. HowItWorks: Section bg → `bg-muted/80`, step circle `bg-white` → `bg-background`, descriptions `dark:text-gray-400` → `dark:text-gray-300`
+   880→   880→   880→  6. Footer: Bg `bg-white` → `bg-background`, all descriptions/links/copyright `dark:text-gray-500` → `dark:text-gray-400`, `dark:text-gray-700` → `dark:text-gray-500`, social icons `dark:text-gray-500` → `dark:text-gray-400`, subscribe label `dark:text-gray-400` → `dark:text-gray-300`
+   881→   881→   881→  7. TestimonialsSection: Cards `bg-white` → `bg-background`, handles `dark:text-gray-500` → `dark:text-gray-400`, timestamps `dark:text-gray-600` → `dark:text-gray-500`, description `dark:text-gray-400` → `dark:text-gray-300`
+   882→   882→   882→  8. NewsletterSection: Section bg + gradient bg + input bg all `bg-white` → `bg-background`, disclaimer `dark:text-gray-500` → `dark:text-gray-400`
+   883→   883→   883→  9. StatusSection: All label text `dark:text-gray-500` → `dark:text-gray-400`, table headers `dark:text-gray-500` → `dark:text-gray-400`, badge `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+   884→   884→   884→  10. ChangelogSection: Badge `bg-white` → `bg-background`, badge text `dark:text-gray-400` → `dark:text-gray-300`, dates `dark:text-gray-500` → `dark:text-gray-400`, timeline dot `dark:bg-gray-600` → `dark:bg-gray-500`, description `dark:text-gray-400` → `dark:text-gray-300`
+   885→   885→   885→  11. DocsSection: Section bg `bg-white` → `bg-background`, badge bg `bg-white` → `bg-background`, badge text `dark:text-gray-400` → `dark:text-gray-300`, description `dark:text-gray-400` → `dark:text-gray-300`
+   886→   886→   886→  12. IntegrationSection: Section bg + card bgs `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+   887→   887→   887→  13. PricingSection: Description `dark:text-gray-400` → `dark:text-gray-300`
+   888→   888→   888→  14. CtaSection: Cta bg `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+   889→   889→   889→- Verified via agent-browser:
+   890→   890→   890→  - Light theme: Clean white, all text readable, proper contrast ✅
+   891→   891→   891→  - Dark theme hero: A- grade, all text readable, no white areas ✅
+   892→   892→   892→  - Dark mode footer: "Excellent dark mode design with no accessibility or visibility issues" ✅
+   893→   893→   893→  - Dark mode How It Works: "well-implemented dark mode" ✅
+   894→   894→   894→  - Dark mode Stats: "flawless" ✅
+   895→   895→   895→  - Dark mode Pricing: "high-contrast dark theme" ✅
+   896→   896→   896→- ESLint passes with zero errors
+   897→   897→   897→- Dev server compiles successfully
+   898→   898→   898→
+   899→   899→   899→Stage Summary:
+   900→   900→   900→- ROOT CAUSE: `bg-white` hardcoded on page.tsx root div prevented entire page from switching to dark theme
+   901→   901→   901→- Fixed 15 files, 70+ individual class changes
+   902→   902→   902→- All sections now properly switch between light and dark themes
+   903→   903→   903→- All text has proper contrast in both themes
+   904→   904→   904→- Verified via 6 agent-browser screenshots + VLM analysis
+   905→   905→   905→

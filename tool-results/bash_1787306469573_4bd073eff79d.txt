@@ -1,0 +1,1057 @@
+- navigation
+  - StaticText "Sentinel"
+  - generic
+    - link "Features" [ref=e6]
+    - link "Dashboard" [ref=e7]
+    - link "Docs" [ref=e8]
+    - link "Pricing" [ref=e9]
+    - link "How It Works" [ref=e10]
+    - link "Integrations" [ref=e11]
+    - link "Status" [ref=e12]
+  - button "Open command palette" [ref=e2]
+    - StaticText "Search..."
+    - StaticText "⌘"
+    - StaticText "K"
+  - link "Documentation" [ref=e3]
+  - button "Toggle theme" [ref=e4]
+  - button "Get Started" [ref=e5]
+- main
+  - generic
+    - generic
+    - generic
+      - generic
+        - StaticText "Production Monitoring for AI Agents"
+      - heading "Stop guessing why your agents fail" [level=1, ref=e28]
+        - StaticText "Stop guessing why your agents fail"
+      - paragraph
+        - StaticText "Surface silent failures, pull context across traces, and improve your agent before users churn. Real-time observability for production AI systems."
+      - button "View Live Dashboard" [ref=e29]
+      - link "Read the Docs" [ref=e30]
+      - StaticText "99.9% Uptime SLA"
+      - StaticText "SOC 2 Compliant"
+      - StaticText "GDPR Ready"
+      - generic
+        - StaticText "trace: 4e0c8418-c8a5"
+        - StaticText "ai.agent.run"
+        - StaticText "12.4s · 18 spans"
+        - StaticText "input_guardrail"
+        - StaticText "142"
+        - StaticText "ms"
+        - StaticText "retrieve_context"
+        - StaticText "2100"
+        - StaticText "ms"
+        - StaticText "model (gpt-4o)"
+        - StaticText "3200"
+        - StaticText "ms"
+        - StaticText "tools"
+        - StaticText "3400"
+        - StaticText "ms"
+        - StaticText "speak_to_user"
+        - StaticText "500"
+        - StaticText "ms"
+        - StaticText "ISSUE DETECTED"
+        - paragraph
+          - StaticText "Agent fabricated customer ID instead of asking for verification"
+  - generic
+    - generic
+      - heading "Everything you need toship reliable agents" [level=2, ref=e31]
+        - StaticText "Everything you need toship reliable agents"
+      - paragraph
+        - StaticText "From detection to resolution — a complete observability stack built for the unique challenges of production AI systems."
+      - generic
+        - generic
+          - StaticText "Operational"
+        - heading "Surface Silent Failures" [level=3, ref=e153]
+        - paragraph
+          - StaticText "Audit every trace against your agent's instructions. Group recurring failures into actionable issues — even ones that return success codes."
+      - generic
+        - generic
+          - StaticText "Operational"
+        - heading "Live Alerts" [level=3, ref=e154]
+          - StaticText "Live Alerts"
+        - paragraph
+          - StaticText "Get notified on what matters. Sentinel triages issues by severity and alerts you in Slack, PagerDuty, or webhooks — no noise."
+      - generic
+        - generic
+          - StaticText "Operational"
+        - heading "MCP Fix Integration" [level=3, ref=e155]
+        - paragraph
+          - StaticText "Pull context directly into your coding agent via MCP. Resolve issues without context-switching between tools."
+      - generic
+        - generic
+          - StaticText "Standby"
+        - heading "Online Evals" [level=3, ref=e156]
+        - paragraph
+          - StaticText "After deploying a fix, Sentinel creates an online eval. If a regression occurs, you'll know immediately."
+      - generic
+        - generic
+          - StaticText "Partial"
+        - heading "Self-Healing APIs" [level=3, ref=e157]
+          - StaticText "Self-Healing APIs"
+        - paragraph
+          - StaticText "Circuit breakers, auto-fallback, request queuing, and adaptive timeouts. If Stripe, OpenAI, or any API degrades — Sentinel heals it automatically."
+      - generic
+        - generic
+          - StaticText "Operational"
+        - heading "Full Trace Visibility" [level=3, ref=e158]
+        - paragraph
+          - StaticText "See every span, token, tool call, and model invocation. Understand exactly what your agent did and why."
+      - generic
+        - generic
+          - StaticText "Operational"
+        - heading "LLM-Agnostic Agent Healing" [level=3, ref=e159]
+        - paragraph
+          - StaticText "Works with any LLM — just provide your API key. Auto-switches between OpenAI, Anthropic, Gemini, and more during outages. No vendor lock-in."
+      - generic
+        - generic
+          - StaticText "Standby"
+        - heading "Framework Agnostic" [level=3, ref=e160]
+        - paragraph
+          - StaticText "Native support for LangChain, CrewAI, AutoGen, LlamaIndex, and custom frameworks. Drop-in integration."
+  - heading "From failure to fix in four steps" [level=2, ref=e13]
+    - StaticText "From failure to fix in four steps"
+  - paragraph
+    - StaticText "A closed-loop workflow that catches what your error monitoring can't."
+  - generic
+    - generic
+      - StaticText "01"
+      - StaticText "STEP "
+      - StaticText "01"
+      - heading "Instrument" [level=3, ref=e161]
+      - paragraph
+        - StaticText "Add one line to wrap your agent. Sentinel automatically captures every span, token, tool call, and model invocation — zero configuration needed."
+      - StaticText "from sentinel import trace_agent\n\nagent = trace_agent(my_agent, \n  project_id=\"sentinel_3a18f6d4\")"
+    - generic
+      - StaticText "02"
+      - StaticText "STEP "
+      - StaticText "02"
+      - heading "Detect" [level=3, ref=e162]
+      - paragraph
+        - StaticText "Sentinel audits every trace against your agent's system prompt and groups recurring failures into issues — even silent ones that return success codes."
+      - StaticText "# 33 of 50 runs affected\nISSUE: Fabricated customer IDs\nSEVERITY: P0 Critical\nROOT CAUSE: Missing guardrail"
+    - generic
+      - StaticText "03"
+      - StaticText "STEP "
+      - StaticText "03"
+      - heading "Fix" [level=3, ref=e163]
+      - paragraph
+        - StaticText "Pull context into your coding agent via MCP. Sentinel provides the exact trace, root cause, and suggested fix — resolve without context-switching."
+      - StaticText "# lemma · get_incident (inc_4f2a)\n└ P0 — fabricated customer IDs\n\n# Update prompts/support.md\n+ Require email before any lookup"
+    - generic
+      - StaticText "04"
+      - StaticText "STEP "
+      - StaticText "04"
+      - heading "Validate" [level=3, ref=e164]
+      - paragraph
+        - StaticText "After deploying the fix, Sentinel creates an online eval scoring every new trace against the failure mode. Regressions trigger immediate alerts."
+      - StaticText "EVAL: refund_policy_violations\nSTATUS: all passing ✓\nNEW TRACES: 24 scored clean\nREGRESSION: none detected"
+  - generic
+    - generic
+      - heading "Trusted atscale" [level=2, ref=e32]
+        - StaticText "Trusted atscale"
+      - paragraph
+        - StaticText "Numbers that reflect the reliability teams depend on every day."
+      - generic
+        - generic
+          - StaticText "0M+"
+        - paragraph
+          - StaticText "Traces Analyzed"
+      - generic
+        - generic
+          - StaticText "0.0%"
+        - paragraph
+          - StaticText "Uptime"
+      - generic
+        - generic
+          - StaticText "0+"
+        - paragraph
+          - StaticText "Teams"
+      - generic
+        - generic
+          - StaticText "<0ms"
+        - paragraph
+          - StaticText "Latency"
+  - generic
+    - generic
+      - generic
+        - StaticText "Live Demo"
+      - heading "Theobservability dashboard" [level=2, ref=e33]
+        - StaticText "Theobservability dashboard"
+      - paragraph
+        - StaticText "Real-time monitoring of AI agent traces, issues, and metrics — everything running live below."
+      - generic
+        - generic
+          - button "Overview" [ref=e202]
+            - StaticText "Overview"
+          - button "Traces" [ref=e203]
+          - button "Issues 5" [ref=e204]
+            - StaticText "Issues"
+            - StaticText "5"
+          - button "Alerts 4" [ref=e205]
+            - StaticText "Alerts"
+            - StaticText "4"
+          - button "API Health" [ref=e206]
+        - StaticText "Live"
+        - button "Open settings" [ref=e165]
+        - generic
+          - paragraph
+            - StaticText "6"
+          - paragraph
+            - StaticText "+1 this week"
+          - image
+        - generic
+          - paragraph
+            - StaticText "1,247"
+          - paragraph
+            - StaticText "+12% vs yesterday"
+          - image
+        - generic
+          - paragraph
+            - StaticText "4"
+          - paragraph
+            - StaticText "2 critical"
+          - image
+        - generic
+          - paragraph
+            - StaticText "9.2%"
+          - paragraph
+            - StaticText "-3.1% vs last week"
+          - image
+        - generic
+          - paragraph
+            - StaticText "2.4M"
+          - paragraph
+            - StaticText "+18% this week"
+          - image
+        - generic
+          - paragraph
+            - StaticText "6.8s"
+          - paragraph
+            - StaticText "+0.4s vs yesterday"
+          - image
+        - heading "Monitored Agents" [level=3, ref=e166]
+        - StaticText "("
+        - StaticText "6"
+        - StaticText ")"
+        - generic [ref=e167] clickable [cursor:pointer, onclick]
+          - heading "support-agent" [level=3, ref=e207]
+          - StaticText "Critical"
+          - paragraph
+            - StaticText "Customer support LLM agent handling ticket creation and escalation"
+          - StaticText "Error Rate"
+          - StaticText "34.2"
+          - StaticText "%"
+          - progressbar
+          - StaticText "LangChain"
+          - button "Compare" [ref=e208]
+          - StaticText "36m ago"
+        - generic [ref=e168] clickable [cursor:pointer, onclick]
+          - heading "research-agent" [level=3, ref=e209]
+          - StaticText "Active"
+          - paragraph
+            - StaticText "Research assistant for literature review and summarization"
+          - StaticText "Error Rate"
+          - StaticText "2.1"
+          - StaticText "%"
+          - progressbar
+          - StaticText "CrewAI"
+          - button "Compare" [ref=e210]
+          - StaticText "39m ago"
+        - generic [ref=e169] clickable [cursor:pointer, onclick]
+          - heading "checkout-agent" [level=3, ref=e211]
+          - StaticText "Degraded"
+          - paragraph
+            - StaticText "E-commerce checkout flow with refund and policy enforcement"
+          - StaticText "Error Rate"
+          - StaticText "12.8"
+          - StaticText "%"
+          - progressbar
+          - StaticText "AutoGen"
+          - button "Compare" [ref=e212]
+          - StaticText "35m ago"
+        - generic [ref=e170] clickable [cursor:pointer, onclick]
+          - heading "onboarding-agent" [level=3, ref=e213]
+          - StaticText "Active"
+          - paragraph
+            - StaticText "User onboarding flow with personalization and setup guidance"
+          - StaticText "Error Rate"
+          - StaticText "1.4"
+          - StaticText "%"
+          - progressbar
+          - StaticText "LlamaIndex"
+          - button "Compare" [ref=e214]
+          - StaticText "41m ago"
+        - generic [ref=e171] clickable [cursor:pointer, onclick]
+          - heading "data-pipeline" [level=3, ref=e215]
+          - StaticText "Inactive"
+          - paragraph
+            - StaticText "Automated data extraction, transformation and loading agent"
+          - StaticText "Error Rate"
+          - StaticText "0.8"
+          - StaticText "%"
+          - progressbar
+          - StaticText "LangGraph"
+          - button "Compare" [ref=e216]
+          - StaticText "1d ago"
+        - generic [ref=e172] clickable [cursor:pointer, onclick]
+          - heading "code-review-bot" [level=3, ref=e217]
+          - StaticText "Active"
+          - paragraph
+            - StaticText "Automated code review agent for pull request analysis"
+          - StaticText "Error Rate"
+          - StaticText "3.7"
+          - StaticText "%"
+          - progressbar
+          - StaticText "CrewAI"
+          - button "Compare" [ref=e218]
+          - StaticText "37m ago"
+        - heading "MCP Fix Workflow" [level=3, ref=e173]
+        - StaticText "sentinel-mcp"
+        - StaticText "●"
+        - StaticText "sentinel"
+        - StaticText "get_incident (inc_4f2a)"
+        - StaticText "●"
+        - StaticText "sentinel"
+        - StaticText "get_traces (customer_id_fabrication)"
+        - StaticText "├──"
+        - StaticText "Update (prompts/support_agent.md)"
+        - StaticText "✓ Fix applied — PR #482 opened"
+        - StaticText "⟳ recap: Replay traces"
+        - paragraph
+          - StaticText "Click below to simulate the MCP fix workflow"
+        - button "Run MCP Fix Workflow" [ref=e174]
+        - heading "Agent Metrics (24h)" [level=3, ref=e175]
+        - StaticText "Error Rate %"
+        - StaticText "Avg Latency (s)"
+        - StaticText "Throughput (req/min)"
+        - StaticText "Token Usage (K)"
+        - SvgRoot
+          - StaticText "09:27 AM"
+          - StaticText "02:27 PM"
+          - StaticText "07:27 PM"
+          - StaticText "12:27 AM"
+          - StaticText "05:27 AM"
+          - StaticText "0"
+          - StaticText "55"
+          - StaticText "110"
+          - StaticText "165"
+          - StaticText "220"
+        - heading "Issue Severity" [level=3, ref=e176]
+        - SvgRoot
+          - group [ref=e264] focusable [tabindex]
+            - group
+              - image
+            - group
+              - image
+            - group
+              - image
+            - group
+              - image
+            - StaticText "29%"
+            - StaticText "29%"
+            - StaticText "29%"
+            - StaticText "14%"
+        - StaticText "P0 Critical"
+        - StaticText "P1 High"
+        - StaticText "P2 Medium"
+        - StaticText "Resolved"
+        - heading "Framework Distribution" [level=3, ref=e177]
+        - SvgRoot
+          - StaticText "LangChain"
+          - StaticText "CrewAI"
+          - StaticText "AutoGen"
+          - StaticText "LlamaIndex"
+          - StaticText "0"
+          - StaticText "1"
+          - StaticText "2"
+  - generic
+    - generic
+      - StaticText "Documentation"
+      - heading "Everything you need toget started" [level=2, ref=e34]
+        - StaticText "Everything you need toget started"
+      - paragraph
+        - StaticText "Comprehensive guides, API references, and code examples to integrate Sentinel into your AI agent stack in minutes."
+      - heading "Getting Started" [level=3, ref=e35]
+      - paragraph
+        - StaticText "From zero to observability in 4 steps"
+      - button "Show setup steps" [expanded=false, ref=e36]
+        - StaticText "Show setup steps"
+      - heading "API Integration" [level=3, ref=e37]
+      - paragraph
+        - StaticText "Drop-in SDK for any framework"
+      - paragraph
+        - StaticText "Initialize the SDK"
+      - generic
+        - button "Copy code" [ref=e178]
+          - StaticText "Copy"
+        - StaticText "import { SentinelClient } from '@sentinel/sdk';\n\nconst client = new SentinelClient({\n  apiKey: process.env.SENTINEL_API_KEY,\n  baseUrl: 'https://api.sentinel.ai',\n});"
+      - paragraph
+        - StaticText "Wrap Agent Calls"
+      - generic
+        - button "Copy code" [ref=e179]
+          - StaticText "Copy"
+        - StaticText "const result = await client.trace({\n  name: 'customer_support_agent',\n  metadata: { version: '2.1.0' },\n  fn: async () => {\n    return await myAgent.run(query);\n  },\n});"
+      - paragraph
+        - StaticText "Custom Trace Attributes"
+      - generic
+        - button "Copy code" [ref=e180]
+          - StaticText "Copy"
+        - StaticText "client.setAttributes({\n  environment: 'production',\n  team: 'platform',\n  agentFramework: 'langchain',\n});\n\n// Add spans for tool calls\nclient.startSpan('retrieval', {\n  attributes: { vectorDb: 'pinecone' },\n});"
+      - heading "Self-Healing APIs" [level=3, ref=e38]
+      - paragraph
+        - StaticText "Automated resilience for your agent's dependencies"
+      - paragraph
+        - StaticText "Circuit Breaker States"
+      - StaticText "Closed"
+      - StaticText "Half-Open"
+      - StaticText "Open"
+      - list
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Automatic circuit breaking"
+          - paragraph
+            - StaticText "Trips open when error rates exceed your threshold."
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Exponential backoff retry"
+          - paragraph
+            - StaticText "Progressive retry delays to avoid overwhelming failing services."
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Fallback endpoint activation"
+          - paragraph
+            - StaticText "Automatically routes traffic to backup endpoints."
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Request queuing during outages"
+          - paragraph
+            - StaticText "Buffers requests while circuits are open, replays on recovery."
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Real-time health monitoring"
+          - paragraph
+            - StaticText "Continuous pings and latency tracking for every endpoint."
+      - heading "API Reference" [level=3, ref=e39]
+      - paragraph
+        - StaticText "RESTful endpoints for programmatic access to all Sentinel features"
+      - table
+        - rowgroup
+          - row
+            - columnheader "METHOD" [ref=e265]
+            - columnheader "ENDPOINT" [ref=e266]
+            - columnheader "DESCRIPTION" [ref=e267]
+        - row
+          - cell "GET" [ref=e219]
+          - cell "/api/agents" [ref=e220]
+          - cell "List monitored agents" [ref=e221]
+        - row
+          - cell "GET" [ref=e222]
+          - cell "/api/traces" [ref=e223]
+          - cell "Fetch trace data" [ref=e224]
+        - row
+          - cell "GET" [ref=e225]
+          - cell "/api/endpoints" [ref=e226]
+          - cell "API health endpoints" [ref=e227]
+        - row
+          - cell "POST" [ref=e228]
+          - cell "/api/endpoints" [ref=e229]
+          - cell "Manage endpoints" [ref=e230]
+        - row
+          - cell "GET" [ref=e231]
+          - cell "/api/healing" [ref=e232]
+          - cell "Healing action history" [ref=e233]
+        - row
+          - cell "GET" [ref=e234]
+          - cell "/api/api-health" [ref=e235]
+          - cell "Health summary" [ref=e236]
+        - row
+          - cell "GET" [ref=e237]
+          - cell "/api/metrics" [ref=e238]
+          - cell "Time-series metrics" [ref=e239]
+        - row
+          - cell "GET" [ref=e240]
+          - cell "/api/issues" [ref=e241]
+          - cell "Detected issues" [ref=e242]
+        - row
+          - cell "GET" [ref=e243]
+          - cell "/api/alerts" [ref=e244]
+          - cell "Alert feed" [ref=e245]
+  - generic
+    - heading "Loved byengineering teams" [level=2, ref=e14]
+      - StaticText "Loved byengineering teams"
+    - paragraph
+      - StaticText "Hear from the teams shipping reliable AI agents in production."
+    - generic
+      - generic
+        - paragraph
+          - StaticText "Sentinel caught a silent failure in our LangChain agent that was returning wrong JSON to 12% of users. We had no idea until the trace audit surfaced it. Absolute game changer."
+        - StaticText "SC"
+        - paragraph
+          - StaticText "Sarah Chen"
+        - paragraph
+          - StaticText "@sarachen_dev"
+        - StaticText "2 hours ago"
+        - paragraph
+          - StaticText "We went from ~40 minutes of debugging agent failures to under 5. The trace viewer alone is worth the price. Seeing every tool call laid out visually is incredible."
+        - StaticText "MJ"
+        - paragraph
+          - StaticText "Marcus Johnson"
+        - paragraph
+          - StaticText "@marcusj_eng"
+        - StaticText "5 hours ago"
+        - paragraph
+          - StaticText "Finally, observability for AI agents that actually understands the domain. Sentinel doesn't just log traces — it audits them against your agent's instructions. Smart."
+        - StaticText "AT"
+        - paragraph
+          - StaticText "Aiko Tanaka"
+        - paragraph
+          - StaticText "@aiko_aiops"
+        - StaticText "8 hours ago"
+        - paragraph
+          - StaticText "MCP fix integration is the killer feature. Our agents can pull context from Sentinel and self-heal. Reduced our incident response time by 10x."
+        - StaticText "DP"
+        - paragraph
+          - StaticText "David Park"
+        - paragraph
+          - StaticText "@dpark_cto"
+        - StaticText "1 day ago"
+        - paragraph
+          - StaticText "99.9% uptime isn't just marketing — we've been running Sentinel for 6 months and it's never missed a trace. The reliability of this platform is unmatched."
+        - StaticText "ER"
+        - paragraph
+          - StaticText "Elena Rodriguez"
+        - paragraph
+          - StaticText "@elenar_ml"
+        - StaticText "1 day ago"
+        - paragraph
+          - StaticText "Shipped our CrewAI agents to production 3x faster because we had Sentinel watching from day one. The online evals after fixes give us real confidence."
+        - StaticText "JW"
+        - paragraph
+          - StaticText "James Wright"
+        - paragraph
+          - StaticText "@jwright_sre"
+        - StaticText "2 days ago"
+        - paragraph
+          - StaticText "Sentinel caught a silent failure in our LangChain agent that was returning wrong JSON to 12% of users. We had no idea until the trace audit surfaced it. Absolute game changer."
+        - StaticText "SC"
+        - paragraph
+          - StaticText "Sarah Chen"
+        - paragraph
+          - StaticText "@sarachen_dev"
+        - StaticText "2 hours ago"
+        - paragraph
+          - StaticText "We went from ~40 minutes of debugging agent failures to under 5. The trace viewer alone is worth the price. Seeing every tool call laid out visually is incredible."
+        - StaticText "MJ"
+        - paragraph
+          - StaticText "Marcus Johnson"
+        - paragraph
+          - StaticText "@marcusj_eng"
+        - StaticText "5 hours ago"
+        - paragraph
+          - StaticText "Finally, observability for AI agents that actually understands the domain. Sentinel doesn't just log traces — it audits them against your agent's instructions. Smart."
+        - StaticText "AT"
+        - paragraph
+          - StaticText "Aiko Tanaka"
+        - paragraph
+          - StaticText "@aiko_aiops"
+        - StaticText "8 hours ago"
+        - paragraph
+          - StaticText "MCP fix integration is the killer feature. Our agents can pull context from Sentinel and self-heal. Reduced our incident response time by 10x."
+        - StaticText "DP"
+        - paragraph
+          - StaticText "David Park"
+        - paragraph
+          - StaticText "@dpark_cto"
+        - StaticText "1 day ago"
+        - paragraph
+          - StaticText "99.9% uptime isn't just marketing — we've been running Sentinel for 6 months and it's never missed a trace. The reliability of this platform is unmatched."
+        - StaticText "ER"
+        - paragraph
+          - StaticText "Elena Rodriguez"
+        - paragraph
+          - StaticText "@elenar_ml"
+        - StaticText "1 day ago"
+        - paragraph
+          - StaticText "Shipped our CrewAI agents to production 3x faster because we had Sentinel watching from day one. The online evals after fixes give us real confidence."
+        - StaticText "JW"
+        - paragraph
+          - StaticText "James Wright"
+        - paragraph
+          - StaticText "@jwright_sre"
+        - StaticText "2 days ago"
+  - generic
+    - generic
+      - StaticText "Pricing"
+      - heading "Simple, transparentpricing" [level=2, ref=e40]
+        - StaticText "Simple, transparentpricing"
+      - paragraph
+        - StaticText "Start free and scale as your AI operations grow. No hidden fees, no surprises."
+      - heading "Starter" [level=3, ref=e41]
+      - StaticText "$0"
+      - StaticText "/month"
+      - list
+        - listitem [level=1]
+          - StaticText "Up to 3 agents"
+        - listitem [level=1]
+          - StaticText "1,000 traces/month"
+        - listitem [level=1]
+          - StaticText "7-day data retention"
+        - listitem [level=1]
+          - StaticText "Community support"
+        - listitem [level=1]
+          - StaticText "Basic issue detection"
+      - button "Get Started Free" [ref=e42]
+      - generic
+        - StaticText "Most Popular"
+        - heading "Pro" [level=3, ref=e181]
+        - StaticText "$49"
+        - StaticText "/month"
+        - paragraph
+          - StaticText "Everything in Starter, plus:"
+        - list
+          - listitem [level=1]
+            - StaticText "Up to 25 agents"
+          - listitem [level=1]
+            - StaticText "100,000 traces/month"
+          - listitem [level=1]
+            - StaticText "30-day data retention"
+          - listitem [level=1]
+            - StaticText "Priority support"
+          - listitem [level=1]
+            - StaticText "Self-Healing API control"
+          - listitem [level=1]
+            - StaticText "Custom alert rules"
+          - listitem [level=1]
+            - StaticText "API health monitoring"
+          - listitem [level=1]
+            - StaticText "CSV & PDF export"
+        - button "Start Free Trial" [ref=e182]
+          - StaticText "Start Free Trial"
+      - heading "Enterprise" [level=3, ref=e43]
+      - StaticText "Custom"
+      - StaticText "Contact Sales"
+      - paragraph
+        - StaticText "Everything in Pro, plus:"
+      - list
+        - listitem [level=1]
+          - StaticText "Unlimited agents"
+        - listitem [level=1]
+          - StaticText "Unlimited traces"
+        - listitem [level=1]
+          - StaticText "90-day data retention"
+        - listitem [level=1]
+          - StaticText "Dedicated support"
+        - listitem [level=1]
+          - StaticText "Self-Healing API control"
+        - listitem [level=1]
+          - StaticText "Custom integrations"
+        - listitem [level=1]
+          - StaticText "SLA guarantee (99.99%)"
+        - listitem [level=1]
+          - StaticText "On-premise deployment option"
+        - listitem [level=1]
+          - StaticText "SOC 2 compliance"
+      - button "Contact Sales" [ref=e44]
+      - paragraph
+        - StaticText "All plans include SSL encryption, 99.9% uptime SLA, and unlimited team members."
+  - heading "Sentinel Weekly" [level=2, ref=e45]
+  - paragraph
+    - StaticText "The Friday briefing on AI agent reliability."
+  - paragraph
+    - StaticText "A curated weekly digest of production incidents, reliability patterns, and best practices for building trustworthy AI systems."
+  - textbox "you@company.com" [ref=e46]
+  - button "Subscribe" [ref=e47]
+  - paragraph
+    - StaticText "No spam. Unsubscribe anytime."
+  - heading "Fits into yourexisting stack" [level=2, ref=e15]
+    - StaticText "Fits into yourexisting stack"
+  - paragraph
+    - StaticText "Native support for the frameworks your team already uses. One line to instrument."
+  - StaticText "LC"
+  - StaticText "LangChain"
+  - StaticText "CA"
+  - StaticText "CrewAI"
+  - StaticText "AG"
+  - StaticText "AutoGen"
+  - StaticText "LI"
+  - StaticText "LlamaIndex"
+  - StaticText "LG"
+  - StaticText "LangGraph"
+  - StaticText "SDK"
+  - StaticText "Custom SDK"
+  - generic
+    - button [ref=e48]
+    - StaticText "pip install sentinel-ai\n\n# In your agent file\nfrom sentinel import trace_agent\n\nagent = trace_agent(your_agent,\n  project_id=\"your_project_id\"\n)"
+  - heading "Trust is non-negotiable" [level=3, ref=e16]
+  - paragraph
+    - StaticText "Your data stays yours. Protected by best-in-class infrastructure and verified compliance."
+  - StaticText "SOC 2 Type II"
+  - paragraph
+    - StaticText "Independently audited"
+  - StaticText "AES-256"
+  - paragraph
+    - StaticText "Encryption at rest"
+  - StaticText "TLS 1.2+"
+  - paragraph
+    - StaticText "Encryption in transit"
+  - StaticText "Data Isolation"
+  - paragraph
+    - StaticText "Per-org isolation"
+  - generic
+    - StaticText "Changelog"
+    - heading "What'snew" [level=2, ref=e49]
+      - StaticText "What'snew"
+    - paragraph
+      - StaticText "Latest updates, improvements, and fixes across all Sentinel features."
+    - generic
+      - generic
+        - generic
+          - StaticText "v2.0"
+        - heading "Self-Healing API Control System" [level=3, ref=e246]
+        - StaticText "NEW"
+        - paragraph
+          - StaticText "Circuit breakers, automatic fallback activation, request queuing, and real-time health monitoring for all your agent dependencies. Monitor 8+ endpoint categories including LLMs, databases, payments, and MCP servers."
+        - StaticText "Circuit Breakers"
+        - StaticText "Auto-Fallback"
+        - StaticText "Health Monitoring"
+        - StaticText "Request Queuing"
+        - StaticText "2 days ago"
+      - generic
+        - generic
+          - StaticText "v1.4"
+        - heading "Documentation Hub & SaaS Settings" [level=3, ref=e247]
+        - paragraph
+          - StaticText "Interactive getting started guide, API integration examples with copy-to-clipboard, comprehensive API reference table, and a full settings panel with workspace config, notification preferences, and data retention controls."
+        - StaticText "Docs"
+        - StaticText "Settings"
+        - StaticText "API Reference"
+        - StaticText "1 week ago"
+      - generic
+        - generic
+          - StaticText "v1.3"
+        - heading "Transparent Pricing" [level=3, ref=e248]
+        - paragraph
+          - StaticText "Three-tier pricing with Starter (free), Pro ($49/mo), and Enterprise (custom). All plans include SSL encryption and 99.9% uptime SLA."
+        - StaticText "Pricing"
+        - StaticText "SaaS"
+        - StaticText "1 week ago"
+      - generic
+        - generic
+          - StaticText "v1.2"
+        - heading "Agent Comparison & Trace Waterfall" [level=3, ref=e249]
+        - paragraph
+          - StaticText "Side-by-side agent comparison with 6 metrics and animated performance bars. Gantt-chart waterfall visualization for trace spans with color-coded types and hover tooltips."
+        - StaticText "Comparison"
+        - StaticText "Waterfall"
+        - StaticText "Performance"
+        - StaticText "2 weeks ago"
+      - generic
+        - generic
+          - StaticText "v1.1"
+        - heading "Advanced Tracing & Alerting" [level=3, ref=e250]
+        - paragraph
+          - StaticText "Canvas sparkline metrics, CSV export with custom column mapping, onboarding tour with sessionStorage persistence, and filter/search state persistence across sessions."
+        - StaticText "Sparklines"
+        - StaticText "Export"
+        - StaticText "Tour"
+        - StaticText "Filters"
+        - StaticText "3 weeks ago"
+      - generic
+        - generic
+          - StaticText "v1.0"
+        - heading "Sentinel Launch" [level=3, ref=e251]
+        - paragraph
+          - StaticText "Real-time AI agent observability with 5 dashboard tabs, 6 monitored agents, trace explorer with span details, issue detection, MCP fix workflow integration, and particle network hero animation."
+        - StaticText "Launch"
+        - StaticText "Dashboard"
+        - StaticText "Traces"
+        - StaticText "MCP"
+        - StaticText "1 month ago"
+  - generic
+    - StaticText "System Status"
+    - heading "Real-time infrastructure health" [level=2, ref=e50]
+    - paragraph
+      - StaticText "Monitor service uptime, latency, and incident history across all Sentinel subsystems."
+    - generic [ref=e51] clickable [onclick]
+      - StaticText "All Systems Operational"
+    - heading "API Gateway" [level=3, ref=e52]
+    - StaticText "Operational"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "99.99%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "12ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 14 days ago"
+    - heading "Trace Pipeline" [level=3, ref=e53]
+    - StaticText "Operational"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "99.97%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "8ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 21 days ago"
+    - heading "Alert Engine" [level=3, ref=e54]
+    - StaticText "Operational"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "99.98%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "5ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 30 days ago"
+    - heading "MCP Integration" [level=3, ref=e55]
+    - StaticText "Degraded"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "98.72%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "156ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 2 hours ago"
+    - heading "Dashboard UI" [level=3, ref=e56]
+    - StaticText "Operational"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "99.95%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "45ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 7 days ago"
+    - heading "Data Pipeline" [level=3, ref=e57]
+    - StaticText "Operational"
+    - paragraph
+      - StaticText "UPTIME"
+    - paragraph
+      - StaticText "99.99%"
+    - paragraph
+      - StaticText "LATENCY"
+    - paragraph
+      - StaticText "23ms"
+    - Canvas "Sparkline chart"
+    - paragraph
+      - StaticText "Last incident: 45 days ago"
+    - heading "90-Day Uptime" [level=3, ref=e58]
+    - StaticText ">99.9%"
+    - StaticText "99–99.9%"
+    - StaticText "<99%"
+    - generic [ref=e59] clickable [onclick]
+    - generic [ref=e60] clickable [onclick]
+    - generic [ref=e61] clickable [onclick]
+    - generic [ref=e62] clickable [onclick]
+    - generic [ref=e63] clickable [onclick]
+    - generic [ref=e64] clickable [onclick]
+    - generic [ref=e65] clickable [onclick]
+    - generic [ref=e66] clickable [onclick]
+    - generic [ref=e67] clickable [onclick]
+    - generic [ref=e68] clickable [onclick]
+    - generic [ref=e69] clickable [onclick]
+    - generic [ref=e70] clickable [onclick]
+    - generic [ref=e71] clickable [onclick]
+    - generic [ref=e72] clickable [onclick]
+    - generic [ref=e73] clickable [onclick]
+    - generic [ref=e74] clickable [onclick]
+    - generic [ref=e75] clickable [onclick]
+    - generic [ref=e76] clickable [onclick]
+    - generic [ref=e77] clickable [onclick]
+    - generic [ref=e78] clickable [onclick]
+    - generic [ref=e79] clickable [onclick]
+    - generic [ref=e80] clickable [onclick]
+    - generic [ref=e81] clickable [onclick]
+    - generic [ref=e82] clickable [onclick]
+    - generic [ref=e83] clickable [onclick]
+    - generic [ref=e84] clickable [onclick]
+    - generic [ref=e85] clickable [onclick]
+    - generic [ref=e86] clickable [onclick]
+    - generic [ref=e87] clickable [onclick]
+    - generic [ref=e88] clickable [onclick]
+    - generic [ref=e89] clickable [onclick]
+    - generic [ref=e90] clickable [onclick]
+    - generic [ref=e91] clickable [onclick]
+    - generic [ref=e92] clickable [onclick]
+    - generic [ref=e93] clickable [onclick]
+    - generic [ref=e94] clickable [onclick]
+    - generic [ref=e95] clickable [onclick]
+    - generic [ref=e96] clickable [onclick]
+    - generic [ref=e97] clickable [onclick]
+    - generic [ref=e98] clickable [onclick]
+    - generic [ref=e99] clickable [onclick]
+    - generic [ref=e100] clickable [onclick]
+    - generic [ref=e101] clickable [onclick]
+    - generic [ref=e102] clickable [onclick]
+    - generic [ref=e103] clickable [onclick]
+    - generic [ref=e104] clickable [onclick]
+    - generic [ref=e105] clickable [onclick]
+    - generic [ref=e106] clickable [onclick]
+    - generic [ref=e107] clickable [onclick]
+    - generic [ref=e108] clickable [onclick]
+    - generic [ref=e109] clickable [onclick]
+    - generic [ref=e110] clickable [onclick]
+    - generic [ref=e111] clickable [onclick]
+    - generic [ref=e112] clickable [onclick]
+    - generic [ref=e113] clickable [onclick]
+    - generic [ref=e114] clickable [onclick]
+    - generic [ref=e115] clickable [onclick]
+    - generic [ref=e116] clickable [onclick]
+    - generic [ref=e117] clickable [onclick]
+    - generic [ref=e118] clickable [onclick]
+    - generic [ref=e119] clickable [onclick]
+    - generic [ref=e120] clickable [onclick]
+    - generic [ref=e121] clickable [onclick]
+    - generic [ref=e122] clickable [onclick]
+    - generic [ref=e123] clickable [onclick]
+    - generic [ref=e124] clickable [onclick]
+    - generic [ref=e125] clickable [onclick]
+    - generic [ref=e126] clickable [onclick]
+    - generic [ref=e127] clickable [onclick]
+    - generic [ref=e128] clickable [onclick]
+    - generic [ref=e129] clickable [onclick]
+    - generic [ref=e130] clickable [onclick]
+    - generic [ref=e131] clickable [onclick]
+    - generic [ref=e132] clickable [onclick]
+    - generic [ref=e133] clickable [onclick]
+    - generic [ref=e134] clickable [onclick]
+    - generic [ref=e135] clickable [onclick]
+    - generic [ref=e136] clickable [onclick]
+    - generic [ref=e137] clickable [onclick]
+    - generic [ref=e138] clickable [onclick]
+    - generic [ref=e139] clickable [onclick]
+    - generic [ref=e140] clickable [onclick]
+    - generic [ref=e141] clickable [onclick]
+    - generic [ref=e142] clickable [onclick]
+    - generic [ref=e143] clickable [onclick]
+    - generic [ref=e144] clickable [onclick]
+    - generic [ref=e145] clickable [onclick]
+    - generic [ref=e146] clickable [onclick]
+    - generic [ref=e147] clickable [onclick]
+    - generic [ref=e148] clickable [onclick]
+    - heading "Recent Incidents" [level=3, ref=e149]
+    - table
+      - rowgroup
+        - row
+          - columnheader "TIME" [ref=e268]
+          - columnheader "SERVICE" [ref=e269]
+          - columnheader "DURATION" [ref=e270]
+          - columnheader "STATUS" [ref=e271]
+      - row
+        - cell "Today, 14:32 UTC" [ref=e252]
+        - cell "MCP Integration" [ref=e253]
+        - cell "2h 14m" [ref=e254]
+        - cell "Monitoring" [ref=e255]
+          - StaticText "Monitoring"
+      - row
+        - cell "Yesterday, 09:15 UTC" [ref=e256]
+        - cell "Alert Engine" [ref=e257]
+        - cell "18m" [ref=e258]
+        - cell "Resolved" [ref=e259]
+          - StaticText "Resolved"
+      - row
+        - cell "3 days ago, 22:48 UTC" [ref=e260]
+        - cell "API Gateway" [ref=e261]
+        - cell "47m" [ref=e262]
+        - cell "Resolved" [ref=e263]
+          - StaticText "Resolved"
+  - generic
+    - heading "Start monitoring youragents today" [level=2, ref=e150]
+      - StaticText "Start monitoring youragents today"
+    - paragraph
+      - StaticText "Free for up to 3 agents. No credit card required."
+    - button "Get Started Free" [ref=e151]
+    - button "Book a Demo" [ref=e152]
+- contentinfo
+  - generic
+  - generic
+    - StaticText "All Systems Operational"
+    - StaticText "4.9/5 on Product Hunt"
+    - StaticText "10K+ GitHub Stars"
+    - StaticText "2,000+ Teams"
+    - StaticText "99.9% Uptime"
+    - StaticText "Sentinel"
+    - paragraph
+      - StaticText "Production-grade AI agent observability"
+    - paragraph
+      - StaticText "Production monitoring for AI agents. Catch silent failures before your users do."
+    - link "Twitter" [ref=e17]
+    - link "GitHub" [ref=e18]
+    - link "LinkedIn" [ref=e19]
+    - link "YouTube" [ref=e20]
+    - link "Discord" [ref=e21]
+      - image
+    - paragraph
+      - StaticText "Subscribe to our newsletter"
+    - textbox "Email address" [ref=e22]
+    - button "Subscribe" [ref=e23]
+    - heading "PRODUCT" [level=4, ref=e24]
+    - list
+      - listitem [level=1]
+        - link "Features" [ref=e183]
+      - listitem [level=1]
+        - link "Pricing" [ref=e184]
+      - listitem [level=1]
+        - link "Integrations" [ref=e185]
+      - listitem [level=1]
+        - link "Changelog" [ref=e186]
+      - listitem [level=1]
+        - link "Docs" [ref=e187]
+    - heading "COMPANY" [level=4, ref=e25]
+    - list
+      - listitem [level=1]
+        - link "About" [ref=e188]
+      - listitem [level=1]
+        - link "Blog" [ref=e189]
+      - listitem [level=1]
+        - link "Careers" [ref=e190]
+      - listitem [level=1]
+        - link "Contact" [ref=e191]
+    - heading "RESOURCES" [level=4, ref=e26]
+    - list
+      - listitem [level=1]
+        - link "Documentation" [ref=e192]
+      - listitem [level=1]
+        - link "API Reference" [ref=e193]
+      - listitem [level=1]
+        - link "Changelog" [ref=e194]
+      - listitem [level=1]
+        - link "Status" [ref=e195]
+      - listitem [level=1]
+        - link "Weekly" [ref=e196]
+    - heading "LEGAL" [level=4, ref=e27]
+    - list
+      - listitem [level=1]
+        - link "Privacy" [ref=e197]
+      - listitem [level=1]
+        - link "Terms" [ref=e198]
+      - listitem [level=1]
+        - link "Security" [ref=e199]
+      - listitem [level=1]
+        - link "Trust Center" [ref=e200]
+    - paragraph
+      - StaticText "© 2025 SentinelBuilt with ♥ for AI reliability"
+    - paragraph
+      - StaticText "Inspired by the observability challenges of production AI systems."
+- region "Notifications (F8)" [ref=e1]
+  - list
+- button "Open Next.js Dev Tools" [expanded=false, ref=e201]
+  - image
+- alert

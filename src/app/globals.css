@@ -129,6 +129,35 @@
   .dark ::selection {
     background: rgba(239, 68, 68, 0.2);
   }
+  /* Immediate pointer cursor on all interactive elements */
+  a,
+  button,
+  [role="button"],
+  [role="tab"],
+  [role="link"],
+  [role="option"],
+  [role="switch"],
+  [role="checkbox"],
+  [role="radio"],
+  [role="menuitem"],
+  summary,
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="range"],
+  input[type="color"],
+  input[type="file"],
+  label[for],
+  [onclick] {
+    cursor: pointer;
+  }
+  /* Instant theme switch — kill all CSS transitions during class swap */
+  .theme-switching,
+  .theme-switching *,
+  .theme-switching *::before,
+  .theme-switching *::after {
+    transition: none !important;
+  }
 }
 
 @layer utilities {

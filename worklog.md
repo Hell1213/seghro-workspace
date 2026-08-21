@@ -1,23 +1,60 @@
 # Sentinel — AI Agent Observability Dashboard
 
 ## Current Project Status
-**Phase: V13 — Comprehensive Dark/Light Theme Fix**
-- Page renders with 52+ component files (optimized with lazy loading)
-- Dev server compiles and serves HTTP 200
-- ESLint passes with zero errors
-- All 10 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity, self-heal)
+**Phase: V14 — Theme Blink Fix + Cursor Fix + Production Launch Audit**
+- Page renders with 76 component files (~14,250 lines), optimized with lazy loading
+- Dev server compiles and serves HTTP 200, ESLint zero errors
+- All 11 API routes functional (agents, traces, issues, alerts, metrics, endpoints, healing, api-health, activity, self-heal, health)
 - WebSocket real-time alert streaming on port 3001
-- Dark mode fully functional with theme toggle
+- Dark/light theme toggle — instant, zero-blink switching
 - 12+ landing sections + 5-tab working dashboard + 3-tier pricing + comprehensive styling
+- **V14**: Theme toggle blink fix (CSS crossfade + .theme-switching class), global cursor-pointer rule, comprehensive production launch audit
 - **V13**: Comprehensive dark/light theme fix across 15+ files, 70+ individual class fixes. All sections verified in both themes via agent-browser.
-- **V12**: Fully responsive navbar (dynamic link count by viewport), instant tab switching (no motion fade), status dots on all feature cards, LLM-agnostic self-healing agent system, HowItWorks step alignment fix, HeroSection no-fade-on-scroll, 8-card feature grid with Self-Healing APIs + LLM-Agnostic Healing features, tour guide instant positioning
-- **V11**: Status page section, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs (Activity/Performance), enhanced footer
-- **V10**: Changelog timeline section, Hero gradient mesh + trust indicators, Footer social proof row
+- **V12**: Fully responsive navbar (dynamic link count by viewport), instant tab switching, status dots, LLM-agnostic self-healing agent system
+- **V11**: Status page, live Recharts metric cards, magnetic hover feature cards, agent detail sub-tabs
+- **V10**: Changelog timeline, Hero gradient mesh, Footer social proof
 - **V9**: Pricing section (3-tier SaaS), tab bar polish, Activity API, lazy loading
-- **V8**: Self-Healing API Control System (5th tab), Documentation section, SaaS Settings panel
+- **V8**: Self-Healing API Control System (5th tab), Documentation section, Settings panel
 - **V7**: Page skeleton loading, real-time toast notifications
 - **V6**: Agent comparison, trace waterfall Gantt chart, navbar polish, filter persistence
 - **V5**: Particle canvas, typing animation, CSV export, onboarding tour, URL state, sparklines
+
+---
+
+## V14 Session — Theme Blink Fix + Cursor Fix + Production Launch Audit
+
+### 1. Theme Toggle Blink Fix (Root Cause + Fix)
+**Root cause:** Three separate issues caused visible blink during theme switching:
+- `AnimatePresence mode="wait"` with scale-0→1 animation caused the toggle icon to disappear then reappear
+- `transition-all` on Button component caused ALL CSS properties (including colors) to animate through intermediate states during theme class change
+- Same `transition-all` pattern on navbar and other elements amplified the flash
+
+**Fix applied (3-layer):**
+1. **Navbar theme toggle** — Replaced `AnimatePresence` with pure CSS crossfade: both Sun/Moon icons rendered simultaneously, one hidden via `opacity-0 scale-50 pointer-events-none`, toggled via `transition-all duration-200`. Zero unmount/remount.
+2. **Button component** — Changed base class from `transition-all` to `transition-[color,background-color,border-color,box-shadow,transform]` to exclude irrelevant properties from transitioning.
+3. **Global theme-switching class** — Added `handleThemeToggle()` that: (a) adds `.theme-switching` class to `<html>`, (b) forces reflow, (c) changes theme, (d) removes class on next animation frame. CSS rule `.theme-switching, .theme-switching *, .theme-switching *::before, .theme-switching *::after { transition: none !important; }` ensures zero visual transition during class swap. After 2 frames, transitions resume for normal hover/click effects.
+
+### 2. Global Cursor Pointer Fix
+Added global CSS rule in `@layer base` targeting all interactive elements:
+`a, button, [role="button"], [role="tab"], [role="link"], [role="option"], [role="switch"], [role="checkbox"], [role="radio"], [role="menuitem"], summary, select, input[type="checkbox"], input[type="radio"], input[type="range"], input[type="color"], input[type="file"], label[for], [onclick] { cursor: pointer; }`
+This ensures immediate pointer cursor on hover for every clickable element across the entire app.
+
+### 3. Production Launch Readiness Audit
+Conducted comprehensive audit covering: API routes, database, mini-services, infrastructure, security, scalability.
+
+**Key findings:**
+- **Infrastructure readiness: ~5%** — No Dockerfile, no docker-compose, no K8s, no CI/CD, no .env.example
+- **Can handle 1 lakh users: NO** — Single-process, no DB reads, no caching, no CDN, no horizontal scaling
+- **Database: Defined but UNUSED** — Prisma schema has 6 models, SQLite file exists, but ZERO API routes query the DB. All data is hardcoded in `seed-data.ts`.
+- **Auth: COMPLETELY MISSING** — next-auth installed but zero config, no login/register, no route protection
+- **Testing: ZERO** — No test files, no test framework
+- **What IS working:** Beautiful UI shell with 76 components, working theme system, 5-tab dashboard, self-healing engine concept, WebSocket alert streaming
+- **Estimated work to MVP launch: 4-6 weeks** for a solo developer
+
+**Files modified:**
+- `src/components/landing/Navbar.tsx` — Theme toggle crossfade + handleThemeToggle with .theme-switching
+- `src/components/ui/button.tsx` — Specific transition properties instead of transition-all
+- `src/app/globals.css` — Global cursor-pointer + .theme-switching rule
 
 ---
 
