@@ -12,7 +12,7 @@ export function CtaSection() {
   return (
     <section id="cta" className="relative py-24 sm:py-32 overflow-hidden">
       {/* Animated red gradient mesh background */}
-      <div className="absolute inset-0 bg-white dark:bg-gray-950" />
+      <div className="absolute inset-0 bg-background dark:bg-gray-950" />
       <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-[#dc2626]/8 rounded-full blur-[150px] animate-pulse" />
       <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-[#dc2626]/5 rounded-full blur-[120px] animate-pulse [animation-delay:1s]" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-red-100/50 dark:bg-red-950/30 rounded-full blur-[100px] animate-pulse [animation-delay:2s]" />
@@ -27,7 +27,7 @@ export function CtaSection() {
             Start monitoring your{'\u00A0'}
             <span className="text-gradient">agents today</span>
           </h2>
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-10">
+          <p className="text-lg text-gray-500 dark:text-gray-300 max-w-xl mx-auto mb-10">
             Free for up to 3 agents. No credit card required.
           </p>
 

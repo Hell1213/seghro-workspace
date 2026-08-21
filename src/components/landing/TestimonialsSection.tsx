@@ -117,7 +117,7 @@ export function TestimonialsSection() {
             Loved by{'\u00A0'}
             <span className="text-gradient">engineering teams</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Hear from the teams shipping reliable AI agents in production.
           </p>
         </motion.div>
@@ -146,7 +146,7 @@ export function TestimonialsSection() {
             <motion.div
               key={`${t.handle}-${i}`}
               variants={itemVariants}
-              className="flex-shrink-0 w-[340px] sm:w-[380px] rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm hover:shadow-md hover:shadow-red-100/20 dark:hover:shadow-red-900/20 transition-all duration-300"
+              className="flex-shrink-0 w-[340px] sm:w-[380px] rounded-2xl border border-gray-200 dark:border-gray-800 bg-background dark:bg-gray-900 p-6 shadow-sm hover:shadow-md hover:shadow-red-100/20 dark:hover:shadow-red-900/20 transition-all duration-300"
             >
               <Quote className="h-5 w-5 text-gray-200 dark:text-red-900/60 mb-3" />
               <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5">
@@ -158,9 +158,9 @@ export function TestimonialsSection() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{t.name}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">{t.handle}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-400">{t.handle}</p>
                 </div>
-                <span className="text-xs text-gray-300 dark:text-gray-600 flex-shrink-0">{t.timestamp}</span>
+                <span className="text-xs text-gray-300 dark:text-gray-500 flex-shrink-0">{t.timestamp}</span>
               </div>
             </motion.div>
           ))}

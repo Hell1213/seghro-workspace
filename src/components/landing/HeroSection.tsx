@@ -173,7 +173,7 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mt-5 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-xl min-h-[2.5rem]"
+              className="mt-5 text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-xl min-h-[2.5rem]"
             >
               <TypingText
                 text="Surface silent failures, pull context across traces, and improve your agent before users churn. Real-time observability for production AI systems."
@@ -213,16 +213,16 @@ export function HeroSection() {
               className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2"
             >
               <div className="flex items-center gap-1.5">
-                <Shield className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-                <span className="text-xs text-gray-400 dark:text-gray-500">99.9% Uptime SLA</span>
+                <Shield className="h-3.5 w-3.5 text-gray-400 dark:text-gray-400" />
+                <span className="text-xs text-gray-400 dark:text-gray-400">99.9% Uptime SLA</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Zap className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-                <span className="text-xs text-gray-400 dark:text-gray-500">SOC 2 Compliant</span>
+                <Zap className="h-3.5 w-3.5 text-gray-400 dark:text-gray-400" />
+                <span className="text-xs text-gray-400 dark:text-gray-400">SOC 2 Compliant</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Globe className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
-                <span className="text-xs text-gray-400 dark:text-gray-500">GDPR Ready</span>
+                <Globe className="h-3.5 w-3.5 text-gray-400 dark:text-gray-400" />
+                <span className="text-xs text-gray-400 dark:text-gray-400">GDPR Ready</span>
               </div>
             </motion.div>
           </div>
@@ -251,7 +251,7 @@ export function HeroSection() {
             animate={{ y: [0, 8, 0] }}
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
           >
-            <ArrowDown className="h-5 w-5 text-gray-300 dark:text-gray-600" />
+            <ArrowDown className="h-5 w-5 text-gray-300 dark:text-gray-500" />
           </motion.div>
         </motion.div>
       </motion.div>

@@ -48,7 +48,7 @@ export function HowItWorks() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="how-it-works" className="relative py-20 sm:py-28 bg-gray-50/80 dark:bg-gray-900/60">
+    <section id="how-it-works" className="relative py-20 sm:py-28 bg-muted/80 dark:bg-gray-900/60">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -60,7 +60,7 @@ export function HowItWorks() {
             From failure to fix in{' '}
             <span className="text-gradient">four steps</span>
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-3 text-base sm:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             A closed-loop workflow that catches what your error monitoring can&apos;t.
           </p>
         </motion.div>
@@ -85,7 +85,7 @@ export function HowItWorks() {
               >
                 {/* Step number on the line — always visible on sm+ */}
                 <div className="absolute left-0 top-0 z-10 flex">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-gray-900 border-2 border-[#dc2626] text-xs font-bold text-[#dc2626]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background dark:bg-gray-900 border-2 border-[#dc2626] text-xs font-bold text-[#dc2626]">
                     {step.number}
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export function HowItWorks() {
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-500 dark:text-gray-300 leading-relaxed">
                     {step.description}
                   </p>
                 </div>

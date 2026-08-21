@@ -255,14 +255,14 @@ export function StatusSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 mb-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-background dark:bg-gray-800 px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 mb-4">
             <Activity className="h-3.5 w-3.5" />
             System Status
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100 text-balance">
             <span className="text-gradient">Real-time infrastructure health</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Monitor service uptime, latency, and incident history across all Sentinel subsystems.
           </p>
         </motion.div>
@@ -330,7 +330,7 @@ export function StatusSection() {
                 <div className="flex items-end justify-between gap-2 mb-3">
                   <div className="flex gap-4">
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-400">
                         Uptime
                       </p>
                       <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
@@ -338,7 +338,7 @@ export function StatusSection() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                      <p className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-gray-400">
                         Latency
                       </p>
                       <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
@@ -350,7 +350,7 @@ export function StatusSection() {
                 </div>
 
                 {/* Last incident */}
-                <p className="text-[11px] text-gray-400 dark:text-gray-500">
+                <p className="text-[11px] text-gray-400 dark:text-gray-400">
                   Last incident:{' '}
                   <span className={svc.status === 'Degraded' ? 'text-amber-500 font-medium' : ''}>
                     {svc.lastIncident}
@@ -372,7 +372,7 @@ export function StatusSection() {
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               90-Day Uptime
             </h3>
-            <div className="flex items-center gap-4 text-[11px] text-gray-400 dark:text-gray-500">
+            <div className="flex items-center gap-4 text-[11px] text-gray-400 dark:text-gray-400">
               <span className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-sm bg-green-500 dark:bg-green-400" />
                 &gt;99.9%
@@ -421,16 +421,16 @@ export function StatusSection() {
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700">
-                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Time
                   </th>
-                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Service
                   </th>
-                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-400">
                     Duration
                   </th>
-                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500 text-right">
+                  <th className="pb-3 text-[11px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-400 text-right">
                     Status
                   </th>
                 </tr>

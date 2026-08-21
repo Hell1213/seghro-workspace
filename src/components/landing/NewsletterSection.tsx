@@ -17,10 +17,10 @@ export function NewsletterSection() {
   };
 
   return (
-    <section id="newsletter" className="relative py-20 sm:py-24 bg-white dark:bg-[#0a0a0a] overflow-hidden">
+    <section id="newsletter" className="relative py-20 sm:py-24 bg-background dark:bg-[#0a0a0a] overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="relative rounded-2xl border border-red-100 dark:border-red-900/30 bg-gradient-to-br from-white via-white to-red-50/50 dark:from-[#141414] dark:via-[#141414] dark:to-red-950/20 p-8 sm:p-12 lg:p-16"
+          className="relative rounded-2xl border border-red-100 dark:border-red-900/30 bg-gradient-to-br from-background via-background to-red-50/50 dark:from-[#141414] dark:via-[#141414] dark:to-red-950/20 p-8 sm:p-12 lg:p-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
@@ -81,7 +81,7 @@ export function NewsletterSection() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
-                className="h-11 flex-1 rounded-lg border-red-200 dark:border-red-800/50 bg-white dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-[#dc2626] focus-visible:border-[#dc2626]"
+                className="h-11 flex-1 rounded-lg border-red-200 dark:border-red-800/50 bg-background dark:bg-[#1a1a1a] text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:ring-[#dc2626] focus-visible:border-[#dc2626]"
               />
               <Button
                 onClick={handleSubscribe}
@@ -92,7 +92,7 @@ export function NewsletterSection() {
             </motion.div>
 
             <motion.p
-              className="mt-3 text-xs text-gray-400 dark:text-gray-500"
+              className="mt-3 text-xs text-gray-400 dark:text-gray-400"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}

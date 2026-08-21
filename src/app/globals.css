@@ -138,6 +138,12 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  .dark .text-gradient {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #d1d5db 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   .bg-grid-pattern {
     background-image:
       linear-gradient(rgba(220, 38, 38, 0.03) 1px, transparent 1px),

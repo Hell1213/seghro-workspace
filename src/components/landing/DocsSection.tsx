@@ -457,7 +457,7 @@ export function DocsSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section id="docs" className="relative py-24 sm:py-32 bg-white dark:bg-gray-900/50">
+    <section id="docs" className="relative py-24 sm:py-32 bg-background dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
       <div className="absolute bottom-0 left-1/3 w-1/2 h-1/2 bg-red-500/[0.02] blur-[100px] rounded-full" />
 
@@ -468,14 +468,14 @@ export function DocsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 mb-4">
+          <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-background dark:bg-gray-800 px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300 mb-4">
             Documentation
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
             Everything you need to{'\u00A0'}
             <span className="text-gradient">get started</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Comprehensive guides, API references, and code examples to integrate
             Sentinel into your AI agent stack in minutes.
           </p>

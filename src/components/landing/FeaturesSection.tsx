@@ -135,7 +135,7 @@ export function FeaturesSection() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
 
   return (
-    <section id="features" className="relative py-20 sm:py-28 bg-white dark:bg-gray-900/50">
+    <section id="features" className="relative py-20 sm:py-28 bg-background dark:bg-gray-900/50">
       <div className="absolute inset-0 bg-dot-pattern opacity-40" />
       <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-red-500/[0.02] blur-[100px] rounded-full" />
       <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gray-500/[0.03] blur-[80px] rounded-full" />
@@ -151,7 +151,7 @@ export function FeaturesSection() {
             Everything you need to{'\u00A0'}
             <span className="text-gradient">ship reliable agents</span>
           </h2>
-          <p className="mt-3 text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-3 text-base sm:text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             From detection to resolution — a complete observability stack built
             for the unique challenges of production AI systems.
           </p>
@@ -167,14 +167,14 @@ export function FeaturesSection() {
             <motion.div
               key={feature.title}
               variants={itemVariants}
-              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 card-lift overflow-hidden cursor-default"
+              className="group relative rounded-2xl border border-gray-100 dark:border-gray-800 bg-background dark:bg-gray-900 p-5 card-lift overflow-hidden cursor-default"
             >
               {/* Status dot + label at top right */}
               <div className="absolute top-4 right-4 flex items-center gap-1.5">
                 <span
                   className={`inline-block h-2 w-2 rounded-full ${STATUS_DOT[feature.status || 'info']}`}
                 />
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-400">
                   {STATUS_LABEL[feature.status || 'info']}
                 </span>
               </div>

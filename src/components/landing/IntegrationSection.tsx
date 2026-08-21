@@ -42,7 +42,7 @@ agent = trace_agent(your_agent,
   };
 
   return (
-    <section id="integrations" className="relative py-24 sm:py-32 bg-white dark:bg-gray-900/50">
+    <section id="integrations" className="relative py-24 sm:py-32 bg-background dark:bg-gray-900/50">
       <div ref={ref} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -54,7 +54,7 @@ agent = trace_agent(your_agent,
             Fits into your{' '}
             <span className="text-gradient">existing stack</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Native support for the frameworks your team already uses. One line to instrument.
           </p>
         </motion.div>
@@ -74,7 +74,7 @@ agent = trace_agent(your_agent,
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={isInView ? { opacity: 1, scale: 1 } : {}}
                   transition={{ delay: 0.2 + i * 0.05 }}
-                  className="group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-3.5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-sm transition-all"
+                  className="group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-background dark:bg-gray-900 p-3.5 hover:border-red-200 dark:hover:border-red-900/50 hover:shadow-sm transition-all"
                 >
                   <div className={`flex h-9 w-9 items-center justify-center rounded-lg text-xs font-bold ${fw.color} transition-transform group-hover:scale-110`}>
                     {fw.logo}
@@ -108,7 +108,7 @@ agent = trace_agent(your_agent,
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 sm:p-8">
+            <div className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-background dark:bg-gray-900 p-6 sm:p-8">
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
                 Trust is non-negotiable
               </h3>

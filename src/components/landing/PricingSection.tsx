@@ -105,7 +105,7 @@ export function PricingSection() {
             Simple, transparent{'\u00A0'}
             <span className="text-gradient">pricing</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Start free and scale as your AI operations grow. No hidden fees, no surprises.
           </p>
         </motion.div>

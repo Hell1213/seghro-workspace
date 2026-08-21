@@ -263,7 +263,7 @@
    263→          transition={{ duration: 0.6 }}
    264→          className="text-center mb-10"
    265→        >
-   266→          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
+   266→          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
    267→            <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
    268→            Live Demo
    269→          </div>
@@ -271,7 +271,7 @@
    271→            The{'\u00A0'}
    272→            <span className="text-gradient">observability dashboard</span>
    273→          </h2>
-   274→          <p className="mt-4 text-lg text-gray-500 max-w-2xl mx-auto">
+   274→          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
    275→            Real-time monitoring of AI agent traces, issues, and metrics —
    276→            everything running live below.
    277→          </p>
@@ -321,13 +321,13 @@
    321→                })}
    322→              </div>
    323→              <div className="hidden sm:flex items-center gap-2">
-   324→                <div className="flex items-center gap-2 text-xs text-gray-400">
+   324→                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
    325→                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
    326→                  Live
    327→                </div>
    328→                <button
    329→                  onClick={() => setSettingsOpen(true)}
-   330→                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+   330→                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
    331→                  aria-label="Open settings"
    332→                >
    333→                  <Settings className="h-4 w-4" />
@@ -355,7 +355,7 @@
    355→                    <div className="grid lg:grid-cols-3 gap-6">
    356→                      <div className="lg:col-span-2">
    357→                        <div className="flex items-center gap-2 mb-4">
-   358→                          <Bot className="h-4 w-4 text-gray-400" />
+   358→                          <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
    359→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
    360→                          <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
    361→                        </div>
@@ -388,25 +388,25 @@
    388→                  <div>
    389→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
    390→                      <div className="flex items-center gap-2">
-   391→                        <GitBranch className="h-4 w-4 text-gray-400" />
+   391→                        <GitBranch className="h-4 w-4 text-gray-400 dark:text-gray-500" />
    392→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
    393→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
    394→                      </div>
    395→                      <div className="flex items-center gap-2 w-full sm:w-auto">
    396→                        <div className="relative flex-1 sm:flex-none">
-   397→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+   397→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
    398→                          <Input
    399→                            placeholder="Search traces..."
    400→                            value={traceSearch}
    401→                            onChange={(e) => setTraceSearch(e.target.value)}
-   402→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+   402→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
    403→                          />
    404→                          {traceSearch && (
    405→                            <button
    406→                              onClick={() => setTraceSearch('')}
    407→                              className="absolute right-2 top-1/2 -translate-y-1/2"
    408→                            >
-   409→                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+   409→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
    410→                            </button>
    411→                          )}
    412→                        </div>
@@ -422,7 +422,7 @@
    422→                    <div className="flex flex-wrap items-center gap-2 mb-4">
    423→                      <button
    424→                        onClick={() => setShowWaterfall(!showWaterfall)}
-   425→                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'}`}
+   425→                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
    426→                      >
    427→                        <BarChart3 className="h-3 w-3" />
    428→                        Waterfall
@@ -443,8 +443,8 @@
    443→                            traceStatusFilter === stat
    444→                              ? stat === 'success' ? 'bg-emerald-500 text-white'
    445→                                : stat === 'error' ? 'bg-[#dc2626] text-white'
-   446→                                : 'bg-gray-200 text-gray-700'
-   447→                              : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+   446→                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   447→                              : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
    448→                          }`}
    449→                        >
    450→                          {stat.charAt(0).toUpperCase() + stat.slice(1)}
@@ -453,8 +453,8 @@
    453→                    </div>
    454→
    455→                    {filteredTraces.length === 0 ? (
-   456→                      <div className="text-center py-12 text-gray-400">
-   457→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+   456→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   457→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
    458→                        <p className="text-sm">No traces match your filters</p>
    459→                      </div>
    460→                    ) : (
@@ -463,7 +463,7 @@
    463→                    {showWaterfall && filteredTraces.length > 0 && (
    464→                      <div className="mt-6">
    465→                        <div className="flex items-center gap-2 mb-3">
-   466→                          <BarChart3 className="h-4 w-4 text-gray-400" />
+   466→                          <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
    467→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
    468→                        </div>
    469→                        <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
@@ -483,19 +483,19 @@
    483→                      </div>
    484→                      <div className="flex items-center gap-2 w-full sm:w-auto">
    485→                        <div className="relative flex-1 sm:flex-none">
-   486→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
+   486→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
    487→                          <Input
    488→                            placeholder="Search issues..."
    489→                            value={issueSearch}
    490→                            onChange={(e) => setIssueSearch(e.target.value)}
-   491→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 border-gray-200 w-full sm:w-56"
+   491→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
    492→                          />
    493→                          {issueSearch && (
    494→                            <button
    495→                              onClick={() => setIssueSearch('')}
    496→                              className="absolute right-2 top-1/2 -translate-y-1/2"
    497→                            >
-   498→                              <X className="h-3 w-3 text-gray-400 hover:text-gray-600" />
+   498→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
    499→                            </button>
    500→                          )}
    501→                        </div>
@@ -504,7 +504,7 @@
    504→                          className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
    505→                            showFilters
    506→                              ? 'bg-[#dc2626] text-white border-[#dc2626]'
-   507→                              : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+   507→                              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
    508→                          }`}
    509→                        >
    510→                          <Filter className="h-3.5 w-3.5" />
@@ -526,7 +526,7 @@
    526→                        exit={{ height: 0, opacity: 0 }}
    527→                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
    528→                      >
-   529→                        <span className="text-[11px] text-gray-500 font-medium">Severity:</span>
+   529→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Severity:</span>
    530→                        {['all', 'P0', 'P1', 'P2'].map((sev) => (
    531→                          <button
    532→                            key={sev}
@@ -536,15 +536,15 @@
    536→                                ? sev === 'P0' ? 'bg-[#dc2626] text-white'
    537→                                  : sev === 'P1' ? 'bg-amber-500 text-white'
    538→                                  : sev === 'P2' ? 'bg-gray-500 text-white'
-   539→                                  : 'bg-gray-200 text-gray-700'
-   540→                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+   539→                                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   540→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
    541→                            }`}
    542→                          >
    543→                            {sev === 'all' ? 'All' : sev}
    544→                          </button>
    545→                        ))}
-   546→                        <div className="w-px h-4 bg-gray-200 mx-1" />
-   547→                        <span className="text-[11px] text-gray-500 font-medium">Status:</span>
+   546→                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+   547→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Status:</span>
    548→                        {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
    549→                          <button
    550→                            key={stat}
@@ -552,18 +552,18 @@
    552→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
    553→                              issueStatusFilter === stat
    554→                                ? 'bg-[#dc2626] text-white'
-   555→                                : 'bg-white text-gray-500 border border-gray-200 hover:border-gray-300'
+   555→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
    556→                            }`}
    557→                          >
    558→                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
    559→                          </button>
    560→                        ))}
-   561→                      </div>
+   561→                      </motion.div>
    562→                    )}
    563→
    564→                    {filteredIssues.length === 0 ? (
-   565→                      <div className="text-center py-12 text-gray-400">
-   566→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+   565→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   566→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
    567→                        <p className="text-sm">No issues match your filters</p>
    568→                      </div>
    569→                    ) : (
@@ -583,7 +583,7 @@
    583→                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
    584→                      <div className="lg:col-span-2">
    585→                        <div className="flex items-center gap-2 mb-3">
-   586→                          <Clock className="h-4 w-4 text-gray-400" />
+   586→                          <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
    587→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
    588→                        </div>
    589→                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">

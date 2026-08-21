@@ -98,7 +98,7 @@ export function ChangelogSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-400 mb-4">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 dark:border-gray-700 bg-background dark:bg-gray-800 px-3.5 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 mb-4">
             <GitBranch className="h-3.5 w-3.5" />
             Changelog
           </span>
@@ -106,7 +106,7 @@ export function ChangelogSection() {
             What&#39;s{'\u00A0'}
             <span className="text-gradient">new</span>
           </h2>
-          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Latest updates, improvements, and fixes across all Sentinel features.
           </p>
         </motion.div>
@@ -133,12 +133,12 @@ export function ChangelogSection() {
                   <div className="hidden lg:flex items-start pt-6">
                     <div className="relative flex items-center gap-3">
                       {/* Timeline dot */}
-                      <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                      <div className="relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-gray-200 dark:border-gray-700 bg-background dark:bg-gray-900">
                         <div
                           className={`h-3 w-3 rounded-full ${
                             release.latest
                               ? 'bg-[#dc2626]'
-                              : 'bg-gray-300 dark:bg-gray-600'
+                              : 'bg-gray-300 dark:bg-gray-500'
                           }`}
                         />
                       </div>
@@ -192,7 +192,7 @@ export function ChangelogSection() {
                           {tag}
                         </Badge>
                       ))}
-                      <span className="ml-auto text-xs text-gray-400 dark:text-gray-500">
+                      <span className="ml-auto text-xs text-gray-400 dark:text-gray-400">
                         {release.date}
                       </span>
                     </div>

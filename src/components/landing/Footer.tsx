@@ -102,7 +102,7 @@ export function Footer() {
 
   return (
     <motion.footer
-      className="relative border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-hidden"
+      className="relative border-t border-gray-100 dark:border-gray-800 bg-background dark:bg-gray-950 overflow-hidden"
       variants={footerVariants}
       initial="hidden"
       whileInView="visible"
@@ -168,10 +168,10 @@ export function Footer() {
                 Sentinel
               </span>
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 mb-3">
+            <p className="text-xs text-gray-400 dark:text-gray-400 mt-1 mb-3">
               Production-grade AI agent observability
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed mb-5">
+            <p className="text-xs text-gray-400 dark:text-gray-400 leading-relaxed mb-5">
               Production monitoring for AI agents. Catch silent failures before your users do.
             </p>
 
@@ -182,7 +182,7 @@ export function Footer() {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-[#dc2626] dark:hover:text-red-400 hover:scale-110 hover:-translate-y-0.5"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-gray-400 transition-all duration-200 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-[#dc2626] dark:hover:text-red-400 hover:scale-110 hover:-translate-y-0.5"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -190,7 +190,7 @@ export function Footer() {
             </div>
 
             {/* Inline Newsletter Input */}
-            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-300 mb-2">
               Subscribe to our newsletter
             </p>
             <div className="flex gap-2">
@@ -225,7 +225,7 @@ export function Footer() {
                   <li key={link.label}>
                     <a
                       href={link.href || '#'}
-                      className="text-xs text-gray-400 dark:text-gray-500 hover:text-[#dc2626] dark:hover:text-red-400 transition-colors"
+                      className="text-xs text-gray-400 dark:text-gray-400 hover:text-[#dc2626] dark:hover:text-red-400 transition-colors"
                     >
                       {link.label}
                     </a>
@@ -241,12 +241,12 @@ export function Footer() {
           variants={itemVariants}
           className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4"
         >
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-gray-400 dark:text-gray-400">
             &copy; 2025 Sentinel{' '}
             <span className="inline-block h-1 w-1 rounded-full bg-[#dc2626] mx-1.5 align-middle" />
             Built with &hearts; for AI reliability
           </p>
-          <p className="text-xs text-gray-300 dark:text-gray-700">
+          <p className="text-xs text-gray-300 dark:text-gray-500">
             Inspired by the observability challenges of production AI systems.
           </p>
         </motion.div>

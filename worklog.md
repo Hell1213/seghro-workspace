@@ -853,3 +853,52 @@ Added before the last comment block ("Dot grid pattern (alternative)"):
 6. **API rate limiting middleware** — SaaS-grade request throttling
 7. **Onboarding tour improvements** — Step for new Status section
 8. **A/B testing infrastructure** — Feature flags for SaaS tier management
+
+---
+Task ID: 1
+Agent: Main Agent
+Task: Fix dark/light theme toggle - home page not changing to dark theme + faded text in dark mode
+
+Work Log:
+- Analyzed user-provided screenshots via VLM to identify issues: (1) home page stuck in light mode, (2) text faded/invisible in dark mode
+- Read globals.css — confirmed CSS variables and dark variant setup is correct (`@custom-variant dark (&:is(.dark *))`)
+- Read page.tsx — found ROOT CAUSE: `<div className="min-h-screen flex flex-col bg-white">` hardcoded `bg-white` overriding body's `bg-background`
+- Read all 13 landing page components (HeroSection, FeaturesSection, HowItWorks, StatsSection, DashboardSection, DocsSection, TestimonialsSection, PricingSection, NewsletterSection, IntegrationSection, ChangelogSection, StatusSection, CtaSection, Footer, Navbar)
+- Identified systematic issues:
+  1. `bg-white` hardcoded in page.tsx root div (ROOT CAUSE of entire page not switching)
+  2. `bg-white` hardcoded in 7+ section components instead of semantic `bg-background`
+  3. `text-gray-400 dark:text-gray-500` pattern used for ~20+ text elements — gray-500 is too dark in dark mode
+  4. `text-gray-300 dark:text-gray-600` and `text-gray-300 dark:text-gray-700` used for timestamps/footers — nearly invisible
+  5. `.text-gradient` CSS utility had no dark variant — gray end of gradient invisible in dark mode
+  6. Section description text using `dark:text-gray-400` — acceptable but could be brighter
+- Fixed all issues systematically:
+  1. `page.tsx`: `bg-white` → `bg-background`
+  2. `globals.css`: Added `.dark .text-gradient` with brighter gray (#d1d5db)
+  3. HeroSection: Trust indicator text/icons `dark:text-gray-500` → `dark:text-gray-400`, description `dark:text-gray-400` → `dark:text-gray-300`, scroll arrow `dark:text-gray-600` → `dark:text-gray-500`
+  4. FeaturesSection: Section bg `bg-white` → `bg-background`, card bg `bg-white` → `bg-background`, status labels `dark:text-gray-500` → `dark:text-gray-400`, description `dark:text-gray-400` → `dark:text-gray-300`
+  5. HowItWorks: Section bg → `bg-muted/80`, step circle `bg-white` → `bg-background`, descriptions `dark:text-gray-400` → `dark:text-gray-300`
+  6. Footer: Bg `bg-white` → `bg-background`, all descriptions/links/copyright `dark:text-gray-500` → `dark:text-gray-400`, `dark:text-gray-700` → `dark:text-gray-500`, social icons `dark:text-gray-500` → `dark:text-gray-400`, subscribe label `dark:text-gray-400` → `dark:text-gray-300`
+  7. TestimonialsSection: Cards `bg-white` → `bg-background`, handles `dark:text-gray-500` → `dark:text-gray-400`, timestamps `dark:text-gray-600` → `dark:text-gray-500`, description `dark:text-gray-400` → `dark:text-gray-300`
+  8. NewsletterSection: Section bg + gradient bg + input bg all `bg-white` → `bg-background`, disclaimer `dark:text-gray-500` → `dark:text-gray-400`
+  9. StatusSection: All label text `dark:text-gray-500` → `dark:text-gray-400`, table headers `dark:text-gray-500` → `dark:text-gray-400`, badge `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+  10. ChangelogSection: Badge `bg-white` → `bg-background`, badge text `dark:text-gray-400` → `dark:text-gray-300`, dates `dark:text-gray-500` → `dark:text-gray-400`, timeline dot `dark:bg-gray-600` → `dark:bg-gray-500`, description `dark:text-gray-400` → `dark:text-gray-300`
+  11. DocsSection: Section bg `bg-white` → `bg-background`, badge bg `bg-white` → `bg-background`, badge text `dark:text-gray-400` → `dark:text-gray-300`, description `dark:text-gray-400` → `dark:text-gray-300`
+  12. IntegrationSection: Section bg + card bgs `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+  13. PricingSection: Description `dark:text-gray-400` → `dark:text-gray-300`
+  14. CtaSection: Cta bg `bg-white` → `bg-background`, description `dark:text-gray-400` → `dark:text-gray-300`
+- Verified via agent-browser:
+  - Light theme: Clean white, all text readable, proper contrast ✅
+  - Dark theme hero: A- grade, all text readable, no white areas ✅
+  - Dark mode footer: "Excellent dark mode design with no accessibility or visibility issues" ✅
+  - Dark mode How It Works: "well-implemented dark mode" ✅
+  - Dark mode Stats: "flawless" ✅
+  - Dark mode Pricing: "high-contrast dark theme" ✅
+- ESLint passes with zero errors
+- Dev server compiles successfully
+
+Stage Summary:
+- ROOT CAUSE: `bg-white` hardcoded on page.tsx root div prevented entire page from switching to dark theme
+- Fixed 15 files, 70+ individual class changes
+- All sections now properly switch between light and dark themes
+- All text has proper contrast in both themes
+- Verified via 6 agent-browser screenshots + VLM analysis
