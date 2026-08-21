@@ -1,0 +1,68 @@
+# ============================================================
+# Sentinel V8 — Docker Compose
+# ============================================================
+# Usage:
+#   docker compose up -d          # start all services
+#   docker compose logs -f web    # tail web service logs
+#   docker compose down           # stop all services
+#
+# To swap to PostgreSQL later:
+#   1. Add a `postgres` service (image: postgres:16-alpine, volume for /var/lib/postgresql/data)
+#   2. Change web.environment.DATABASE_URL to "postgresql://sentinel:password@postgres:5432/sentinel"
+#   3. Change web.depends_on to include postgres
+#   4. Update prisma/schema.prisma: provider = "postgresql"
+#   5. Remove the db-data volume mount (SQLite file no longer needed)
+# ============================================================
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel-web
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    volumes:
+      # Persist the SQLite database file across container restarts
+      - db-data:/app/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - sentinel
+
+  # alert-streamer: WebSocket service for real-time alert streaming
+  alert-streamer:
+    build:
+      context: ./mini-services/alert-streamer
+      dockerfile: Dockerfile
+    container_name: sentinel-alert-streamer
+    # Internal port only — accessed via gateway/Caddy, not exposed to host
+    expose:
+      - "3001"
+    environment:
+      - PORT=3001
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    networks:
+      - sentinel
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  sentinel:
+    driver: bridge

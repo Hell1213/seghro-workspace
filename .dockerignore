@@ -1,0 +1,56 @@
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Version control
+.git
+.gitignore
+
+# Mini-services (built separately in docker-compose)
+mini-services
+
+# Documentation & logs
+*.md
+dev.log
+server.log
+PROGRESS.md
+
+# Tests
+tests
+
+# Tool artifacts
+tool-results
+
+# Environment files (secrets)
+.env
+.env.local
+.env.*.local
+
+# Downloaded/uploaded assets
+download
+upload
+
+# Misc
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+examples
+agent-ctx
+--output
+--full-page
+lemma.json
+pitchdeck.md
+Caddyfile
+eslint.config.mjs
+components.json
+tsconfig.json
+tailwind.config.ts
+postcss.config.mjs

@@ -1,0 +1,618 @@
+     1→'use client';
+     2→
+     3→import { motion, useInView } from 'framer-motion';
+     4→import { useRef, useState, useEffect } from 'react';
+     5→import {
+     6→  LayoutDashboard,
+     7→  GitBranch,
+     8→  AlertTriangle,
+     9→  Bell,
+    10→  Bot,
+    11→  Clock,
+    12→  Search,
+    13→  Filter,
+    14→  X,
+    15→  GitCompareArrows,
+    16→  BarChart3,
+    17→  Heart,
+    18→  Settings,
+    19→} from 'lucide-react';
+    20→import { Input } from '@/components/ui/input';
+    21→import { ExportButton } from '@/components/ui/ExportButton';
+    22→import { MetricCards } from './MetricCards';
+    23→import { AgentGrid } from './AgentGrid';
+    24→import { TraceViewer } from './TraceViewer';
+    25→import { IssuesPanel } from './IssuesPanel';
+    26→import { AlertFeed } from './AlertFeed';
+    27→import { ActivityTimeline } from './ActivityTimeline';
+    28→import { MetricsCharts } from './MetricsCharts';
+    29→import { McpPanel } from './McpPanel';
+    30→import { AgentDetailSheet } from './AgentDetailSheet';
+    31→import { AgentComparison } from './AgentComparison';
+    32→import { TraceWaterfall } from './TraceWaterfall';
+    33→import { DashboardSkeleton } from './DashboardSkeleton';
+    34→import { ApiHealthPanel } from './ApiHealthPanel';
+    35→import { SettingsPanel } from './SettingsPanel';
+    36→
+    37→type TabId = 'overview' | 'traces' | 'issues' | 'alerts' | 'api-health';
+    38→
+    39→const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
+    40→  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    41→  { id: 'traces', label: 'Traces', icon: GitBranch },
+    42→  { id: 'issues', label: 'Issues', icon: AlertTriangle },
+    43→  { id: 'alerts', label: 'Alerts', icon: Bell },
+    44→  { id: 'api-health', label: 'API Health', icon: Heart },
+    45→];
+    46→
+    47→interface Agent {
+    48→  id: string;
+    49→  name: string;
+    50→  description: string;
+    51→  status: 'active' | 'degraded' | 'critical' | 'inactive';
+    52→  framework: string;
+    53→  lastRunAt: string;
+    54→  totalRuns: number;
+    55→  errorRate: number;
+    56→  avgLatency: number;
+    57→}
+    58→
+    59→interface Trace {
+    60→  id: string;
+    61→  agentId: string;
+    62→  traceId: string;
+    63→  status: string;
+    64→  duration: number;
+    65→  inputTokens: number;
+    66→  outputTokens: number;
+    67→  createdAt: string;
+    68→  spans: any[];
+    69→}
+    70→
+    71→interface Issue {
+    72→  id: string;
+    73→  agentId: string;
+    74→  agentName: string;
+    75→  title: string;
+    76→  description: string;
+    77→  severity: 'P0' | 'P1' | 'P2';
+    78→  status: string;
+    79→  affectedRuns: number;
+    80→  totalRuns: number;
+    81→  failureRate: number;
+    82→  rootCause: string;
+    83→  suggestedFix: string;
+    84→  createdAt: string;
+    85→  updatedAt: string;
+    86→}
+    87→
+    88→interface AlertItem {
+    89→  id: string;
+    90→  title: string;
+    91→  message: string;
+    92→  severity: string;
+    93→  status: string;
+    94→  channel: string;
+    95→  createdAt: string;
+    96→}
+    97→
+    98→export function DashboardSection() {
+    99→  const ref = useRef<HTMLDivElement>(null);
+   100→  const isInView = useInView(ref, { once: true, margin: '-100px' });
+   101→  const [activeTab, setActiveTab] = useState<TabId>('overview');
+   102→
+   103→  // Sync tab to URL hash
+   104→  useEffect(() => {
+   105→    const hash = window.location.hash.replace('#dashboard-', '').replace('#', '');
+   106→    if (['overview', 'traces', 'issues', 'alerts', 'api-health'].includes(hash)) {
+   107→      setActiveTab(hash as TabId);
+   108→    }
+   109→  }, []);
+   110→
+   111→  const handleTabChange = (tab: TabId) => {
+   112→    setActiveTab(tab);
+   113→    window.history.replaceState(null, '', `#dashboard-${tab}`);
+   114→  };
+   115→  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+   116→  const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
+   117→  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
+   118→  const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
+   119→  const [showWaterfall, setShowWaterfall] = useState(true);
+   120→  const [settingsOpen, setSettingsOpen] = useState(false);
+   121→  const [agents, setAgents] = useState<Agent[]>([]);
+   122→  const [traces, setTraces] = useState<Trace[]>([]);
+   123→  const [issues, setIssues] = useState<Issue[]>([]);
+   124→  const [alertItems, setAlertItems] = useState<AlertItem[]>([]);
+   125→  const [metrics, setMetrics] = useState<any>(null);
+   126→  const [loading, setLoading] = useState(true);
+   127→
+   128→  // Search and filter state
+   129→  const [issueSearch, setIssueSearch] = useState('');
+   130→  const [issueSeverityFilter, setIssueSeverityFilter] = useState<string>('all');
+   131→  const [issueStatusFilter, setIssueStatusFilter] = useState<string>('all');
+   132→  const [showFilters, setShowFilters] = useState(false);
+   133→
+   134→  // Trace search and filter state
+   135→  const [traceSearch, setTraceSearch] = useState('');
+   136→  const [traceStatusFilter, setTraceStatusFilter] = useState<string>('all');
+   137→
+   138→  // Filter persistence via localStorage
+   139→  useEffect(() => {
+   140→    try {
+   141→      const saved = localStorage.getItem('sentinel-dash-filters');
+   142→      if (saved) {
+   143→        const f = JSON.parse(saved);
+   144→        if (f.traceSearch) setTraceSearch(f.traceSearch);
+   145→        if (f.issueSearch) setIssueSearch(f.issueSearch);
+   146→        if (f.traceStatusFilter) setTraceStatusFilter(f.traceStatusFilter);
+   147→        if (f.issueSeverityFilter) setIssueSeverityFilter(f.issueSeverityFilter);
+   148→        if (f.issueStatusFilter) setIssueStatusFilter(f.issueStatusFilter);
+   149→      }
+   150→    } catch { /* ignore */ }
+   151→  }, []);
+   152→
+   153→  useEffect(() => {
+   154→    try {
+   155→      localStorage.setItem('sentinel-dash-filters', JSON.stringify({
+   156→        traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter,
+   157→      }));
+   158→    } catch { /* ignore */ }
+   159→  }, [traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter]);
+   160→
+   161→  // WebSocket for real-time alerts
+   162→  useEffect(() => {
+   163→    let ws: WebSocket | null = null;
+   164→    try {
+   165→      ws = new WebSocket('ws://localhost:3001/?XTransformPort=3001');
+   166→      ws.onmessage = (event) => {
+   167→        try {
+   168→          const data = JSON.parse(event.data);
+   169→          if (data.type === 'new_alert') {
+   170→            setAlertItems((prev) => [data.alert, ...prev].slice(0, 20));
+   171→          }
+   172→        } catch (e) {
+   173→          // ignore parse errors
+   174→        }
+   175→      };
+   176→    } catch (e) {
+   177→      // WebSocket not available, that's ok
+   178→    }
+   179→    return () => {
+   180→      if (ws) ws.close();
+   181→    };
+   182→  }, []);
+   183→
+   184→  const fetchIssues = async () => {
+   185→    try {
+   186→      const issuesRes = await fetch('/api/issues').then((r) => r.json());
+   187→      setIssues(issuesRes);
+   188→    } catch {
+   189→      // silently fail
+   190→    }
+   191→  };
+   192→
+   193→  useEffect(() => {
+   194→    async function fetchData() {
+   195→      try {
+   196→        const [agentsRes, tracesRes, issuesRes, alertsRes, metricsRes] =
+   197→          await Promise.all([
+   198→            fetch('/api/agents').then((r) => r.json()),
+   199→            fetch('/api/traces').then((r) => r.json()),
+   200→            fetch('/api/issues').then((r) => r.json()),
+   201→            fetch('/api/alerts').then((r) => r.json()),
+   202→            fetch('/api/metrics').then((r) => r.json()),
+   203→          ]);
+   204→        setAgents(agentsRes);
+   205→        setTraces(tracesRes);
+   206→        setIssues(issuesRes);
+   207→        setAlertItems(alertsRes);
+   208→        setMetrics(metricsRes);
+   209→      } catch (e) {
+   210→        console.error('Failed to fetch dashboard data:', e);
+   211→      } finally {
+   212→        setLoading(false);
+   213→      }
+   214→    }
+   215→    fetchData();
+   216→  }, []);
+   217→
+   218→  const handleCompareAgent = (agent: Agent) => {
+   219→    if (comparisonIds.includes(agent.id)) {
+   220→      setComparisonIds(comparisonIds.filter(id => id !== agent.id));
+   221→      return;
+   222→    }
+   223→    const newIds = [...comparisonIds, agent.id].slice(-2);
+   224→    setComparisonIds(newIds);
+   225→    if (newIds.length === 2) {
+   226→      const a = agents.find(a => a.id === newIds[0]);
+   227→      const b = agents.find(a => a.id === newIds[1]);
+   228→      if (a && b) {
+   229→        setComparisonAgents([a, b]);
+   230→        setComparisonIds([]);
+   231→      }
+   232→    }
+   233→  };
+   234→
+   235→  const filteredTraces = traces.filter((t) => {
+   236→    const matchesAgent = !selectedAgentId || t.agentId === selectedAgentId;
+   237→    const matchesSearch = !traceSearch ||
+   238→      t.traceId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   239→      t.agentId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   240→      t.status.toLowerCase().includes(traceSearch.toLowerCase());
+   241→    const matchesStatus = traceStatusFilter === 'all' || t.status === traceStatusFilter;
+   242→    return matchesAgent && matchesSearch && matchesStatus;
+   243→  });
+   244→
+   245→  const filteredIssues = issues.filter((issue) => {
+   246→    const matchesSearch = !issueSearch ||
+   247→      issue.title.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   248→      issue.agentName.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   249→      issue.description.toLowerCase().includes(issueSearch.toLowerCase());
+   250→    const matchesSeverity = issueSeverityFilter === 'all' || issue.severity === issueSeverityFilter;
+   251→    const matchesStatus = issueStatusFilter === 'all' || issue.status === issueStatusFilter;
+   252→    return matchesSearch && matchesSeverity && matchesStatus;
+   253→  });
+   254→
+   255→  return (
+   256→    <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50 dark:bg-gray-900/30">
+   257→      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+   258→      <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   259→        {/* Section header */}
+   260→        <motion.div
+   261→          initial={{ opacity: 0, y: 20 }}
+   262→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   263→          transition={{ duration: 0.6 }}
+   264→          className="text-center mb-10"
+   265→        >
+   266→          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
+   267→            <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
+   268→            Live Demo
+   269→          </div>
+   270→          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+   271→            The{'\u00A0'}
+   272→            <span className="text-gradient">observability dashboard</span>
+   273→          </h2>
+   274→          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+   275→            Real-time monitoring of AI agent traces, issues, and metrics —
+   276→            everything running live below.
+   277→          </p>
+   278→        </motion.div>
+   279→
+   280→        {/* Dashboard container */}
+   281→        <motion.div
+   282→          initial={{ opacity: 0, y: 30 }}
+   283→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   284→          transition={{ duration: 0.7, delay: 0.1 }}
+   285→          className="animated-border rounded-2xl bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
+   286→        >
+   287→          {/* Dashboard header with tabs */}
+   288→          <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
+   289→            <div className="flex items-center justify-between">
+   290→              <div data-tour="tabs" className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+   291→                {tabs.map((tab) => {
+   292→                  const Icon = tab.icon;
+   293→                  const isActive = activeTab === tab.id;
+   294→                  return (
+   295→                    <button
+   296→                      key={tab.id}
+   297→                      onClick={() => handleTabChange(tab.id)}
+   298→                      className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-all duration-200 ${
+   299→                        isActive
+   300→                          ? 'text-[#dc2626] border-[#dc2626]'
+   301→                          : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
+   302→                      }`}
+   303→                    >
+   304→                      <Icon className="h-4 w-4" />
+   305→                      {tab.label}
+   306→                      {isActive && (
+   307→                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full" />
+   308→                      )}
+   309→                      {tab.id === 'issues' && issues.length > 0 && (
+   310→                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+   311→                          {issues.filter((i) => i.status !== 'resolved').length}
+   312→                        </span>
+   313→                      )}
+   314→                      {tab.id === 'alerts' && alertItems.filter((a) => a.status === 'unread').length > 0 && (
+   315→                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+   316→                          {alertItems.filter((a) => a.status === 'unread').length}
+   317→                        </span>
+   318→                      )}
+   319→                    </button>
+   320→                  );
+   321→                })}
+   322→              </div>
+   323→              <div className="hidden sm:flex items-center gap-2">
+   324→                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+   325→                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+   326→                  Live
+   327→                </div>
+   328→                <button
+   329→                  onClick={() => setSettingsOpen(true)}
+   330→                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+   331→                  aria-label="Open settings"
+   332→                >
+   333→                  <Settings className="h-4 w-4" />
+   334→                </button>
+   335→              </div>
+   336→            </div>
+   337→          </div>
+   338→
+   339→          {/* Dashboard content */}
+   340→          <div className="p-4 sm:p-6">
+   341→            {loading ? (
+   342→              <DashboardSkeleton />
+   343→            ) : (
+   344→              <>
+   345→                {/* OVERVIEW TAB */}
+   346→                {activeTab === 'overview' && (
+   347→                  <div className="space-y-6"
+   348→                  >
+   349→                    {metrics?.cards && (
+   350→                      <div data-tour="metrics">
+   351→                        <MetricCards cards={metrics.cards} />
+   352→                      </div>
+   353→                    )}
+   354→
+   355→                    <div className="grid lg:grid-cols-3 gap-6">
+   356→                      <div className="lg:col-span-2">
+   357→                        <div className="flex items-center gap-2 mb-4">
+   358→                          <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   359→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
+   360→                          <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
+   361→                        </div>
+   362→                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} onCompare={handleCompareAgent} comparisonIds={comparisonIds} />
+   363→                        {comparisonIds.length === 1 && (
+   364→                          <p className="text-xs text-[#dc2626] mt-2 flex items-center gap-1.5"><GitCompareArrows className="h-3 w-3" />1 agent selected — click another to compare</p>
+   365→                        )}
+   366→                        </div>
+   367→                      </div>
+   368→                      <div>
+   369→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
+   370→                        <div data-tour="mcp"><McpPanel /></div>
+   371→                      </div>
+   372→                    </div>
+   373→
+   374→                    {metrics?.timeSeries && metrics?.severityBreakdown && metrics?.frameworkDistribution && (
+   375→                      <div data-tour="charts">
+   376→                        <MetricsCharts
+   377→                          timeSeries={metrics.timeSeries}
+   378→                          severity={metrics.severityBreakdown}
+   379→                          frameworks={metrics.frameworkDistribution}
+   380→                        />
+   381→                      </div>
+   382→                    )}
+   383→                  </div>
+   384→                )}
+   385→
+   386→                {/* TRACES TAB */}
+   387→                {activeTab === 'traces' && (
+   388→                  <div>
+   389→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   390→                      <div className="flex items-center gap-2">
+   391→                        <GitBranch className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   392→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
+   393→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
+   394→                      </div>
+   395→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   396→                        <div className="relative flex-1 sm:flex-none">
+   397→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   398→                          <Input
+   399→                            placeholder="Search traces..."
+   400→                            value={traceSearch}
+   401→                            onChange={(e) => setTraceSearch(e.target.value)}
+   402→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   403→                          />
+   404→                          {traceSearch && (
+   405→                            <button
+   406→                              onClick={() => setTraceSearch('')}
+   407→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   408→                            >
+   409→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   410→                            </button>
+   411→                          )}
+   412→                        </div>
+   413→                        <ExportButton
+   414→                          data={filteredTraces as unknown as Record<string, unknown>[]}
+   415→                          filename="sentinel-traces"
+   416→                          columns={['traceId', 'agentId', 'status', 'duration', 'inputTokens', 'outputTokens', 'createdAt']}
+   417→                          label="Export"
+   418→                        />
+   419→                      </div>
+   420→                    </div>
+   421→
+   422→                    <div className="flex flex-wrap items-center gap-2 mb-4">
+   423→                      <button
+   424→                        onClick={() => setShowWaterfall(!showWaterfall)}
+   425→                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
+   426→                      >
+   427→                        <BarChart3 className="h-3 w-3" />
+   428→                        Waterfall
+   429→                      </button>
+   430→                      {selectedAgentId && (
+   431→                        <button
+   432→                          onClick={() => setSelectedAgentId(null)}
+   433→                          className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/20 hover:bg-[#dc2626]/20 transition-colors"
+   434→                        >
+   435→                          ← All agents
+   436→                        </button>
+   437→                      )}
+   438→                      {['all', 'success', 'error'].map((stat) => (
+   439→                        <button
+   440→                          key={stat}
+   441→                          onClick={() => setTraceStatusFilter(stat)}
+   442→                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   443→                            traceStatusFilter === stat
+   444→                              ? stat === 'success' ? 'bg-emerald-500 text-white'
+   445→                                : stat === 'error' ? 'bg-[#dc2626] text-white'
+   446→                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   447→                              : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   448→                          }`}
+   449→                        >
+   450→                          {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   451→                        </button>
+   452→                      ))}
+   453→                    </div>
+   454→
+   455→                    {filteredTraces.length === 0 ? (
+   456→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   457→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   458→                        <p className="text-sm">No traces match your filters</p>
+   459→                      </div>
+   460→                    ) : (
+   461→                      <TraceViewer traces={filteredTraces} />
+   462→                    )}
+   463→                    {showWaterfall && filteredTraces.length > 0 && (
+   464→                      <div className="mt-6">
+   465→                        <div className="flex items-center gap-2 mb-3">
+   466→                          <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   467→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
+   468→                        </div>
+   469→                        <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
+   470→                      </div>
+   471→                    )}
+   472→                  </div>
+   473→                )}
+   474→
+   475→                {/* ISSUES TAB */}
+   476→                {activeTab === 'issues' && (
+   477→                  <div>
+   478→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   479→                      <div className="flex items-center gap-2">
+   480→                        <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
+   481→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Detected Issues</h3>
+   482→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredIssues.length}/{issues.length})</span>
+   483→                      </div>
+   484→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   485→                        <div className="relative flex-1 sm:flex-none">
+   486→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   487→                          <Input
+   488→                            placeholder="Search issues..."
+   489→                            value={issueSearch}
+   490→                            onChange={(e) => setIssueSearch(e.target.value)}
+   491→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   492→                          />
+   493→                          {issueSearch && (
+   494→                            <button
+   495→                              onClick={() => setIssueSearch('')}
+   496→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   497→                            >
+   498→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   499→                            </button>
+   500→                          )}
+   501→                        </div>
+   502→                        <button
+   503→                          onClick={() => setShowFilters(!showFilters)}
+   504→                          className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
+   505→                            showFilters
+   506→                              ? 'bg-[#dc2626] text-white border-[#dc2626]'
+   507→                              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   508→                          }`}
+   509→                        >
+   510→                          <Filter className="h-3.5 w-3.5" />
+   511→                          Filters
+   512→                        </button>
+   513→                        <ExportButton
+   514→                          data={filteredIssues as unknown as Record<string, unknown>[]}
+   515→                          filename="sentinel-issues"
+   516→                          columns={['agentName', 'title', 'severity', 'status', 'failureRate', 'affectedRuns', 'createdAt']}
+   517→                          label="Export"
+   518→                        />
+   519→                      </div>
+   520→                    </div>
+   521→
+   522→                    {showFilters && (
+   523→                      <motion.div
+   524→                        initial={{ height: 0, opacity: 0 }}
+   525→                        animate={{ height: 'auto', opacity: 1 }}
+   526→                        exit={{ height: 0, opacity: 0 }}
+   527→                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
+   528→                      >
+   529→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Severity:</span>
+   530→                        {['all', 'P0', 'P1', 'P2'].map((sev) => (
+   531→                          <button
+   532→                            key={sev}
+   533→                            onClick={() => setIssueSeverityFilter(sev)}
+   534→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   535→                              issueSeverityFilter === sev
+   536→                                ? sev === 'P0' ? 'bg-[#dc2626] text-white'
+   537→                                  : sev === 'P1' ? 'bg-amber-500 text-white'
+   538→                                  : sev === 'P2' ? 'bg-gray-500 text-white'
+   539→                                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   540→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   541→                            }`}
+   542→                          >
+   543→                            {sev === 'all' ? 'All' : sev}
+   544→                          </button>
+   545→                        ))}
+   546→                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+   547→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Status:</span>
+   548→                        {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
+   549→                          <button
+   550→                            key={stat}
+   551→                            onClick={() => setIssueStatusFilter(stat)}
+   552→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   553→                              issueStatusFilter === stat
+   554→                                ? 'bg-[#dc2626] text-white'
+   555→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   556→                            }`}
+   557→                          >
+   558→                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   559→                          </button>
+   560→                        ))}
+   561→                      </motion.div>
+   562→                    )}
+   563→
+   564→                    {filteredIssues.length === 0 ? (
+   565→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   566→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   567→                        <p className="text-sm">No issues match your filters</p>
+   568→                      </div>
+   569→                    ) : (
+   570→                      <IssuesPanel issues={filteredIssues} onUpdate={fetchIssues} />
+   571→                    )}
+   572→                  </div>
+   573→                )}
+   574→
+   575→                {/* API HEALTH TAB */}
+   576→                {activeTab === 'api-health' && (
+   577→                  <ApiHealthPanel />
+   578→                )}
+   579→
+   580→                {/* ALERTS TAB */}
+   581→                {activeTab === 'alerts' && (
+   582→                  <div>
+   583→                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+   584→                      <div className="lg:col-span-2">
+   585→                        <div className="flex items-center gap-2 mb-3">
+   586→                          <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   587→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
+   588→                        </div>
+   589→                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">
+   590→                          <ActivityTimeline />
+   591→                        </div>
+   592→                      </div>
+   593→                      <div className="lg:col-span-3">
+   594→                        <AlertFeed alerts={alertItems} />
+   595→                      </div>
+   596→                    </div>
+   597→                  </div>
+   598→                )}
+   599→              </>
+   600→            )}
+   601→          </div>
+   602→        </motion.div>
+   603→      </div>
+   604→
+   605→      <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
+   606→      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+   607→      {comparisonAgents && (
+   608→        <AgentComparison
+   609→          agentA={comparisonAgents[0]}
+   610→          agentB={comparisonAgents[1]}
+   611→          open={!!comparisonAgents}
+   612→          onClose={() => { setComparisonAgents(null); setComparisonIds([]); }}
+   613→        />
+   614→      )}
+   615→    </section>
+   616→  );
+   617→}
+   618→

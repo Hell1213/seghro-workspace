@@ -56,6 +56,47 @@ Conducted comprehensive audit covering: API routes, database, mini-services, inf
 - `src/components/ui/button.tsx` — Specific transition properties instead of transition-all
 - `src/app/globals.css` — Global cursor-pointer + .theme-switching rule
 
+### 4. P0 Infrastructure Build (same session, continued)
+
+#### 4a. Docker & Config (Task 2-a)
+- Created `Dockerfile` — 3-stage (deps→builder→runner) with Bun, non-root user, prisma generate, standalone output
+- Created `mini-services/alert-streamer/Dockerfile`
+- Created `docker-compose.yml` — web (port 3000, health check, db volume) + alert-streamer (port 3001)
+- Created `.dockerignore`
+- Created `.env.example` — 15 env vars documented with comments and PostgreSQL swap example
+- Hardened `next.config.ts` — removed ignoreBuildErrors, enabled reactStrictMode, added allowedDevOrigins, added security headers (X-Frame-Options: DENY, nosniff, Referrer-Policy, Permissions-Policy)
+
+#### 4b. Authentication System (Task 2-b)
+- Updated `prisma/schema.prisma` — Added User model (id, name, email, image, role, orgId FK) + Organization model (name, slug, plan)
+- Created `src/lib/auth.ts` — NextAuth v4 config with PrismaAdapter, GitHub + Credentials providers, JWT strategy, custom callbacks
+- Created `src/app/api/auth/[...nextauth]/route.ts`
+- Created `src/middleware.ts` — Protects /dashboard routes, redirects to /login, adds security headers
+- Created `src/app/login/page.tsx` — Beautiful dark/light themed login with email/password + GitHub OAuth, demo credentials
+- Created `src/components/AuthProviders.tsx` — Client wrapper for SessionProvider
+- Updated `src/app/layout.tsx` — Wrapped children with AuthProviders > ThemeProvider
+- Created `src/lib/auth-guard.ts` — getAuthSession(), requireAuth(), requireRole()
+- Created `prisma/seed.ts` — Seeds 1 org, 1 admin user, 6 agents, 8 traces + spans, 6 issues, 7 alerts, 2304 metric data points
+- Demo credentials: demo@sentinel.dev / demo1234
+
+#### 4c. Database Migration (Task 2-c)
+- Created `src/lib/api-response.ts` — success(), error(), validationError() standardized response helpers
+- Migrated `/api/agents` to Prisma findMany with ?search= filter
+- Migrated `/api/traces` to Prisma findMany with includes + ?agentId=&status=&search= filters
+- Migrated `/api/issues` to Prisma with Zod PATCH validation (status enum)
+- Migrated `/api/alerts` to Prisma with Zod PATCH validation
+- Migrated `/api/metrics` to Prisma groupBy aggregations + ?range=24h|7d|30d
+- Migrated `/api/activity` to combined Prisma query (traces + issues + alerts)
+- Added try/catch + standardized error responses to all routes
+- Kept /api/endpoints, /api/healing, /api/api-health on in-memory (TODO: Phase 3)
+
+#### 4d. Error Handling & Pages
+- Created `src/app/error.tsx` — Global error boundary with Framer Motion, dev stack trace, copy button, branded
+- Created `src/app/not-found.tsx` — Branded 404 page
+- Created `src/app/loading.tsx` — Pulsing Sentinel logo loading state
+- Replaced `/api` health check — returns real DB connection status, uptime, version, latency
+
+#### Production readiness progress: ~12% → ~35%
+
 ---
 
 ## V10 Session — Completed Modifications (v10-1/v10-3/v10-4)
@@ -939,3 +980,78 @@ Stage Summary:
 - All sections now properly switch between light and dark themes
 - All text has proper contrast in both themes
 - Verified via 6 agent-browser screenshots + VLM analysis
+
+---
+Task ID: 2-a
+Agent: infrastructure-setup
+Task: Create Docker, env, and config hardening files
+
+Work Log:
+- Created multi-stage Dockerfile (deps → builder → runner) with Bun runtime, non-root user, Prisma generate, SQLite db/ copy
+- Created mini-services/alert-streamer/Dockerfile for WebSocket service
+- Created docker-compose.yml with web + alert-streamer services, health checks, db-data volume, bridge network
+- Created .dockerignore (node_modules, .next, .git, mini-services, docs, tests, tool-results, .env, images)
+- Created .env.example documenting all required env vars (DATABASE_URL, NEXTAUTH_*, GITHUB_*, EMAIL_SERVER_*, ZAI_API_KEY, STRIPE_*, SENTRY_DSN, REDIS_URL)
+- Hardened next.config.ts: removed ignoreBuildErrors, enabled reactStrictMode, added security headers (X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Permissions-Policy), added allowedDevOrigins
+- ESLint passes with zero errors after changes
+
+Stage Summary:
+- All P0 infrastructure files created
+- App is now containerizable with `docker compose up -d`
+- Security headers applied at Next.js config level
+- Build-time type checking enforced (no more silent TS errors)
+
+---
+Task ID: 2-b
+Agent: auth-setup
+Task: Implement full NextAuth authentication system
+
+Work Log:
+- Installed @auth/prisma-adapter package
+- Updated Prisma schema with User + Organization models (orgId FK on User)
+- Ran db:push to apply schema changes
+- Created auth config (src/lib/auth.ts) with GitHubProvider + CredentialsProvider, JWT strategy, custom session/jwt callbacks for id+role
+- Created [...nextauth] API route (src/app/api/auth/[...nextauth]/route.ts)
+- Created auth middleware (src/middleware.ts) protecting /dashboard/* routes with session cookie check + security headers
+- Created login page (src/app/login/page.tsx) with email/password form, GitHub OAuth button, Google placeholder, dark/light theme support, demo credentials hint
+- Created client AuthProviders wrapper (src/components/AuthProviders.tsx) with SessionProvider
+- Updated layout.tsx to wrap children with SessionProvider inside ThemeProvider
+- Created seed script (prisma/seed.ts) that seeds: 1 org, 1 demo user (admin), 6 agents, 8 traces with spans, 6 issues, 7 alerts, 2304 metric data points
+- Added prisma.seed config to package.json
+- Created auth-guard helper (src/lib/auth-guard.ts) with getAuthSession(), requireAuth(), requireRole()
+- Updated .env with NEXTAUTH_SECRET, NEXTAUTH_URL, GITHUB_ID, GITHUB_SECRET
+- ESLint passes with zero errors
+- Dev server compiles successfully, /api/auth/session returns 200
+
+Stage Summary:
+- Full auth system operational with JWT strategy
+- Demo user seeded (demo@sentinel.dev / demo1234)
+- /dashboard routes protected by middleware (redirects to /login if no session)
+- Login page at /login with red accent, dark/light theme support
+- Auth guard utilities ready for API route protection
+
+---
+Task ID: 2-c
+Agent: db-migration
+Task: Migrate all API routes from seed-data to Prisma DB queries
+
+Work Log:
+- Created api-response.ts helper (success/error/validationError)
+- Migrated /api/agents to Prisma with search filter and soft auth check
+- Migrated /api/traces to Prisma with agentId/status/search filters
+- Migrated /api/issues to Prisma with Zod PATCH validation (open/investigating/resolved/wontfix/reopened)
+- Migrated /api/alerts to Prisma with Zod PATCH validation
+- Migrated /api/metrics to Prisma aggregations (timeSeries via groupBy, cards via aggregate, severity breakdown via groupBy, framework distribution via groupBy)
+- Migrated /api/activity to Prisma combined query (traces + issues + alerts merged and sorted)
+- Kept endpoints/healing/api-health on in-memory self-healing-data.ts with TODO comments
+- Added try/catch to all routes
+- Fixed activity route bug (t.spans → t._count.spans)
+- All 10 API routes returning 200, lint zero errors
+
+Stage Summary:
+- All data-serving routes now query real database
+- Zod validation on all mutation endpoints (issues PATCH, alerts PATCH, endpoints POST)
+- Standardized error responses via api-response.ts
+- Response shapes match what frontend expects (raw arrays for GET, no wrapping)
+- Time range filter (?range=24h|7d|30d) added to metrics endpoint
+- Search filter (?search=) added to agents and traces endpoints

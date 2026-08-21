@@ -1,17 +1,55 @@
-import { NextResponse } from "next/server";
-import { alerts } from "@/lib/seed-data";
+import { NextRequest } from 'next/server';
+import { db } from '@/lib/db';
+import { z } from 'zod';
+import { error, validationError } from '@/lib/api-response';
+
+const patchSchema = z.object({
+  id: z.string().min(1),
+});
 
 export async function GET() {
-  return NextResponse.json(alerts);
+  try {
+    const alerts = await db.alert.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return Response.json(
+      alerts.map((a) => ({
+        id: a.id,
+        title: a.title,
+        message: a.message ?? '',
+        severity: a.severity,
+        status: a.status,
+        channel: a.channel,
+        createdAt: a.createdAt.toISOString(),
+      })),
+    );
+  } catch (err) {
+    console.error('[/api/alerts] Error:', err);
+    return error('Failed to fetch alerts');
+  }
 }
 
-export async function PATCH(request: Request) {
-  const body = await request.json();
-  const { id } = body;
-  const alert = alerts.find((a) => a.id === id);
-  if (alert) {
-    alert.status = "read";
-    return NextResponse.json(alert);
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const parsed = patchSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return validationError(parsed.error.flatten());
+    }
+
+    const updated = await db.alert.update({
+      where: { id: parsed.data.id },
+      data: { status: 'read' },
+    });
+
+    return Response.json({
+      id: updated.id,
+      status: updated.status,
+    });
+  } catch (err) {
+    console.error('[/api/alerts] PATCH Error:', err);
+    return error('Failed to update alert');
   }
-  return NextResponse.json({ error: "Alert not found" }, { status: 404 });
 }
