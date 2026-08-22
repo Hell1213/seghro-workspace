@@ -1,0 +1,762 @@
+     1→'use client';
+     2→
+     3→import { motion, useInView } from 'framer-motion';
+     4→import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+     5→import {
+     6→  LayoutDashboard,
+     7→  GitBranch,
+     8→  AlertTriangle,
+     9→  Bell,
+    10→  Bot,
+    11→  Clock,
+    12→  Search,
+    13→  Filter,
+    14→  X,
+    15→  GitCompareArrows,
+    16→  BarChart3,
+    17→  Heart,
+    18→  Settings,
+    19→  User,
+    20→  Eye,
+    21→  Plus,
+    22→  Zap,
+    23→} from 'lucide-react';
+    24→import { useSession } from 'next-auth/react';
+    25→import { useAutoRefresh } from '@/hooks/use-auto-refresh';
+    26→import { Input } from '@/components/ui/input';
+    27→import { Badge } from '@/components/ui/badge';
+    28→import { ExportButton } from '@/components/ui/ExportButton';
+    29→import { MetricCards } from './MetricCards';
+    30→import { AgentGrid } from './AgentGrid';
+    31→import { TraceViewer } from './TraceViewer';
+    32→import { IssuesPanel } from './IssuesPanel';
+    33→import { AlertFeed } from './AlertFeed';
+    34→import { ActivityTimeline } from './ActivityTimeline';
+    35→import { MetricsCharts } from './MetricsCharts';
+    36→import { McpPanel } from './McpPanel';
+    37→import { AgentDetailSheet } from './AgentDetailSheet';
+    38→import { AgentComparison } from './AgentComparison';
+    39→import { TraceWaterfall } from './TraceWaterfall';
+    40→import { DashboardSkeleton } from './DashboardSkeleton';
+    41→import { ApiHealthPanel } from './ApiHealthPanel';
+    42→import { SettingsPanel } from './SettingsPanel';
+    43→import { CreateAgentDialog } from './CreateAgentDialog';
+    44→import { SimulateTraceDialog } from './SimulateTraceDialog';
+    45→
+    46→type TabId = 'overview' | 'traces' | 'issues' | 'alerts' | 'api-health';
+    47→
+    48→const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
+    49→  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    50→  { id: 'traces', label: 'Traces', icon: GitBranch },
+    51→  { id: 'issues', label: 'Issues', icon: AlertTriangle },
+    52→  { id: 'alerts', label: 'Alerts', icon: Bell },
+    53→  { id: 'api-health', label: 'API Health', icon: Heart },
+    54→];
+    55→
+    56→interface Agent {
+    57→  id: string;
+    58→  name: string;
+    59→  description: string;
+    60→  status: 'active' | 'degraded' | 'critical' | 'inactive';
+    61→  framework: string;
+    62→  lastRunAt: string;
+    63→  totalRuns: number;
+    64→  errorRate: number;
+    65→  avgLatency: number;
+    66→}
+    67→
+    68→interface Trace {
+    69→  id: string;
+    70→  agentId: string;
+    71→  traceId: string;
+    72→  status: string;
+    73→  duration: number;
+    74→  inputTokens: number;
+    75→  outputTokens: number;
+    76→  createdAt: string;
+    77→  spans: any[];
+    78→}
+    79→
+    80→interface Issue {
+    81→  id: string;
+    82→  agentId: string;
+    83→  agentName: string;
+    84→  title: string;
+    85→  description: string;
+    86→  severity: 'P0' | 'P1' | 'P2';
+    87→  status: string;
+    88→  affectedRuns: number;
+    89→  totalRuns: number;
+    90→  failureRate: number;
+    91→  rootCause: string;
+    92→  suggestedFix: string;
+    93→  createdAt: string;
+    94→  updatedAt: string;
+    95→}
+    96→
+    97→interface AlertItem {
+    98→  id: string;
+    99→  title: string;
+   100→  message: string;
+   101→  severity: string;
+   102→  status: string;
+   103→  channel: string;
+   104→  createdAt: string;
+   105→}
+   106→
+   107→export function DashboardSection() {
+   108→  const ref = useRef<HTMLDivElement>(null);
+   109→  const isInView = useInView(ref, { once: true, margin: '-100px' });
+   110→  const { data: session } = useSession();
+   111→  const [activeTab, setActiveTab] = useState<TabId>('overview');
+   112→
+   113→  // Auth-aware banner: demo mode vs authenticated user
+   114→  const isAuthenticated = !!session?.user?.email;
+   115→  const [bannerDismissed, setBannerDismissed] = useState(false);
+   116→
+   117→  useEffect(() => {
+   118→    try {
+   119→      const dismissed = localStorage.getItem('aegis-auth-banner-dismissed');
+   120→      if (dismissed === 'true') setBannerDismissed(true);
+   121→    } catch { /* ignore */ }
+   122→  }, []);
+   123→
+   124→  const handleDismissBanner = useCallback(() => {
+   125→    setBannerDismissed(true);
+   126→    try {
+   127→      localStorage.setItem('aegis-auth-banner-dismissed', 'true');
+   128→    } catch { /* ignore */ }
+   129→  }, []);
+   130→
+   131→  const showBanner = useMemo(
+   132→    () => !bannerDismissed,
+   133→    [bannerDismissed]
+   134→  );
+   135→
+   136→  // Sync tab to URL hash
+   137→  useEffect(() => {
+   138→    const hash = window.location.hash.replace('#dashboard-', '').replace('#', '');
+   139→    if (['overview', 'traces', 'issues', 'alerts', 'api-health'].includes(hash)) {
+   140→      setActiveTab(hash as TabId);
+   141→    }
+   142→  }, []);
+   143→
+   144→  const handleTabChange = (tab: TabId) => {
+   145→    setActiveTab(tab);
+   146→    window.history.replaceState(null, '', `#dashboard-${tab}`);
+   147→  };
+   148→  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+   149→  const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
+   150→  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
+   151→  const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
+   152→  const [showWaterfall, setShowWaterfall] = useState(true);
+   153→  const [settingsOpen, setSettingsOpen] = useState(false);
+   154→  const [createAgentOpen, setCreateAgentOpen] = useState(false);
+   155→  const [simulateTraceOpen, setSimulateTraceOpen] = useState(false);
+   156→  const [agents, setAgents] = useState<Agent[]>([]);
+   157→  const [traces, setTraces] = useState<Trace[]>([]);
+   158→  const [issues, setIssues] = useState<Issue[]>([]);
+   159→  const [alertItems, setAlertItems] = useState<AlertItem[]>([]);
+   160→  const [metrics, setMetrics] = useState<any>(null);
+   161→  const [loading, setLoading] = useState(true);
+   162→
+   163→  // Search and filter state
+   164→  const [issueSearch, setIssueSearch] = useState('');
+   165→  const [issueSeverityFilter, setIssueSeverityFilter] = useState<string>('all');
+   166→  const [issueStatusFilter, setIssueStatusFilter] = useState<string>('all');
+   167→  const [showFilters, setShowFilters] = useState(false);
+   168→
+   169→  // Trace search and filter state
+   170→  const [traceSearch, setTraceSearch] = useState('');
+   171→  const [traceStatusFilter, setTraceStatusFilter] = useState<string>('all');
+   172→
+   173→  // Filter persistence via localStorage
+   174→  useEffect(() => {
+   175→    try {
+   176→      const saved = localStorage.getItem('aegis-dash-filters');
+   177→      if (saved) {
+   178→        const f = JSON.parse(saved);
+   179→        if (f.traceSearch) setTraceSearch(f.traceSearch);
+   180→        if (f.issueSearch) setIssueSearch(f.issueSearch);
+   181→        if (f.traceStatusFilter) setTraceStatusFilter(f.traceStatusFilter);
+   182→        if (f.issueSeverityFilter) setIssueSeverityFilter(f.issueSeverityFilter);
+   183→        if (f.issueStatusFilter) setIssueStatusFilter(f.issueStatusFilter);
+   184→      }
+   185→    } catch { /* ignore */ }
+   186→  }, []);
+   187→
+   188→  useEffect(() => {
+   189→    try {
+   190→      localStorage.setItem('aegis-dash-filters', JSON.stringify({
+   191→        traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter,
+   192→      }));
+   193→    } catch { /* ignore */ }
+   194→  }, [traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter]);
+   195→
+   196→  // Track latest alert ID for pulse animation on the badge
+   197→  const [latestAlertId, setLatestAlertId] = useState<string | null>(null);
+   198→
+   199→  // WebSocket for real-time alerts
+   200→  // NOTE: The alert-streamer mini-service has been upgraded to Socket.IO.
+   201→  //       The raw WebSocket connection below still works because Socket.IO serves
+   202→  //       a plain HTTP server that can accept ws:// upgrades. To fully migrate the
+   203→  //       client to Socket.IO, replace this block with the socket.io-client library
+   204→  //       and listen for 'new-alert' events from the 'alerts' room.
+   205→  useEffect(() => {
+   206→    let ws: WebSocket | null = null;
+   207→    try {
+   208→      ws = new WebSocket('ws://localhost:3001/?XTransformPort=3001');
+   209→      ws.onmessage = (event) => {
+   210→        try {
+   211→          const data = JSON.parse(event.data);
+   212→          if (data.type === 'new_alert') {
+   213→            setAlertItems((prev) => [data.alert, ...prev].slice(0, 20));
+   214→            setLatestAlertId(data.alert.id);
+   215→          }
+   216→        } catch (e) {
+   217→          // ignore parse errors
+   218→        }
+   219→      };
+   220→    } catch (e) {
+   221→      // WebSocket not available, that's ok
+   222→    }
+   223→    return () => {
+   224→      if (ws) ws.close();
+   225→    };
+   226→  }, []);
+   227→
+   228→  const fetchAgents = useCallback(async () => {
+   229→    try {
+   230→      const res = await fetch('/api/agents').then((r) => r.json());
+   231→      setAgents(res);
+   232→    } catch {
+   233→      // silently fail
+   234→    }
+   235→  }, []);
+   236→
+   237→  const fetchAlerts = useCallback(async () => {
+   238→    try {
+   239→      const res = await fetch('/api/alerts').then((r) => r.json());
+   240→      setAlertItems(res);
+   241→    } catch {
+   242→      // silently fail
+   243→    }
+   244→  }, []);
+   245→
+   246→  const fetchIssues = useCallback(async () => {
+   247→    try {
+   248→      const issuesRes = await fetch('/api/issues').then((r) => r.json());
+   249→      setIssues(issuesRes);
+   250→    } catch {
+   251→      // silently fail
+   252→    }
+   253→  }, []);
+   254→
+   255→  const fetchTraces = useCallback(async () => {
+   256→    try {
+   257→      const tracesRes = await fetch('/api/traces').then((r) => r.json());
+   258→      setTraces(tracesRes);
+   259→    } catch {
+   260→      // silently fail
+   261→    }
+   262→  }, []);
+   263→
+   264→  // Auto-refresh: agents every 60s, alerts every 15s
+   265→  useAutoRefresh(fetchAgents, 60000);
+   266→  useAutoRefresh(fetchAlerts, 15000);
+   267→
+   268→  useEffect(() => {
+   269→    async function fetchData() {
+   270→      try {
+   271→        const [agentsRes, tracesRes, issuesRes, alertsRes, metricsRes] =
+   272→          await Promise.all([
+   273→            fetch('/api/agents').then((r) => r.json()),
+   274→            fetch('/api/traces').then((r) => r.json()),
+   275→            fetch('/api/issues').then((r) => r.json()),
+   276→            fetch('/api/alerts').then((r) => r.json()),
+   277→            fetch('/api/metrics').then((r) => r.json()),
+   278→          ]);
+   279→        setAgents(agentsRes);
+   280→        setTraces(tracesRes);
+   281→        setIssues(issuesRes);
+   282→        setAlertItems(alertsRes);
+   283→        setMetrics(metricsRes);
+   284→      } catch (e) {
+   285→        console.error('Failed to fetch dashboard data:', e);
+   286→      } finally {
+   287→        setLoading(false);
+   288→      }
+   289→    }
+   290→    fetchData();
+   291→  }, []);
+   292→
+   293→  const handleCompareAgent = (agent: Agent) => {
+   294→    if (comparisonIds.includes(agent.id)) {
+   295→      setComparisonIds(comparisonIds.filter(id => id !== agent.id));
+   296→      return;
+   297→    }
+   298→    const newIds = [...comparisonIds, agent.id].slice(-2);
+   299→    setComparisonIds(newIds);
+   300→    if (newIds.length === 2) {
+   301→      const a = agents.find(a => a.id === newIds[0]);
+   302→      const b = agents.find(a => a.id === newIds[1]);
+   303→      if (a && b) {
+   304→        setComparisonAgents([a, b]);
+   305→        setComparisonIds([]);
+   306→      }
+   307→    }
+   308→  };
+   309→
+   310→  const filteredTraces = traces.filter((t) => {
+   311→    const matchesAgent = !selectedAgentId || t.agentId === selectedAgentId;
+   312→    const matchesSearch = !traceSearch ||
+   313→      t.traceId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   314→      t.agentId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   315→      t.status.toLowerCase().includes(traceSearch.toLowerCase());
+   316→    const matchesStatus = traceStatusFilter === 'all' || t.status === traceStatusFilter;
+   317→    return matchesAgent && matchesSearch && matchesStatus;
+   318→  });
+   319→
+   320→  const filteredIssues = issues.filter((issue) => {
+   321→    const matchesSearch = !issueSearch ||
+   322→      issue.title.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   323→      issue.agentName.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   324→      issue.description.toLowerCase().includes(issueSearch.toLowerCase());
+   325→    const matchesSeverity = issueSeverityFilter === 'all' || issue.severity === issueSeverityFilter;
+   326→    const matchesStatus = issueStatusFilter === 'all' || issue.status === issueStatusFilter;
+   327→    return matchesSearch && matchesSeverity && matchesStatus;
+   328→  });
+   329→
+   330→  return (
+   331→    <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50 dark:bg-gray-900/30">
+   332→      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+   333→      <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   334→        {/* Section header */}
+   335→        <motion.div
+   336→          initial={{ opacity: 0, y: 20 }}
+   337→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   338→          transition={{ duration: 0.6 }}
+   339→          className="text-center mb-10"
+   340→        >
+   341→          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
+   342→            <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
+   343→            Live Demo
+   344→          </div>
+   345→          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+   346→            The{'\u00A0'}
+   347→            <span className="text-gradient">observability dashboard</span>
+   348→          </h2>
+   349→          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+   350→            Real-time monitoring of AI agent traces, issues, and metrics —
+   351→            everything running live below.
+   352→          </p>
+   353→        </motion.div>
+   354→
+   355→        {/* Dashboard container */}
+   356→        <motion.div
+   357→          initial={{ opacity: 0, y: 30 }}
+   358→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   359→          transition={{ duration: 0.7, delay: 0.1 }}
+   360→          className="animated-border rounded-2xl bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
+   361→        >
+   362→          {/* Dashboard header with tabs */}
+   363→          <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
+   364→            <div className="flex items-center justify-between">
+   365→              <div data-tour="tabs" className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+   366→                {tabs.map((tab) => {
+   367→                  const Icon = tab.icon;
+   368→                  const isActive = activeTab === tab.id;
+   369→                  return (
+   370→                    <button
+   371→                      key={tab.id}
+   372→                      onClick={() => handleTabChange(tab.id)}
+   373→                      className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-all duration-200 ${
+   374→                        isActive
+   375→                          ? 'text-[#dc2626] border-[#dc2626]'
+   376→                          : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
+   377→                      }`}
+   378→                    >
+   379→                      <Icon className="h-4 w-4" />
+   380→                      {tab.label}
+   381→                      {isActive && (
+   382→                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full" />
+   383→                      )}
+   384→                      {tab.id === 'issues' && issues.length > 0 && (
+   385→                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+   386→                          {issues.filter((i) => i.status !== 'resolved').length}
+   387→                        </span>
+   388→                      )}
+   389→                      {tab.id === 'alerts' && alertItems.filter((a) => a.status === 'unread').length > 0 && (
+   390→                        <motion.span
+   391→                          key={latestAlertId ?? 'badge'}
+   392→                          initial={{ scale: 1.3 }}
+   393→                          animate={{ scale: 1 }}
+   394→                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+   395→                          className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white"
+   396→                        >
+   397→                          {alertItems.filter((a) => a.status === 'unread').length}
+   398→                        </motion.span>
+   399→                      )}
+   400→                    </button>
+   401→                  );
+   402→                })}
+   403→              </div>
+   404→              <div className="hidden sm:flex items-center gap-2">
+   405→                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+   406→                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+   407→                  Live
+   408→                </div>
+   409→                <button
+   410→                  onClick={() => setSettingsOpen(true)}
+   411→                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+   412→                  aria-label="Open settings"
+   413→                >
+   414→                  <Settings className="h-4 w-4" />
+   415→                </button>
+   416→              </div>
+   417→            </div>
+   418→          </div>
+   419→
+   420→          {/* Auth-aware banner: Demo Mode or Authenticated User */}
+   421→          {showBanner && (
+   422→            <div className="border-b border-gray-100 dark:border-gray-800">
+   423→              <div className="px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+   424→                {isAuthenticated ? (
+   425→                  <div className="flex items-center gap-2.5 min-w-0">
+   426→                    <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+   427→                      <User className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+   428→                    </div>
+   429→                    <div className="min-w-0">
+   430→                      <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
+   431→                        Signed in as{' '}
+   432→                        <span className="font-semibold text-gray-900 dark:text-gray-100">{session.user.name || session.user.email}</span>
+   433→                      </p>
+   434→                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{(session.user as { role?: string }).role || 'viewer'}</p>
+   435→                    </div>
+   436→                    <Badge variant="outline" className="ml-2 shrink-0 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] px-2">
+   437→                      Authenticated
+   438→                    </Badge>
+   439→                  </div>
+   440→                ) : (
+   441→                  <div className="flex items-center gap-2.5 min-w-0">
+   442→                    <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+   443→                      <Eye className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+   444→                    </div>
+   445→                    <p className="text-xs text-amber-700 dark:text-amber-300 min-w-0">
+   446→                      <span className="font-semibold">Demo Mode</span>{' — '}
+   447→                      <span className="text-amber-600 dark:text-amber-400">Viewing simulated data</span>
+   448→                    </p>
+   449→                    <Badge variant="outline" className="ml-2 shrink-0 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 text-[10px] px-2">
+   450→                      Unauthenticated
+   451→                    </Badge>
+   452→                  </div>
+   453→                )}
+   454→                <button
+   455→                  onClick={handleDismissBanner}
+   456→                  className="h-6 w-6 rounded-md flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 focus-ring"
+   457→                  aria-label="Dismiss banner"
+   458→                >
+   459→                  <X className="h-3.5 w-3.5" />
+   460→                </button>
+   461→              </div>
+   462→            </div>
+   463→          )}
+   464→
+   465→          {/* Dashboard content */}
+   466→          <div className="p-4 sm:p-6">
+   467→            {loading ? (
+   468→              <DashboardSkeleton />
+   469→            ) : (
+   470→              <>
+   471→                {/* OVERVIEW TAB */}
+   472→                {activeTab === 'overview' && (
+   473→                  <div className="space-y-6"
+   474→                  >
+   475→                    {metrics?.cards && (
+   476→                      <div data-tour="metrics">
+   477→                        <MetricCards cards={metrics.cards} />
+   478→                      </div>
+   479→                    )}
+   480→
+   481→                    <div className="grid lg:grid-cols-3 gap-6">
+   482→                      <div className="lg:col-span-2">
+   483→                        <div className="flex items-center justify-between gap-2 mb-4">
+   484→                          <div className="flex items-center gap-2">
+   485→                            <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   486→                            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
+   487→                            <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
+   488→                          </div>
+   489→                          <button
+   490→                            onClick={() => setCreateAgentOpen(true)}
+   491→                            className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors focus-ring"
+   492→                          >
+   493→                            <Plus className="h-3.5 w-3.5" />
+   494→                            Create Agent
+   495→                          </button>
+   496→                        </div>
+   497→                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} onCompare={handleCompareAgent} comparisonIds={comparisonIds} />
+   498→                        {comparisonIds.length === 1 && (
+   499→                          <p className="text-xs text-[#dc2626] mt-2 flex items-center gap-1.5"><GitCompareArrows className="h-3 w-3" />1 agent selected — click another to compare</p>
+   500→                        )}
+   501→                        </div>
+   502→                      </div>
+   503→                      <div>
+   504→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
+   505→                        <div data-tour="mcp"><McpPanel /></div>
+   506→                      </div>
+   507→                    </div>
+   508→
+   509→                    {metrics?.timeSeries && metrics?.severityBreakdown && metrics?.frameworkDistribution && (
+   510→                      <div data-tour="charts">
+   511→                        <MetricsCharts
+   512→                          timeSeries={metrics.timeSeries}
+   513→                          severity={metrics.severityBreakdown}
+   514→                          frameworks={metrics.frameworkDistribution}
+   515→                        />
+   516→                      </div>
+   517→                    )}
+   518→                  </div>
+   519→                )}
+   520→
+   521→                {/* TRACES TAB */}
+   522→                {activeTab === 'traces' && (
+   523→                  <div>
+   524→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   525→                      <div className="flex items-center gap-2">
+   526→                        <GitBranch className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   527→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
+   528→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
+   529→                      </div>
+   530→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   531→                        <button
+   532→                          onClick={() => setSimulateTraceOpen(true)}
+   533→                          className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors focus-ring shrink-0"
+   534→                        >
+   535→                          <Zap className="h-3.5 w-3.5" />
+   536→                          Simulate Trace
+   537→                        </button>
+   538→                        <div className="relative flex-1 sm:flex-none">
+   539→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   540→                          <Input
+   541→                            placeholder="Search traces..."
+   542→                            value={traceSearch}
+   543→                            onChange={(e) => setTraceSearch(e.target.value)}
+   544→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   545→                          />
+   546→                          {traceSearch && (
+   547→                            <button
+   548→                              onClick={() => setTraceSearch('')}
+   549→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   550→                            >
+   551→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   552→                            </button>
+   553→                          )}
+   554→                        </div>
+   555→                        <ExportButton
+   556→                          data={filteredTraces as unknown as Record<string, unknown>[]}
+   557→                          filename="aegis-traces"
+   558→                          columns={['traceId', 'agentId', 'status', 'duration', 'inputTokens', 'outputTokens', 'createdAt']}
+   559→                          label="Export"
+   560→                        />
+   561→                      </div>
+   562→                    </div>
+   563→
+   564→                    <div className="flex flex-wrap items-center gap-2 mb-4">
+   565→                      <button
+   566→                        onClick={() => setShowWaterfall(!showWaterfall)}
+   567→                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
+   568→                      >
+   569→                        <BarChart3 className="h-3 w-3" />
+   570→                        Waterfall
+   571→                      </button>
+   572→                      {selectedAgentId && (
+   573→                        <button
+   574→                          onClick={() => setSelectedAgentId(null)}
+   575→                          className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/20 hover:bg-[#dc2626]/20 transition-colors"
+   576→                        >
+   577→                          ← All agents
+   578→                        </button>
+   579→                      )}
+   580→                      {['all', 'success', 'error'].map((stat) => (
+   581→                        <button
+   582→                          key={stat}
+   583→                          onClick={() => setTraceStatusFilter(stat)}
+   584→                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   585→                            traceStatusFilter === stat
+   586→                              ? stat === 'success' ? 'bg-emerald-500 text-white'
+   587→                                : stat === 'error' ? 'bg-[#dc2626] text-white'
+   588→                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   589→                              : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   590→                          }`}
+   591→                        >
+   592→                          {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   593→                        </button>
+   594→                      ))}
+   595→                    </div>
+   596→
+   597→                    {filteredTraces.length === 0 ? (
+   598→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   599→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   600→                        <p className="text-sm">No traces match your filters</p>
+   601→                      </div>
+   602→                    ) : (
+   603→                      <TraceViewer traces={filteredTraces} />
+   604→                    )}
+   605→                    {showWaterfall && filteredTraces.length > 0 && (
+   606→                      <div className="mt-6">
+   607→                        <div className="flex items-center gap-2 mb-3">
+   608→                          <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   609→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
+   610→                        </div>
+   611→                        <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
+   612→                      </div>
+   613→                    )}
+   614→                  </div>
+   615→                )}
+   616→
+   617→                {/* ISSUES TAB */}
+   618→                {activeTab === 'issues' && (
+   619→                  <div>
+   620→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   621→                      <div className="flex items-center gap-2">
+   622→                        <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
+   623→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Detected Issues</h3>
+   624→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredIssues.length}/{issues.length})</span>
+   625→                      </div>
+   626→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   627→                        <div className="relative flex-1 sm:flex-none">
+   628→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   629→                          <Input
+   630→                            placeholder="Search issues..."
+   631→                            value={issueSearch}
+   632→                            onChange={(e) => setIssueSearch(e.target.value)}
+   633→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   634→                          />
+   635→                          {issueSearch && (
+   636→                            <button
+   637→                              onClick={() => setIssueSearch('')}
+   638→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   639→                            >
+   640→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   641→                            </button>
+   642→                          )}
+   643→                        </div>
+   644→                        <button
+   645→                          onClick={() => setShowFilters(!showFilters)}
+   646→                          className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
+   647→                            showFilters
+   648→                              ? 'bg-[#dc2626] text-white border-[#dc2626]'
+   649→                              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   650→                          }`}
+   651→                        >
+   652→                          <Filter className="h-3.5 w-3.5" />
+   653→                          Filters
+   654→                        </button>
+   655→                        <ExportButton
+   656→                          data={filteredIssues as unknown as Record<string, unknown>[]}
+   657→                          filename="aegis-issues"
+   658→                          columns={['agentName', 'title', 'severity', 'status', 'failureRate', 'affectedRuns', 'createdAt']}
+   659→                          label="Export"
+   660→                        />
+   661→                      </div>
+   662→                    </div>
+   663→
+   664→                    {showFilters && (
+   665→                      <motion.div
+   666→                        initial={{ height: 0, opacity: 0 }}
+   667→                        animate={{ height: 'auto', opacity: 1 }}
+   668→                        exit={{ height: 0, opacity: 0 }}
+   669→                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
+   670→                      >
+   671→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Severity:</span>
+   672→                        {['all', 'P0', 'P1', 'P2'].map((sev) => (
+   673→                          <button
+   674→                            key={sev}
+   675→                            onClick={() => setIssueSeverityFilter(sev)}
+   676→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   677→                              issueSeverityFilter === sev
+   678→                                ? sev === 'P0' ? 'bg-[#dc2626] text-white'
+   679→                                  : sev === 'P1' ? 'bg-amber-500 text-white'
+   680→                                  : sev === 'P2' ? 'bg-gray-500 text-white'
+   681→                                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   682→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   683→                            }`}
+   684→                          >
+   685→                            {sev === 'all' ? 'All' : sev}
+   686→                          </button>
+   687→                        ))}
+   688→                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+   689→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Status:</span>
+   690→                        {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
+   691→                          <button
+   692→                            key={stat}
+   693→                            onClick={() => setIssueStatusFilter(stat)}
+   694→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   695→                              issueStatusFilter === stat
+   696→                                ? 'bg-[#dc2626] text-white'
+   697→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   698→                            }`}
+   699→                          >
+   700→                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   701→                          </button>
+   702→                        ))}
+   703→                      </motion.div>
+   704→                    )}
+   705→
+   706→                    {filteredIssues.length === 0 ? (
+   707→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   708→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   709→                        <p className="text-sm">No issues match your filters</p>
+   710→                      </div>
+   711→                    ) : (
+   712→                      <IssuesPanel issues={filteredIssues} onUpdate={fetchIssues} />
+   713→                    )}
+   714→                  </div>
+   715→                )}
+   716→
+   717→                {/* API HEALTH TAB */}
+   718→                {activeTab === 'api-health' && (
+   719→                  <ApiHealthPanel />
+   720→                )}
+   721→
+   722→                {/* ALERTS TAB */}
+   723→                {activeTab === 'alerts' && (
+   724→                  <div>
+   725→                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+   726→                      <div className="lg:col-span-2">
+   727→                        <div className="flex items-center gap-2 mb-3">
+   728→                          <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   729→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
+   730→                        </div>
+   731→                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">
+   732→                          <ActivityTimeline />
+   733→                        </div>
+   734→                      </div>
+   735→                      <div className="lg:col-span-3">
+   736→                        <AlertFeed alerts={alertItems} onUpdate={fetchAlerts} />
+   737→                      </div>
+   738→                    </div>
+   739→                  </div>
+   740→                )}
+   741→              </>
+   742→            )}
+   743→          </div>
+   744→        </motion.div>
+   745→      </div>
+   746→
+   747→      <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
+   748→      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+   749→      <CreateAgentDialog open={createAgentOpen} onOpenChange={setCreateAgentOpen} onSuccess={fetchAgents} />
+   750→      <SimulateTraceDialog open={simulateTraceOpen} onOpenChange={setSimulateTraceOpen} onSuccess={fetchTraces} agents={agents.map(a => ({ id: a.id, name: a.name, framework: a.framework }))} />
+   751→      {comparisonAgents && (
+   752→        <AgentComparison
+   753→          agentA={comparisonAgents[0]}
+   754→          agentB={comparisonAgents[1]}
+   755→          open={!!comparisonAgents}
+   756→          onClose={() => { setComparisonAgents(null); setComparisonIds([]); }}
+   757→        />
+   758→      )}
+   759→    </section>
+   760→  );
+   761→}
+   762→

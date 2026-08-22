@@ -7,9 +7,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   // Allow cross-origin requests from preview / sandbox iframes
-  allowedDevOrigins: [
-    "http://localhost:3000",
-  ],
+  allowedDevOrigins: ["*"],
 
   // Security headers applied to every response (dev / preview-safe)
   async headers() {

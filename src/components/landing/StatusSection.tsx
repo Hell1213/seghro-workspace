@@ -263,7 +263,7 @@ export function StatusSection() {
             <span className="text-gradient">Real-time infrastructure health</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
-            Monitor service uptime, latency, and incident history across all Aegis subsystems.
+            Monitor service uptime, latency, and incident history across all Seghro subsystems.
           </p>
         </motion.div>
 

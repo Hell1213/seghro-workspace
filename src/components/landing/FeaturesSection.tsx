@@ -37,7 +37,7 @@ const features: Feature[] = [
     icon: Bell,
     title: 'Live Alerts',
     description:
-      'Get notified on what matters. Aegis triages issues by severity and alerts you in Slack, PagerDuty, or webhooks — no noise.',
+      'Get notified on what matters. Seghro triages issues by severity and alerts you in Slack, PagerDuty, or webhooks — no noise.',
     color: 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700',
     iconColor: 'text-gray-600 dark:text-gray-400',
     live: true,
@@ -56,7 +56,7 @@ const features: Feature[] = [
     icon: BarChart3,
     title: 'Online Evals',
     description:
-      "After deploying a fix, Aegis creates an online eval. If a regression occurs, you'll know immediately.",
+      "After deploying a fix, Seghro creates an online eval. If a regression occurs, you'll know immediately.",
     color: 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700',
     iconColor: 'text-gray-600 dark:text-gray-400',
     status: 'info',
@@ -65,7 +65,7 @@ const features: Feature[] = [
     icon: Heart,
     title: 'Self-Healing APIs',
     description:
-      'Circuit breakers, auto-fallback, request queuing, and adaptive timeouts. If Stripe, OpenAI, or any API degrades — Aegis heals it automatically.',
+      'Circuit breakers, auto-fallback, request queuing, and adaptive timeouts. If Stripe, OpenAI, or any API degrades — Seghro heals it automatically.',
     color: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/50',
     iconColor: 'text-emerald-600 dark:text-emerald-400',
     status: 'degraded',

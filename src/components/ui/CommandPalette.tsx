@@ -69,7 +69,7 @@ const NAV_SECTIONS = [
 /*  Local-storage recent items                                         */
 /* ------------------------------------------------------------------ */
 
-const RECENT_KEY = 'aegis-cmd-palette-recent';
+const RECENT_KEY = 'seghro-cmd-palette-recent';
 const MAX_RECENT = 5;
 
 function getRecentItems(): string[] {
@@ -391,11 +391,11 @@ function CommandPalettePanel({
       {
         id: 'qa-copy',
         label: 'Copy Install Command',
-        secondary: 'pip install aegis-sdk',
+        secondary: 'pip install seghro-sdk',
         icon: ClipboardCopy,
         group: 'navigation',
         action: () => {
-          navigator.clipboard.writeText('pip install aegis-sdk');
+          navigator.clipboard.writeText('pip install seghro-sdk');
           toast.success('Copied to clipboard!');
           onClose();
         },
@@ -623,7 +623,7 @@ function CommandPalettePanel({
             </div>
             <div className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
               <Command className="h-3 w-3" />
-              <span>aegis</span>
+              <span>seghro</span>
             </div>
           </div>
         </div>

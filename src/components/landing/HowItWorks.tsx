@@ -10,8 +10,8 @@ const steps = [
     icon: Scan,
     title: 'Instrument',
     description:
-      'Add one line to wrap your agent. Aegis automatically captures every span, token, tool call, and model invocation — zero configuration needed.',
-    code: `from aegis import trace_agent\n\nagent = trace_agent(my_agent, \n  project_id="aegis_3a18f6d4")`,
+      'Add one line to wrap your agent. Seghro automatically captures every span, token, tool call, and model invocation — zero configuration needed.',
+    code: `from seghro import trace_agent\n\nagent = trace_agent(my_agent, \n  project_id="seghro_3a18f6d4")`,
     accent: 'text-[#dc2626]',
   },
   {
@@ -19,7 +19,7 @@ const steps = [
     icon: AlertTriangle,
     title: 'Detect',
     description:
-      'Aegis audits every trace against your agent\'s system prompt and groups recurring failures into issues — even silent ones that return success codes.',
+      'Seghro audits every trace against your agent\'s system prompt and groups recurring failures into issues — even silent ones that return success codes.',
     code: `# 33 of 50 runs affected\nISSUE: Fabricated customer IDs\nSEVERITY: P0 Critical\nROOT CAUSE: Missing guardrail`,
     accent: 'text-gray-600 dark:text-gray-300',
   },
@@ -28,7 +28,7 @@ const steps = [
     icon: Code,
     title: 'Fix',
     description:
-      'Pull context into your coding agent via MCP. Aegis provides the exact trace, root cause, and suggested fix — resolve without context-switching.',
+      'Pull context into your coding agent via MCP. Seghro provides the exact trace, root cause, and suggested fix — resolve without context-switching.',
     code: `# lemma · get_incident (inc_4f2a)\n└ P0 — fabricated customer IDs\n\n# Update prompts/support.md\n+ Require email before any lookup`,
     accent: 'text-[#dc2626]',
   },
@@ -37,7 +37,7 @@ const steps = [
     icon: CheckCircle2,
     title: 'Validate',
     description:
-      'After deploying the fix, Aegis creates an online eval scoring every new trace against the failure mode. Regressions trigger immediate alerts.',
+      'After deploying the fix, Seghro creates an online eval scoring every new trace against the failure mode. Regressions trigger immediate alerts.',
     code: `EVAL: refund_policy_violations\nSTATUS: all passing ✓\nNEW TRACES: 24 scored clean\nREGRESSION: none detected`,
     accent: 'text-gray-600 dark:text-gray-300',
   },

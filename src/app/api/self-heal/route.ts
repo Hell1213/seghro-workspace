@@ -93,13 +93,13 @@ async function analyzeWithLLM(ctx: HealingContext) {
       // Parse and log the LLM decision
       try {
         const parsed = JSON.parse(content);
-        console.log("[Aegis Self-Heal] LLM decision:", JSON.stringify(parsed));
+        console.log("[Seghro Self-Heal] LLM decision:", JSON.stringify(parsed));
       } catch {
-        console.log("[Aegis Self-Heal] LLM analysis (raw):", content.slice(0, 200));
+        console.log("[Seghro Self-Heal] LLM analysis (raw):", content.slice(0, 200));
       }
     }
   } catch (err) {
-    console.error("[Aegis Self-Heal] LLM analysis failed:", err);
+    console.error("[Seghro Self-Heal] LLM analysis failed:", err);
   }
 }
 

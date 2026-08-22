@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { AegisLogo } from '@/components/AegisLogo';
+import { SeghroLogo } from '@/components/SeghroLogo';
 import { toast } from 'sonner';
 
 const footerLinks: Record<string, { label: string; href?: string }[]> = {
@@ -29,7 +29,7 @@ const footerLinks: Record<string, { label: string; href?: string }[]> = {
     { label: 'About', href: '#features' },
     { label: 'Blog', href: '#changelog' },
     { label: 'Careers', href: '#features' },
-    { label: 'Contact', href: 'mailto:team@aegis.dev' },
+    { label: 'Contact', href: 'mailto:team@seghro.dev' },
   ],
   Resources: [
     { label: 'Documentation', href: '#docs' },
@@ -47,11 +47,11 @@ const footerLinks: Record<string, { label: string; href?: string }[]> = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://x.com/aegis_dev', label: 'Twitter' },
-  { icon: Github, href: 'https://github.com/aegis-ai', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/aegis-ai', label: 'LinkedIn' },
-  { icon: Youtube, href: 'https://youtube.com/@aegis_ai', label: 'YouTube' },
-  { icon: DiscordIcon, href: 'https://discord.gg/aegis', label: 'Discord' },
+  { icon: Twitter, href: 'https://x.com/seghro_dev', label: 'Twitter' },
+  { icon: Github, href: 'https://github.com/seghro-ai', label: 'GitHub' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/seghro-ai', label: 'LinkedIn' },
+  { icon: Youtube, href: 'https://youtube.com/@seghro_ai', label: 'YouTube' },
+  { icon: DiscordIcon, href: 'https://discord.gg/seghro', label: 'Discord' },
 ];
 
 function DiscordIcon({ className }: { className?: string }) {
@@ -161,7 +161,7 @@ export function Footer() {
           {/* Brand + Social Links + Newsletter */}
           <motion.div variants={itemVariants} className="col-span-2 md:col-span-1">
             <div className="mb-4">
-              <AegisLogo iconSize={32} textClass="text-lg" />
+              <SeghroLogo iconSize={32} textClass="text-lg" />
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-400 mt-1 mb-3">
               Production-grade AI agent observability
@@ -241,7 +241,7 @@ export function Footer() {
           className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4"
         >
           <p className="text-xs text-gray-400 dark:text-gray-400">
-            &copy; 2025 Aegis{' '}
+            &copy; 2025 Seghro{' '}
             <span className="inline-block h-1 w-1 rounded-full bg-[#dc2626] mx-1.5 align-middle" />
             Built with &hearts; for AI reliability
           </p>

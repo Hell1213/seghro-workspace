@@ -1550,3 +1550,96 @@ Stage Summary:
 - Stripe billing integration (checkout session, customer portal, plan limits)
 - Deep audit of all remaining interactive elements
 - Production deployment configuration
+---
+Task ID: 6-a
+Agent: rename-landing
+Task: Rename Aegis/Sentinel to Seghro in all landing page components
+
+Work Log:
+- Navbar.tsx: Replaced `AegisLogo` import (from `@/components/AegisLogo` → `@/components/SeghroLogo`) and `<AegisLogo` → `<SeghroLogo` JSX usage
+- Footer.tsx: Replaced `AegisLogo` import + JSX, `mailto:team@aegis.dev` → `team@seghro.dev`, 4 social URLs (x.com, github, linkedin, youtube) from aegis to seghro, discord.gg/aegis → discord.gg/seghro, copyright `© 2025 Aegis` → `© 2025 Seghro`
+- HeroSection.tsx: No changes needed (no Aegis/Sentinel references)
+- FeaturesSection.tsx: Replaced 3 “Aegis” → “Seghro” in feature descriptions (Live Alerts, Online Evals, Self-Healing APIs)
+- HowItWorks.tsx: Replaced 4 “Aegis” → “Seghro” in step descriptions; replaced `from aegis import trace_agent` → `from seghro import trace_agent` and `project_id="aegis_3a18f6d4"` → `seghro_3a18f6d4` in code block
+- DocsSection.tsx: Replaced “Create your Aegis workspace” → “Seghro workspace”; “Aegis SDK” → “Seghro SDK”; `@aegis/sdk` → `@seghro/sdk` (3 occurrences); “Aegis tracer” → “Seghro tracer”; `AegisClient` → `SeghroClient`; `api.aegis.ai` → `api.seghro.ai`; “Aegis dashboard” → “Seghro dashboard”; “all Aegis features” → “all Seghro features”; “integrate Aegis into” → “integrate Seghro into”. Preserved `SENTINEL_API_KEY` (env variable name per rules)
+- TestimonialsSection.tsx: Replaced 5 “Aegis” → “Seghro” references in testimonial tweets
+- PricingSection.tsx: Replaced `sales@aegis.dev` → `sales@seghro.dev` in toast description
+- NewsletterSection.tsx: Replaced “Aegis Weekly” → “Seghro Weekly” heading
+- IntegrationSection.tsx: Replaced `pip install aegis-ai` → `pip install seghro-ai` and `from aegis import trace_agent` → `from seghro import trace_agent` in install code block
+- ChangelogSection.tsx: Replaced “Aegis Launch” → “Seghro Launch” in v1.0 release title; “all Aegis features” → “all Seghro features” in section description
+- StatusSection.tsx: Replaced “all Aegis subsystems” → “all Seghro subsystems” in section description
+- CtaSection.tsx: Replaced `team@aegis.dev` → `team@seghro.dev` in toast description
+- Verified zero remaining Aegis/Sentinel/aegis/sentinel references across all 13 landing component files
+
+Stage Summary:
+- All 13 landing page components updated (12 files modified, HeroSection had no changes needed)
+- Total: ~35 individual text replacements across the landing section
+- All `AegisLogo` → `SeghroLogo` import paths and JSX usages updated
+- All `aegis.dev` email addresses updated to `seghro.dev`
+- All `aegis_` prefixed identifiers in code examples updated to `seghro_`
+- All social media URLs containing aegis updated to seghro
+- `SENTINEL_API_KEY` preserved as-is (env variable name exclusion rule)
+- Zero remaining Aegis/Sentinel/aegis/sentinel references confirmed via grep
+
+---
+Task ID: 6-b
+Agent: rename-app-files
+Task: Rename Aegis/Sentinel to Seghro in app files and lib
+
+Work Log:
+- layout.tsx: Replaced 7 instances of "Aegis" with "Seghro" (title, OG siteName, alt text, jsonLd name/creator); SITE_URL and OG SVG text already changed by prior task
+- login/page.tsx: `AegisLogo` import → `SeghroLogo` from `@/components/SeghroLogo`; 2x `<AegisLogo>` → `<SeghroLogo>`; `demo@aegis.dev` → `demo@seghro.dev`
+- register/page.tsx: `AegisLogo` import → `SeghroLogo` from `@/components/SeghroLogo`; 2x `<AegisLogo>` → `<SeghroLogo>`; "and Aegis automatically" → "and Seghro automatically"
+- error.tsx: `console.error('[Aegis Error Boundary]'` → `'[Seghro Error Boundary]'`; brand name span; `support@aegis.dev` → `support@seghro.dev` (href + text)
+- loading.tsx: "Loading Aegis..." → "Loading Seghro..."
+- robots.ts: `https://aegis.dev` → `https://seghro.dev`
+- sitemap.ts: `https://aegis.dev` → `https://seghro.dev`
+- DashboardSection.tsx: 3x `aegis-auth-banner-dismissed` → `seghro-auth-banner-dismissed`; 2x `aegis-dash-filters` → `seghro-dash-filters`; `filename="aegis-traces"` → `"seghro-traces"`; `filename="aegis-issues"` → `"seghro-issues"`
+- McpPanel.tsx: 2x `prefix: 'aegis'` → `prefix: 'seghro'`; `aegis-mcp` → `seghro-mcp`
+- CommandPalette.tsx: `aegis-cmd-palette-recent` → `seghro-cmd-palette-recent`; 2x `pip install aegis-sdk` → `pip install seghro-sdk`; `<span>aegis</span>` → `<span>seghro</span>`
+- DashboardTour.tsx: `aegis-tour-done` → `seghro-tour-done` (both getItem and setItem)
+- seed-data.ts: Comment "Aegis AI Agent Observability" → "Seghro AI Agent Observability"
+- self-healing-agent.ts: Comment + system prompt "Aegis's Self-Healing Agent" → "Seghro's Self-Healing Agent"
+- self-healing-data.ts: `redis.internal.aegis.ai` → `redis.internal.seghro.ai`; `mcp.github.com/aegis` → `mcp.github.com/seghro`
+- webhook-dispatcher.ts: Comment "Aegis V8" → "Seghro V8"; `aegis-default-secret` → `seghro-default-secret`
+- api-key-auth.ts: Comment `aegis_sk_` → `seghro_sk_`; `key.startsWith('aegis_sk_')` → `key.startsWith('seghro_sk_')`
+- api-keys/route.ts: `aegis_sk_` → `seghro_sk_`; keyPrefix slice adjusted 17→18 for longer prefix
+- self-heal/route.ts: 3x `[Aegis Self-Heal]` → `[Seghro Self-Heal]` in console.log/error
+- Verified: zero remaining aegis/Aegis/sentinel/Sentinel references across all 18 edited files
+
+Stage Summary:
+- All 18 specified files updated with Aegis/Sentinel → Seghro renames
+- No file renames performed (content-only edits as instructed)
+- Env var names (NEXTAUTH_URL, SENTINEL_API_KEY, etc.) left untouched
+- Feature descriptions ("AI Agent Observability", etc.) preserved
+- KeyPrefix slice index corrected from 17 to 18 to account for longer `seghro_sk_` prefix
+
+---
+Task ID: 1
+Agent: main
+Task: Fix login/network bombing, rename app to Seghro, create dashboard route
+
+Work Log:
+- Analyzed user screenshot: ERR_TOO_MANY_REDIRECTS between /dashboard and /dashboard/ (301/308 loop)
+- ROOT CAUSE: No /dashboard/page.tsx existed. Login redirected to /dashboard but no page was there, causing infinite redirect loop
+- Diagnosed credential login failure: demo email on login page was demo@aegis.dev but DB had demo@sentinel.dev
+- Diagnosed Google OAuth failure: .env was missing GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET (only had DATABASE_URL)
+- Fixed .env: restored all auth env vars with seghro branding
+- Fixed next.config.ts: allowedDevOrigins changed to ["*"] to support proxy domains
+- Created /src/app/dashboard/layout.tsx: auth-guarded layout with Seghro branding, user badge, sign out button
+- Created /src/app/dashboard/page.tsx: renders DashboardSection component
+- Created /src/components/SeghroLogo.tsx: new logo component with "Seghro" text
+- Updated DB: demo user email changed from demo@sentinel.dev to demo@seghro.dev
+- Launched 2 parallel subagents to rename Aegis/Sentinel to Seghro across 30+ files
+- Subagent 6-a: Renamed in all 13 landing page components (Navbar, Footer, Hero, Features, HowItWorks, Docs, Testimonials, Pricing, Newsletter, Integration, Changelog, Status, Cta)
+- Subagent 6-b: Renamed in 18 app/lib/api files (layout, login, register, error, loading, robots, sitemap, DashboardSection, McpPanel, CommandPalette, DashboardTour, seed-data, self-healing-agent, self-healing-data, webhook-dispatcher, api-key-auth, api-keys route, self-heal route)
+- Verified zero remaining Aegis/Sentinel references in src/
+
+Stage Summary:
+- Login with demo@seghro.dev / demo1234 WORKS - redirects to /dashboard
+- Dashboard renders with full data: metric cards, agent grid, tabs (Overview/Traces/Issues/Alerts/API Health)
+- All pages return HTTP 200 (login, register, home, auth/providers)
+- All 3 auth providers loaded: google, github, credentials
+- App fully renamed to "Seghro" across entire codebase (30+ files, ~50+ replacements)
+- Lint passes clean with zero errors
+- Google Console URIs needed for OAuth to work in sandbox

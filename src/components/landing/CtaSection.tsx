@@ -51,7 +51,7 @@ export function CtaSection() {
             <Button
               variant="outline"
               size="lg"
-              onClick={() => toast.info('Demo request received! Check your email for the calendar link.', { description: 'team@aegis.dev' })}
+              onClick={() => toast.info('Demo request received! Check your email for the calendar link.', { description: 'team@seghro.dev' })}
               className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 font-semibold px-8 h-12 text-base rounded-xl transition-all"
             >
               Book a Demo

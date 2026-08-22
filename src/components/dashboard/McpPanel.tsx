@@ -6,13 +6,13 @@ import { Terminal, ChevronRight, Check, Loader2, Sparkles } from 'lucide-react';
 
 const mcpSteps = [
   {
-    prefix: 'aegis',
+    prefix: 'seghro',
     command: 'get_incident (inc_4f2a)',
     output: 'P0 — Fabricated customer identifiers in support-agent',
     type: 'command' as const,
   },
   {
-    prefix: 'aegis',
+    prefix: 'seghro',
     command: 'get_traces (customer_id_fabrication)',
     output: '12 traces · root cause: missing identification guardrail',
     type: 'command' as const,
@@ -46,7 +46,7 @@ export function McpPanel() {
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-800">
         <div className="flex items-center gap-2">
           <Terminal className="h-3.5 w-3.5 text-gray-500" />
-          <span className="text-xs font-mono text-gray-400">aegis-mcp</span>
+          <span className="text-xs font-mono text-gray-400">seghro-mcp</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-2.5 w-2.5 rounded-full bg-red-500" />

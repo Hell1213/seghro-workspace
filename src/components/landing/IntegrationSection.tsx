@@ -26,10 +26,10 @@ export function IntegrationSection() {
   const isInView = useInView(ref, { once: true, margin: '-60px' });
   const [copied, setCopied] = useState(false);
 
-  const installCode = `pip install aegis-ai
+  const installCode = `pip install seghro-ai
 
 # In your agent file
-from aegis import trace_agent
+from seghro import trace_agent
 
 agent = trace_agent(your_agent,
   project_id="your_project_id"

@@ -58,7 +58,7 @@ const releases: ReleaseEntry[] = [
   },
   {
     version: 'v1.0',
-    title: 'Aegis Launch',
+    title: 'Seghro Launch',
     description:
       'Real-time AI agent observability with 5 dashboard tabs, 6 monitored agents, trace explorer with span details, issue detection, MCP fix workflow integration, and particle network hero animation.',
     tags: ['Launch', 'Dashboard', 'Traces', 'MCP'],
@@ -107,7 +107,7 @@ export function ChangelogSection() {
             <span className="text-gradient">new</span>
           </h2>
           <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
-            Latest updates, improvements, and fixes across all Aegis features.
+            Latest updates, improvements, and fixes across all Seghro features.
           </p>
         </motion.div>
 

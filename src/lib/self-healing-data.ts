@@ -141,7 +141,7 @@ export const apiEndpoints: ApiEndpoint[] = [
   {
     id: 'ep-redis',
     name: 'Redis Cache',
-    baseUrl: 'https://redis.internal.aegis.ai',
+    baseUrl: 'https://redis.internal.seghro.ai',
     category: 'database',
     status: 'healthy',
     circuitBreaker: 'closed',
@@ -159,7 +159,7 @@ export const apiEndpoints: ApiEndpoint[] = [
   {
     id: 'ep-github-mcp',
     name: 'GitHub MCP Server',
-    baseUrl: 'https://mcp.github.com/aegis',
+    baseUrl: 'https://mcp.github.com/seghro',
     category: 'mcp',
     status: 'degraded',
     circuitBreaker: 'closed',

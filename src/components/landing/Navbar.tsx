@@ -4,7 +4,7 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-
 import { useState, useEffect, useMemo } from 'react';
 import { Menu, X, Moon, Sun, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { AegisLogo } from '@/components/AegisLogo';
+import { SeghroLogo } from '@/components/SeghroLogo';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
@@ -88,7 +88,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <AegisLogo
+            <SeghroLogo
               iconSize={32}
               textClass={`text-lg transition-[text-shadow,drop-shadow] duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}
             />

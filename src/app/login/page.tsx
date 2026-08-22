@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, Github, Loader2, AlertCircle, Check, TrendingUp, Sparkles, Target } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { AegisLogo } from '@/components/AegisLogo'
+import { SeghroLogo } from '@/components/SeghroLogo'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -74,7 +74,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="relative z-10">
-          <AegisLogo iconSize={36} white textClass="text-xl" />
+          <SeghroLogo iconSize={36} white textClass="text-xl" />
         </div>
 
         {/* Center content */}
@@ -139,7 +139,7 @@ export default function LoginPage() {
         >
           {/* Mobile-only logo */}
           <div className="lg:hidden flex justify-center mb-8">
-            <AegisLogo iconSize={36} textClass="text-xl" />
+            <SeghroLogo iconSize={36} textClass="text-xl" />
           </div>
 
           {/* Header */}
@@ -297,7 +297,7 @@ export default function LoginPage() {
           {/* Demo credentials */}
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-600">
-              Demo: <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo@aegis.dev</code> / <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo1234</code>
+              Demo: <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo@seghro.dev</code> / <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo1234</code>
             </p>
           </div>
         </motion.div>

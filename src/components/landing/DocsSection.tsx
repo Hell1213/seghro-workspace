@@ -69,25 +69,25 @@ function CopyButton({ text }: { text: string }) {
 const gettingStartedSteps = [
   {
     step: 1,
-    title: 'Create your Aegis workspace',
+    title: 'Create your Seghro workspace',
     description:
       'Sign up and create a workspace to organize your agents, traces, and alerts.',
   },
   {
     step: 2,
     title: 'Install the SDK',
-    description: 'Add the Aegis SDK to your project.',
-    code: 'npm install @aegis/sdk',
+    description: 'Add the Seghro SDK to your project.',
+    code: 'npm install @seghro/sdk',
   },
   {
     step: 3,
     title: 'Add the middleware to your agent',
     description:
-      'Wrap your agent calls with the Aegis tracer to capture every span and token.',
-    code: `import { traceAgent } from '@aegis/sdk';
+      'Wrap your agent calls with the Seghro tracer to capture every span and token.',
+    code: `import { traceAgent } from '@seghro/sdk';
 
 const agent = traceAgent(myAgent, {
-  projectId: 'aegis_3a18f6d4',
+  projectId: 'seghro_3a18f6d4',
   enableSelfHealing: true,
 });`,
   },
@@ -95,7 +95,7 @@ const agent = traceAgent(myAgent, {
     step: 4,
     title: 'View traces in real-time',
     description:
-      'Open the Aegis dashboard to see traces, metrics, and auto-detected issues as they happen.',
+      'Open the Seghro dashboard to see traces, metrics, and auto-detected issues as they happen.',
   },
 ];
 
@@ -179,11 +179,11 @@ function GettingStartedCard() {
 const codeExamples = [
   {
     title: 'Initialize the SDK',
-    code: `import { AegisClient } from '@aegis/sdk';
+    code: `import { SeghroClient } from '@seghro/sdk';
 
-const client = new AegisClient({
+const client = new SeghroClient({
   apiKey: process.env.SENTINEL_API_KEY,
-  baseUrl: 'https://api.aegis.ai',
+  baseUrl: 'https://api.seghro.ai',
 });`,
   },
   {
@@ -396,7 +396,7 @@ function ApiReferenceTable({ isInView }: { isInView: boolean }) {
           API Reference
         </h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          RESTful endpoints for programmatic access to all Aegis features
+          RESTful endpoints for programmatic access to all Seghro features
         </p>
       </div>
       <div className="overflow-x-auto scrollbar-thin">
@@ -477,7 +477,7 @@ export function DocsSection() {
           </h2>
           <p className="mt-4 text-lg text-gray-500 dark:text-gray-300 max-w-2xl mx-auto">
             Comprehensive guides, API references, and code examples to integrate
-            Aegis into your AI agent stack in minutes.
+            Seghro into your AI agent stack in minutes.
           </p>
         </motion.div>
 

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { AlertCircle, Eye, EyeOff, Loader2, TrendingUp, Sparkles, Target } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { AegisLogo } from '@/components/AegisLogo'
+import { SeghroLogo } from '@/components/SeghroLogo'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -109,7 +109,7 @@ export default function RegisterPage() {
 
         {/* Logo */}
         <div className="relative z-10">
-          <AegisLogo iconSize={36} white textClass="text-xl" />
+          <SeghroLogo iconSize={36} white textClass="text-xl" />
         </div>
 
         {/* Center content */}
@@ -136,7 +136,7 @@ export default function RegisterPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base text-white/80 leading-relaxed"
           >
-            Connect your AI agents, and Aegis automatically surfaces failures, optimizes performance, and self-heals issues — you just monitor the dashboard.
+            Connect your AI agents, and Seghro automatically surfaces failures, optimizes performance, and self-heals issues — you just monitor the dashboard.
           </motion.p>
         </div>
 
@@ -174,7 +174,7 @@ export default function RegisterPage() {
         >
           {/* Mobile-only logo */}
           <div className="lg:hidden flex justify-center mb-8">
-            <AegisLogo iconSize={36} textClass="text-xl" />
+            <SeghroLogo iconSize={36} textClass="text-xl" />
           </div>
 
           {/* Header */}
