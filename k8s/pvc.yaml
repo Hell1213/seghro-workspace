@@ -1,0 +1,23 @@
+# PersistentVolumeClaim for SQLite database storage
+# Adjust storageClassName based on your cloud provider:
+#   GKE:        standard (pd-standard) or premium-rwo (pd-ssd)
+#   EKS:        gp2 or gp3
+#   AKS:        default (managed-premium)
+#   Local/Docker: standard (hostPath)
+#   Longhorn:   longhorn
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sentinel-db-pvc
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/part-of: sentinel
+    app.kubernetes.io/component: storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # Adjust storageClassName for your cloud/environment
+  storageClassName: standard

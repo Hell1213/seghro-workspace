@@ -13,9 +13,11 @@ model User {
   email         String       @unique
   emailVerified DateTime?
   image         String?
+  password      String?
   role          String       @default("viewer")
   orgId         String?
   organization  Organization? @relation(fields: [orgId], references: [id])
+  apiKeys       ApiKey[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -113,4 +115,27 @@ model Metric {
   value     Float
   timestamp DateTime @default(now())
   labels    String?
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  keyHash    String    @unique
+  keyPrefix  String
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+}
+
+model Webhook {
+  id        String   @id @default(cuid())
+  orgId     String?
+  url       String
+  events    String   // JSON array of event types
+  secret    String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

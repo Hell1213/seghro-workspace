@@ -1,0 +1,81 @@
+# Prometheus configuration for Sentinel observability stack
+# Deploy alongside Prometheus via the prometheus-operator or standalone
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'sentinel-production'
+    monitor: 'prometheus'
+
+# Alertmanager configuration (update with your Alertmanager address)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+rule_files:
+  - /etc/prometheus/alert-rules.yml
+
+scrape_configs:
+  # Sentinel web application — Next.js on port 3000
+  # NOTE: /metrics endpoint must expose Prometheus-format metrics
+  #       (e.g., via @prometheus/gc-stats or custom middleware)
+  - job_name: 'sentinel-web'
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - sentinel
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)
+        replacement: \1
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+    # Static fallback for non-K8s environments:
+    # static_configs:
+    #   - targets:
+    #       - 'sentinel-web:3000'
+    #     labels:
+    #       service: 'web'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Sentinel alert streamer — WebSocket service on port 3001
+  - job_name: 'sentinel-alert-streamer'
+    kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+            - sentinel
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_name]
+        action: keep
+        regex: sentinel-alert-streamer
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)
+        replacement: \1
+    # Static fallback for non-K8s environments:
+    # static_configs:
+    #   - targets:
+    #       - 'sentinel-alert-streamer:3001'
+    #     labels:
+    #       service: 'alert-streamer'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']

@@ -1,7 +1,17 @@
-import { WebSocketServer, WebSocket } from 'ws';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
 
 const PORT = 3001;
-const wss = new WebSocketServer({ port: PORT });
+
+const httpServer = createServer();
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+  pingInterval: 10000,
+  pingTimeout: 5000,
+});
 
 const alertTemplates = [
   {
@@ -57,46 +67,70 @@ function generateAlert() {
   };
 }
 
-console.log(`Alert streamer WebSocket server running on ws://localhost:${PORT}`);
+console.log(`[AlertStreamer] Socket.IO server starting on port ${PORT}`);
 
-wss.on('connection', (ws) => {
-  console.log('Client connected');
+io.on('connection', (socket) => {
+  console.log(`[AlertStreamer] Client connected: ${socket.id}`);
+
+  // Join the 'alerts' room for alert broadcasting
+  socket.join('alerts');
+  console.log(`[AlertStreamer] Socket ${socket.id} joined room: alerts`);
 
   // Send an initial alert on connect
-  ws.send(JSON.stringify({ type: 'new_alert', alert: generateAlert() }));
+  const initialAlert = generateAlert();
+  socket.emit('new-alert', initialAlert);
 
-  // Stream new alerts every 8-15 seconds
-  const interval = setInterval(() => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'new_alert', alert: generateAlert() }));
-    }
-  }, 8000 + Math.random() * 7000);
-
-  // Stream API health events every 8 seconds
-  const healthInterval = setInterval(() => {
-    if (ws.readyState === WebSocket.OPEN) {
-      const endpoints = ['ep-tavily', 'ep-anthropic-claude', 'ep-openai-gpt4o', 'ep-github-mcp'];
-      const randomEp = endpoints[Math.floor(Math.random() * endpoints.length)];
-      const events = [
-        { type: 'health_check_passed', endpointId: randomEp, latency: Math.floor(Math.random() * 500 + 50), status: 'healthy' },
-        { type: 'latency_spike', endpointId: randomEp, latency: Math.floor(Math.random() * 1500 + 500), status: 'degraded' },
-        { type: 'health_check_failed', endpointId: 'ep-tavily', latency: 0, status: 'down' },
-        { type: 'circuit_breaker_state', endpointId: randomEp, newState: ['closed', 'half-open', 'open'][Math.floor(Math.random() * 3)] },
-      ];
-      const event = events[Math.floor(Math.random() * events.length)];
-      ws.send(JSON.stringify({ type: 'api_health_event', event }));
-    }
-  }, 8000);
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    clearInterval(interval);
-    clearInterval(healthInterval);
+  // Handle custom ping/pong
+  socket.on('ping', () => {
+    socket.emit('pong', { timestamp: Date.now() });
   });
 
-  ws.on('error', (err) => {
-    console.error('WebSocket error:', err.message);
-    clearInterval(interval);
-    clearInterval(healthInterval);
+  socket.on('disconnect', (reason) => {
+    console.log(`[AlertStreamer] Client disconnected: ${socket.id} (reason: ${reason})`);
   });
+
+  socket.on('error', (err) => {
+    console.error(`[AlertStreamer] Socket error on ${socket.id}:`, err);
+  });
+});
+
+// Broadcast alerts to 'alerts' room every 8-15 seconds
+const alertInterval = setInterval(() => {
+  const alert = generateAlert();
+  io.to('alerts').emit('new-alert', alert);
+}, 8000 + Math.random() * 7000);
+
+// Broadcast API health events every 8 seconds
+const healthInterval = setInterval(() => {
+  const endpoints = ['ep-tavily', 'ep-anthropic-claude', 'ep-openai-gpt4o', 'ep-github-mcp'];
+  const randomEp = endpoints[Math.floor(Math.random() * endpoints.length)];
+  const events = [
+    { type: 'health_check_passed', endpointId: randomEp, latency: Math.floor(Math.random() * 500 + 50), status: 'healthy' },
+    { type: 'latency_spike', endpointId: randomEp, latency: Math.floor(Math.random() * 1500 + 500), status: 'degraded' },
+    { type: 'health_check_failed', endpointId: 'ep-tavily', latency: 0, status: 'down' },
+    { type: 'circuit_breaker_state', endpointId: randomEp, newState: ['closed', 'half-open', 'open'][Math.floor(Math.random() * 3)] },
+  ];
+  const event = events[Math.floor(Math.random() * events.length)];
+  io.to('alerts').emit('api-health-event', event);
+}, 8000);
+
+httpServer.listen(PORT, () => {
+  console.log(`[AlertStreamer] Socket.IO server listening on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('[AlertStreamer] Shutting down...');
+  clearInterval(alertInterval);
+  clearInterval(healthInterval);
+  io.close();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('[AlertStreamer] Shutting down...');
+  clearInterval(alertInterval);
+  clearInterval(healthInterval);
+  io.close();
+  process.exit(0);
 });

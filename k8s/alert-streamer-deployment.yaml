@@ -1,0 +1,74 @@
+# Alert streamer — WebSocket mini-service for real-time alert push
+# Runs as a separate lightweight deployment on port 3001
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alert-streamer-deployment
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-alert-streamer
+    app.kubernetes.io/part-of: sentinel
+    app.kubernetes.io/component: alert-streamer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sentinel-alert-streamer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sentinel-alert-streamer
+        app.kubernetes.io/part-of: sentinel
+        app.kubernetes.io/component: alert-streamer
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: sentinel-alert-streamer
+          image: sentinel-alert-streamer:latest
+          # Replace with your container registry:
+          # image: ghcr.io/your-org/sentinel-alert-streamer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ws
+              containerPort: 3001
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: WEB_PORT
+              value: "3001"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: ws
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: ws
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false

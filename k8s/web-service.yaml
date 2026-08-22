@@ -1,0 +1,20 @@
+# ClusterIP service exposing the web deployment
+# Traffic reaches this via the Ingress controller
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/name: sentinel-web
+    app.kubernetes.io/part-of: sentinel
+    app.kubernetes.io/component: web
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sentinel-web
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      protocol: TCP

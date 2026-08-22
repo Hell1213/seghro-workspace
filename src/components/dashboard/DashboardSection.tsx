@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import {
   LayoutDashboard,
   GitBranch,
@@ -17,6 +17,7 @@ import {
   Heart,
   Settings,
 } from 'lucide-react';
+import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { Input } from '@/components/ui/input';
 import { ExportButton } from '@/components/ui/ExportButton';
 import { MetricCards } from './MetricCards';
@@ -158,7 +159,15 @@ export function DashboardSection() {
     } catch { /* ignore */ }
   }, [traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter]);
 
+  // Track latest alert ID for pulse animation on the badge
+  const [latestAlertId, setLatestAlertId] = useState<string | null>(null);
+
   // WebSocket for real-time alerts
+  // NOTE: The alert-streamer mini-service has been upgraded to Socket.IO.
+  //       The raw WebSocket connection below still works because Socket.IO serves
+  //       a plain HTTP server that can accept ws:// upgrades. To fully migrate the
+  //       client to Socket.IO, replace this block with the socket.io-client library
+  //       and listen for 'new-alert' events from the 'alerts' room.
   useEffect(() => {
     let ws: WebSocket | null = null;
     try {
@@ -168,6 +177,7 @@ export function DashboardSection() {
           const data = JSON.parse(event.data);
           if (data.type === 'new_alert') {
             setAlertItems((prev) => [data.alert, ...prev].slice(0, 20));
+            setLatestAlertId(data.alert.id);
           }
         } catch (e) {
           // ignore parse errors
@@ -181,14 +191,36 @@ export function DashboardSection() {
     };
   }, []);
 
-  const fetchIssues = async () => {
+  const fetchAgents = useCallback(async () => {
+    try {
+      const res = await fetch('/api/agents').then((r) => r.json());
+      setAgents(res);
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  const fetchAlerts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/alerts').then((r) => r.json());
+      setAlertItems(res);
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  const fetchIssues = useCallback(async () => {
     try {
       const issuesRes = await fetch('/api/issues').then((r) => r.json());
       setIssues(issuesRes);
     } catch {
       // silently fail
     }
-  };
+  }, []);
+
+  // Auto-refresh: agents every 60s, alerts every 15s
+  useAutoRefresh(fetchAgents, 60000);
+  useAutoRefresh(fetchAlerts, 15000);
 
   useEffect(() => {
     async function fetchData() {
@@ -312,9 +344,15 @@ export function DashboardSection() {
                         </span>
                       )}
                       {tab.id === 'alerts' && alertItems.filter((a) => a.status === 'unread').length > 0 && (
-                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+                        <motion.span
+                          key={latestAlertId ?? 'badge'}
+                          initial={{ scale: 1.3 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                          className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white"
+                        >
                           {alertItems.filter((a) => a.status === 'unread').length}
-                        </span>
+                        </motion.span>
                       )}
                     </button>
                   );

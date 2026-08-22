@@ -1,0 +1,87 @@
+# Prometheus alerting rules for Sentinel
+# Reference these from prometheus.yml under rule_files
+
+groups:
+  - name: sentinel-alerts
+    interval: 30s
+    rules:
+      # High HTTP error rate (5xx responses)
+      - alert: SentinelHighErrorRate
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)
+            /
+            sum(rate(http_requests_total[5m])) by (service)
+          ) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate on {{ $labels.service }}"
+          description: "{{ $labels.service }} is returning {{ $value | humanizePercentage }} 5xx errors (threshold: 5%)."
+
+      # High request latency P99
+      - alert: SentinelHighLatency
+        expr: |
+          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P99 latency on {{ $labels.service }}"
+          description: "P99 latency is {{ $value }}s (threshold: 2s)."
+
+      # High request latency P95
+      - alert: SentinelHighLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P95 latency on {{ $labels.service }}"
+          description: "P95 latency is {{ $value }}s (threshold: 1s)."
+
+      # Pod not ready
+      - alert: SentinelPodNotReady
+        expr: |
+          kube_pod_container_status_ready{namespace="sentinel", container=~"sentinel.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sentinel pod {{ $labels.pod }} not ready"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} has been not ready for 5 minutes."
+
+      # High memory usage
+      - alert: SentinelHighMemory
+        expr: |
+          (container_memory_working_set_bytes{namespace="sentinel", container=~"sentinel.*"}
+          /
+          kube_pod_container_resource_limits{namespace="sentinel", resource="memory", container=~"sentinel.*"}) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on {{ $labels.pod }}"
+          description: "Memory usage is at {{ $value | humanizePercentage }} of limit."
+
+      # Alert streamer down
+      - alert: SentinelAlertStreamerDown
+        expr: up{job="sentinel-alert-streamer"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alert streamer is down"
+          description: "The alert streamer service has been unreachable for 2 minutes. Real-time alerts are not being delivered."
+
+      # WebSocket connections dropped to zero (unexpected)
+      - alert: SentinelNoWebSocketConnections
+        expr: websocket_active_connections < 1 and on() hour() > 8 and on() hour() < 22
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "No active WebSocket connections"
+          description: "No active WebSocket connections detected for 15 minutes during business hours."

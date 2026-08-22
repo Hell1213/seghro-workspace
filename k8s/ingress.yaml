@@ -1,0 +1,54 @@
+# Ingress routing external traffic to Sentinel services
+# Requires an NGINX Ingress Controller installed in the cluster
+#
+# Replace "sentinel.dev" with your real domain name.
+# For TLS, use cert-manager to automatically provision certificates:
+#   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
+#   kubectl create clusterissuer letsencrypt-prod --spec acme server=https://acme-v02.api.letsencrypt.org/directory solver http01 ingressClass=nginx
+# Then add this annotation:
+#   cert-manager.io/cluster-issuer: letsencrypt-prod
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sentinel-ingress
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/part-of: sentinel
+    app.kubernetes.io/component: ingress
+  annotations:
+    # NGINX Ingress Controller class
+    kubernetes.io/ingress.class: nginx
+    # Enable WebSocket support for alert-streamer
+    nginx.ingress.kubernetes.io/websocket-services: "web-service"
+    # Proxy body size (for large payloads)
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    # Timeouts for long-running requests
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # Redirect HTTP → HTTPS
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+spec:
+  ingressClassName: nginx
+  # TLS configuration — replace with cert-managed secret
+  # When using cert-manager, the tls.secretName is auto-created
+  tls:
+    - hosts:
+        # Replace with your real domain
+        - sentinel.dev
+      secretName: sentinel-tls
+  rules:
+    - host: sentinel.dev
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-service
+                port:
+                  number: 3000

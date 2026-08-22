@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { Eye, EyeOff, Github, Loader2, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Github, Loader2, AlertCircle, Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function LoginPage() {
@@ -20,6 +20,7 @@ export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const registered = searchParams.get('registered') === 'true'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -86,6 +87,18 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent className="space-y-4">
+            {/* Success message after registration */}
+            {registered && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="flex items-center gap-2 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-sm"
+              >
+                <Check className="w-4 h-4 shrink-0" />
+                Account created! Please sign in.
+              </motion.div>
+            )}
+
             {/* Error message */}
             {error && (
               <motion.div
@@ -202,7 +215,7 @@ export default function LoginPage() {
           <CardFooter className="flex justify-center border-t border-gray-200 dark:border-gray-800 pt-4">
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Don&apos;t have an account?{' '}
-              <a href="#" className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium">
+              <a href="/register" className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium">
                 Sign up
               </a>
             </p>

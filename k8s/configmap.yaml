@@ -1,0 +1,19 @@
+# ConfigMap for non-sensitive Sentinel configuration
+# Apply first: kubectl apply -f k8s/namespace.yaml
+# Then:      kubectl apply -f k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sentinel-config
+  namespace: sentinel
+  labels:
+    app.kubernetes.io/part-of: sentinel
+    app.kubernetes.io/component: config
+data:
+  # Base URL for NextAuth callbacks — replace with your real domain
+  NEXTAUTH_URL: "https://sentinel.dev"
+  # Database connection string — replace with real connection details
+  # Example for PostgreSQL: postgresql://user:password@postgres-svc:5432/sentinel
+  # Example for SQLite (dev only):   file:/data/sentinel.db
+  DATABASE_URL: "postgresql://sentinel:PLACEHOLDER@postgres-svc:5432/sentinel"
+  NODE_ENV: "production"

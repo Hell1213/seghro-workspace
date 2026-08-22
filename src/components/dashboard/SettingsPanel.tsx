@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -20,8 +20,16 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Copy, Check, Download, RotateCcw, Trash2 } from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Copy, Check, Download, RotateCcw, Trash2, Pencil, Building2, User, Loader2, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ApiKeysPanel } from '@/components/dashboard/ApiKeysPanel';
 
 /* ------------------------------------------------------------------ */
 /*  Props                                                              */
@@ -87,6 +95,221 @@ function SectionHeading({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Profile Section                                                    */
+/* ------------------------------------------------------------------ */
+
+function ProfileSection({ open }: { open: boolean }) {
+  const [profile, setProfile] = useState<{
+    name: string;
+    email: string;
+    role: string;
+    image: string | null;
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    // Use microtask to avoid synchronous setState in effect body
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      setLoading(true);
+      fetch('/api/session')
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data) => {
+          if (cancelled) return;
+          if (data) {
+            setProfile({
+              name: data.name ?? 'Unknown',
+              email: data.email ?? '',
+              role: data.role ?? 'viewer',
+              image: data.image ?? null,
+            });
+          }
+          setLoading(false);
+        })
+        .catch(() => {
+          if (!cancelled) setLoading(false);
+        });
+    });
+    return () => { cancelled = true; };
+  }, [open]);
+
+  return (
+    <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <CardHeader className="pb-3 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <User className="h-4 w-4 text-gray-400" />
+          Profile
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-3">
+        {loading ? (
+          <div className="flex items-center gap-2 py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+            <span className="text-xs text-gray-400">Loading profile…</span>
+          </div>
+        ) : profile ? (
+          <>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-semibold text-gray-600 dark:text-gray-300 overflow-hidden">
+                {profile.image ? (
+                  <img src={profile.image} alt={profile.name} className="h-full w-full object-cover" />
+                ) : (
+                  profile.name.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  {profile.name}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {profile.email}
+                </p>
+              </div>
+              <Badge variant="outline" className="shrink-0 text-[10px] gap-1">
+                <Shield className="w-3 h-3" />
+                {profile.role}
+              </Badge>
+            </div>
+          </>
+        ) : (
+          <p className="text-xs text-gray-400 py-2">Sign in to view your profile.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Workspace Section                                                  */
+/* ------------------------------------------------------------------ */
+
+function WorkspaceSection({ open }: { open: boolean }) {
+  const [org, setOrg] = useState<{
+    name: string;
+    plan: string;
+    userCount: number;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const fetchOrg = useCallback(() => {
+    setLoading(true);
+    fetch('/api/org')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) {
+          setOrg({
+            name: data.name ?? 'Unknown',
+            plan: data.plan ?? 'free',
+            userCount: data.userCount ?? 1,
+          });
+        }
+      })
+      .catch(() => { /* silent */ })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    fetchOrg();
+  }, [open, fetchOrg]);
+
+  async function handleSave() {
+    if (!editName.trim()) return;
+    setSaving(true);
+    try {
+      const res = await fetch('/api/org', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editName.trim() }),
+      });
+      if (res.ok) {
+        setEditing(false);
+        fetchOrg();
+      }
+    } catch { /* silent */ }
+    finally { setSaving(false); }
+  }
+
+  return (
+    <Card className="border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <CardHeader className="pb-3 pt-4 px-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Building2 className="h-4 w-4 text-gray-400" />
+            Workspace
+          </CardTitle>
+          {!loading && org && (
+            <button
+              onClick={() => {
+                setEditName(org.name);
+                setEditing(true);
+              }}
+              className="h-7 w-7 rounded-md flex items-center justify-center text-gray-400 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              aria-label="Edit workspace name"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-3">
+        {loading ? (
+          <div className="flex items-center gap-2 py-2">
+            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+            <span className="text-xs text-gray-400">Loading workspace…</span>
+          </div>
+        ) : org ? (
+          editing ? (
+            <div className="space-y-2">
+              <Label htmlFor="org-name" className="text-xs">Workspace Name</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="org-name"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="h-8 text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSave();
+                    if (e.key === 'Escape') setEditing(false);
+                  }}
+                  autoFocus
+                />
+                <Button size="sm" className="h-8 text-xs" onClick={handleSave} disabled={!editName.trim() || saving}>
+                  {saving ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Save'}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {org.name}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {org.userCount} member{org.userCount !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <Badge variant="outline" className="text-[10px] capitalize">
+                  {org.plan} plan
+                </Badge>
+              </div>
+            </>
+          )
+        ) : (
+          <p className="text-xs text-gray-400 py-2">Sign in to view your workspace.</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Main Component                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -124,48 +347,21 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
         </SheetHeader>
 
         <div className="px-6 py-6 space-y-6">
+          {/* ===== 0. Profile ===== */}
+          <section>
+            <ProfileSection open={open} />
+          </section>
+
           {/* ===== 1. Workspace ===== */}
           <section>
-            <SectionHeading
-              title="Workspace"
-              description="Manage your workspace identity and credentials."
-            />
-            <div className="mt-3 space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="workspace-name">Workspace Name</Label>
-                <Input
-                  id="workspace-name"
-                  defaultValue="Lemma.ai Production"
-                  className="h-9 text-sm"
-                />
-              </div>
+            <WorkspaceSection open={open} />
+          </section>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="api-key">API Key</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="api-key"
-                    readOnly
-                    value="sk_sentinel_live_a8f3e2d1..."
-                    className="h-9 text-sm font-mono"
-                  />
-                  <CopyIconButton text="sk_sentinel_live_a8f3e2d1b4c5d6e7f8" />
-                </div>
-              </div>
+          <Separator />
 
-              <div className="space-y-1.5">
-                <Label htmlFor="webhook-url">Webhook URL</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="webhook-url"
-                    readOnly
-                    value="https://hooks.sentinel.ai/webhook/..."
-                    className="h-9 text-sm font-mono"
-                  />
-                  <CopyIconButton text="https://hooks.sentinel.ai/webhook/whk_3a18f6d4" />
-                </div>
-              </div>
-            </div>
+          {/* ===== 1b. API Keys ===== */}
+          <section>
+            <ApiKeysPanel />
           </section>
 
           <Separator />
