@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="shield-glow" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shield shape -->
+  <path d="M60 8L16 28V56C16 82.4 35.2 106.8 60 112C84.8 106.8 104 82.4 104 56V28L60 8Z" fill="white" opacity="0.15"/>
+  <path d="M60 8L16 28V56C16 82.4 35.2 106.8 60 112C84.8 106.8 104 82.4 104 56V28L60 8Z" stroke="white" stroke-width="1.5" fill="url(#shield-glow)"/>
+
+  <!-- Eye / Radar center -->
+  <circle cx="60" cy="58" r="8" fill="none" stroke="white" stroke-width="2.5"/>
+  <circle cx="60" cy="58" r="3" fill="white"/>
+
+  <!-- Radar arcs -->
+  <path d="M42 58C42 47.5 50.5 39 61 39" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+  <path d="M34 58C34 42 47.5 29 63 29" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M78 58C78 68.5 69.5 77 59 77" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.9"/>
+  <path d="M86 58C86 74 72.5 87 57 87" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+</svg>

@@ -2,8 +2,9 @@
 
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
-import { Shield, Menu, X, Moon, Sun, Search } from 'lucide-react';
+import { Menu, X, Moon, Sun, Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { AegisLogo } from '@/components/AegisLogo';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
@@ -82,18 +83,15 @@ export function Navbar({ onSearchClick }: NavbarProps) {
         <div className="flex h-14 sm:h-16 items-center justify-between">
           {/* Logo */}
           <motion.div
-            className="flex items-center gap-2 shrink-0"
+            className="flex items-center shrink-0"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626] shadow-md shadow-red-500/20">
-              <Shield className="h-4.5 w-4.5 text-white" />
-              <span className="absolute inset-0 rounded-lg bg-[#dc2626] animate-ping opacity-20" />
-            </div>
-            <span className={`text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100 transition-[text-shadow,drop-shadow] duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}>
-              Sentinel
-            </span>
+            <AegisLogo
+              iconSize={32}
+              textClass={`text-lg transition-[text-shadow,drop-shadow] duration-300 ${scrolled ? 'drop-shadow-[0_0_8px_rgba(220,38,38,0.35)]' : ''}`}
+            />
           </motion.div>
 
           {/* Desktop nav links — hide on mobile, flex on md+ */}
@@ -150,7 +148,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
 
             {/* Get Started CTA — visible on md+ */}
             <Button
-              onClick={() => router.push('/register')}
+              onClick={() => router.push('/login')}
               className="hidden md:inline-flex bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-4 lg:px-5 shadow-md shadow-red-200 hover:shadow-red-300 btn-glow shrink-0"
             >
               Get Started
@@ -206,7 +204,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
               </a>
             ))}
             <Button
-              onClick={() => { setMobileOpen(false); router.push('/register'); }}
+              onClick={() => { setMobileOpen(false); router.push('/login'); }}
               className="w-full mt-3 bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm btn-glow"
             >
               Get Started

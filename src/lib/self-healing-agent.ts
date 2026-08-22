@@ -1,5 +1,5 @@
 // ================================================================
-// Sentinel Self-Healing Agent — LLM-Agnostic Core
+// Aegis Self-Healing Agent — LLM-Agnostic Core
 // Works with ANY LLM provider via OpenAI-compatible API format.
 // Just swap the base URL and API key.
 // ================================================================
@@ -37,7 +37,7 @@ export interface HealingDecision {
 // This prompt is designed to work with any frontier model
 // (GPT-4o, Claude 3.5, Gemini Pro, Llama 3, Mistral, etc.)
 
-export const SELF_HEALING_SYSTEM_PROMPT = `You are Sentinel's Self-Healing Agent — an automated API reliability system.
+export const SELF_HEALING_SYSTEM_PROMPT = `You are Aegis's Self-Healing Agent — an automated API reliability system.
 
 ## Your Role
 You analyze API failures and decide the best recovery strategy. You are NOT a coding assistant. You are an infrastructure healing agent that makes real-time decisions to keep AI agent systems running.

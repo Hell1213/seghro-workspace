@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 
 /**
  * Validate an API key from the Authorization header.
- * Expects format: `Bearer sentinel_sk_...`
+ * Expects format: `Bearer aegis_sk_...`
  *
  * Returns the user object if valid, null otherwise.
  * Also updates lastUsedAt on the key.
@@ -17,7 +17,7 @@ export async function validateApiKey(
   if (parts.length !== 2 || parts[0] !== 'Bearer') return null;
 
   const key = parts[1];
-  if (!key.startsWith('sentinel_sk_')) return null;
+  if (!key.startsWith('aegis_sk_')) return null;
 
   try {
     // Find all keys (SQLite is small enough; for larger DB add a prefix index)

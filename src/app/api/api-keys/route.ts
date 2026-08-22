@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
 
     // Generate the full key
     const suffix = generateKeySuffix()
-    const fullKey = `sentinel_sk_${suffix}`
-    const keyPrefix = fullKey.slice(0, 19) // "sentinel_sk_" + first 8 of hex
+    const fullKey = `aegis_sk_${suffix}`
+    const keyPrefix = fullKey.slice(0, 17) // "aegis_sk_" + first 8 of hex
     const keyHash = await bcrypt.hash(fullKey, 12)
 
     // For demo purposes, use first user. In real app, use session userId.

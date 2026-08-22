@@ -117,7 +117,7 @@ const arrowStyles: Record<
 export default function DashboardTour() {
   const [isVisible, setIsVisible] = useState(false);
   const [tourCompleted, setTourCompleted] = useState(() => {
-    if (typeof window !== 'undefined') return !!sessionStorage.getItem('sentinel-tour-done');
+    if (typeof window !== 'undefined') return !!sessionStorage.getItem('aegis-tour-done');
     return false;
   });
   const [isActive, setIsActive] = useState(false);
@@ -145,7 +145,7 @@ export default function DashboardTour() {
     setTooltipPos(null);
     setTargetRect(null);
     setTourCompleted(true);
-    sessionStorage.setItem('sentinel-tour-done', '1');
+    sessionStorage.setItem('aegis-tour-done', '1');
     cancelAnimationFrame(rafRef.current);
   }, []);
 

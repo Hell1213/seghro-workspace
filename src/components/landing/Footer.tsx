@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Shield,
   Github,
   Twitter,
   Star,
@@ -15,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { AegisLogo } from '@/components/AegisLogo';
 import { toast } from 'sonner';
 
 const footerLinks: Record<string, { label: string; href?: string }[]> = {
@@ -29,7 +29,7 @@ const footerLinks: Record<string, { label: string; href?: string }[]> = {
     { label: 'About', href: '#features' },
     { label: 'Blog', href: '#changelog' },
     { label: 'Careers', href: '#features' },
-    { label: 'Contact', href: 'mailto:team@sentinel.dev' },
+    { label: 'Contact', href: 'mailto:team@aegis.dev' },
   ],
   Resources: [
     { label: 'Documentation', href: '#docs' },
@@ -47,11 +47,11 @@ const footerLinks: Record<string, { label: string; href?: string }[]> = {
 };
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://x.com/sentinel_dev', label: 'Twitter' },
-  { icon: Github, href: 'https://github.com/sentinel-ai', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/company/sentinel-ai', label: 'LinkedIn' },
-  { icon: Youtube, href: 'https://youtube.com/@sentinel_ai', label: 'YouTube' },
-  { icon: DiscordIcon, href: 'https://discord.gg/sentinel', label: 'Discord' },
+  { icon: Twitter, href: 'https://x.com/aegis_dev', label: 'Twitter' },
+  { icon: Github, href: 'https://github.com/aegis-ai', label: 'GitHub' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/aegis-ai', label: 'LinkedIn' },
+  { icon: Youtube, href: 'https://youtube.com/@aegis_ai', label: 'YouTube' },
+  { icon: DiscordIcon, href: 'https://discord.gg/aegis', label: 'Discord' },
 ];
 
 function DiscordIcon({ className }: { className?: string }) {
@@ -160,13 +160,8 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 pt-8">
           {/* Brand + Social Links + Newsletter */}
           <motion.div variants={itemVariants} className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#dc2626]">
-                <Shield className="h-4.5 w-4.5 text-white" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-gray-900 dark:text-gray-100">
-                Sentinel
-              </span>
+            <div className="mb-4">
+              <AegisLogo iconSize={32} textClass="text-lg" />
             </div>
             <p className="text-xs text-gray-400 dark:text-gray-400 mt-1 mb-3">
               Production-grade AI agent observability
@@ -246,7 +241,7 @@ export function Footer() {
           className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4"
         >
           <p className="text-xs text-gray-400 dark:text-gray-400">
-            &copy; 2025 Sentinel{' '}
+            &copy; 2025 Aegis{' '}
             <span className="inline-block h-1 w-1 rounded-full bg-[#dc2626] mx-1.5 align-middle" />
             Built with &hearts; for AI reliability
           </p>

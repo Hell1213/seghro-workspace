@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://sentinel.dev'
+const BASE_URL = process.env.NEXTAUTH_URL || 'https://aegis.dev'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

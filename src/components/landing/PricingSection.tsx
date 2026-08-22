@@ -185,10 +185,10 @@ export function PricingSection() {
                 variant={tier.buttonVariant}
                 onClick={() => {
                   if (tier.buttonLabel === 'Contact Sales') {
-                    toast.info('Sales inquiry sent! Our team will reach out within 24 hours.', { description: 'sales@sentinel.dev' });
+                    toast.info('Sales inquiry sent! Our team will reach out within 24 hours.', { description: 'sales@aegis.dev' });
                     return;
                   }
-                  router.push('/register');
+                  router.push('/login');
                 }}
                 className={`w-full font-semibold ${
                   tier.buttonVariant === 'default'

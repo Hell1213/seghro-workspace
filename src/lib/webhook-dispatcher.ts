@@ -1,11 +1,11 @@
-// Server-only module — Webhook delivery system for Sentinel V8
+// Server-only module — Webhook delivery system for Aegis V8
 // Dispatches HTTP POST requests to registered webhook endpoints when events occur.
 
 import { createHmac, randomUUID } from 'crypto'
 import { db } from '@/lib/db'
 
 const WEBHOOK_TIMEOUT_MS = 10_000
-const DEFAULT_SECRET = 'sentinel-default-secret'
+const DEFAULT_SECRET = 'aegis-default-secret'
 
 interface DispatchResult {
   delivered: number

@@ -11,7 +11,7 @@ export default function Loading() {
         </div>
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Loading Sentinel...</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Loading Aegis...</span>
         </div>
       </div>
     </div>

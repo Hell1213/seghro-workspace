@@ -18,7 +18,7 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
   const isDev = process.env.NODE_ENV === 'development'
 
   useEffect(() => {
-    console.error('[Sentinel Error Boundary]', error)
+    console.error('[Aegis Error Boundary]', error)
   }, [error])
 
   async function handleCopyStack() {
@@ -60,7 +60,7 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Sentinel</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Aegis</span>
           </div>
         </motion.div>
 
@@ -191,10 +191,10 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
         >
           If this issue persists, contact{' '}
           <a
-            href="mailto:support@sentinel.dev"
+            href="mailto:support@aegis.dev"
             className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 underline underline-offset-2 transition-colors"
           >
-            support@sentinel.dev
+            support@aegis.dev
           </a>
         </motion.p>
       </motion.div>

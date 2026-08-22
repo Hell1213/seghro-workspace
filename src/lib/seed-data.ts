@@ -1,4 +1,4 @@
-// ---- Mock Data for Sentinel AI Agent Observability ----
+// ---- Mock Data for Aegis AI Agent Observability ----
 
 export interface Agent {
   id: string;

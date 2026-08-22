@@ -44,7 +44,7 @@ export function NewsletterSection() {
               viewport={{ once: true }}
               transition={{ delay: 0.15, duration: 0.5 }}
             >
-              Sentinel Weekly
+              Aegis Weekly
             </motion.h2>
 
             <motion.p

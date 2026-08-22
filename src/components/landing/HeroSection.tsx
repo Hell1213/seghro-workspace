@@ -192,11 +192,11 @@ export function HeroSection() {
             >
               <Button
                 size="lg"
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/login')}
                 className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-6 sm:px-7 shadow-lg shadow-red-200 dark:shadow-red-900/30 hover:shadow-red-300 dark:hover:shadow-red-900/50 transition-all hover:scale-[1.02] btn-glow"
               >
                 <Activity className="mr-2 h-4 w-4 self-center" />
-                View Live Dashboard
+                Get Started
               </Button>
               <Button
                 variant="outline"

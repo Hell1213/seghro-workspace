@@ -116,7 +116,7 @@ export function DashboardSection() {
 
   useEffect(() => {
     try {
-      const dismissed = localStorage.getItem('sentinel-auth-banner-dismissed');
+      const dismissed = localStorage.getItem('aegis-auth-banner-dismissed');
       if (dismissed === 'true') setBannerDismissed(true);
     } catch { /* ignore */ }
   }, []);
@@ -124,7 +124,7 @@ export function DashboardSection() {
   const handleDismissBanner = useCallback(() => {
     setBannerDismissed(true);
     try {
-      localStorage.setItem('sentinel-auth-banner-dismissed', 'true');
+      localStorage.setItem('aegis-auth-banner-dismissed', 'true');
     } catch { /* ignore */ }
   }, []);
 
@@ -173,7 +173,7 @@ export function DashboardSection() {
   // Filter persistence via localStorage
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('sentinel-dash-filters');
+      const saved = localStorage.getItem('aegis-dash-filters');
       if (saved) {
         const f = JSON.parse(saved);
         if (f.traceSearch) setTraceSearch(f.traceSearch);
@@ -187,7 +187,7 @@ export function DashboardSection() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('sentinel-dash-filters', JSON.stringify({
+      localStorage.setItem('aegis-dash-filters', JSON.stringify({
         traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter,
       }));
     } catch { /* ignore */ }
@@ -554,7 +554,7 @@ export function DashboardSection() {
                         </div>
                         <ExportButton
                           data={filteredTraces as unknown as Record<string, unknown>[]}
-                          filename="sentinel-traces"
+                          filename="aegis-traces"
                           columns={['traceId', 'agentId', 'status', 'duration', 'inputTokens', 'outputTokens', 'createdAt']}
                           label="Export"
                         />
@@ -654,7 +654,7 @@ export function DashboardSection() {
                         </button>
                         <ExportButton
                           data={filteredIssues as unknown as Record<string, unknown>[]}
-                          filename="sentinel-issues"
+                          filename="aegis-issues"
                           columns={['agentName', 'title', 'severity', 'status', 'failureRate', 'affectedRuns', 'createdAt']}
                           label="Export"
                         />

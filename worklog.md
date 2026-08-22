@@ -1494,3 +1494,59 @@ Stage Summary:
 - Billing system ready (mock Stripe pattern, drop-in replacement for real Stripe)
 - 17 API routes all returning 200, 3 new POST routes working
 - ESLint: zero errors
+
+--- Task ID: N3
+Agent: rename-agent
+Task: Global rename Sentinel → Aegis
+Work Log:
+- Updated all 35 files with brand rename
+- Changed 'Sentinel' → 'Aegis', 'sentinel' → 'aegis'
+- Updated demo email, API key prefixes, meta tags
+- Preserved code paths, imports, env vars
+Stage Summary:
+- Complete rebrand from Sentinel to Aegis across entire src/ directory
+
+---
+Task ID: REBRAND-SESSION
+Agent: main
+Task: Rebrand Sentinel → Aegis, new logo design, login/signup redesign, Google OAuth, button fixes
+
+Work Log:
+- Analyzed reference login/signup page images (5ads.ai) using VLM skill
+- Created split-screen login page (left: gradient branding panel, right: form) matching reference
+- Created split-screen register page with workspace name field
+- Added Google OAuth provider to auth.ts with user-provided credentials
+- Updated .env with GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NEXTAUTH_SECRET
+- Updated register API to accept workspace name, create org per user
+- Fixed ALL "Get Started" buttons: Hero, Navbar, CTA Section, Pricing → now navigate to /login
+- Generated AI logo image (shield + radar pulse design) saved to public/aegis-logo.png
+- Created custom SVG logo (public/logo.svg + public/logo-white.svg) — shield with radar arcs
+- Created reusable AegisLogo component (src/components/AegisLogo.tsx)
+- Global rename: Sentinel → Aegis across 35+ files in src/
+- Updated: Navbar, Footer, Login, Register logos to use AegisLogo component
+- Updated: demo email demo@aegis.dev, API key prefix aegis_sk_
+- Updated: meta tags, OG tags, sitemap, structured data, testimonials
+- Fixed McpPanel.tsx missing comma (rename artifact)
+- All lint checks pass clean
+- Verified login page renders correctly via agent-browser (split-screen, all elements present)
+- Both /login and /register return HTTP 200
+- Created continuous development cron job (every 15 min)
+
+Stage Summary:
+- Brand renamed from Sentinel to Aegis (Greek shield of Zeus — protection/trust)
+- Professional split-screen auth pages matching reference design
+- Google OAuth enabled (provider added, credentials in .env)
+- Custom shield+radar SVG logo with white variant
+- All CTAs verified working (Get Started → /login)
+- Login page confirmed rendering: heading, email/password fields, Sign In button, Google/GitHub OAuth, Create one link
+
+### Google Cloud Console URIs Needed:
+- **Authorized JavaScript origins:** `http://localhost:3000`
+- **Authorized redirect URIs:** `http://localhost:3000/api/auth/callback/google`
+- For production, replace localhost:3000 with your production domain
+
+### Remaining Tasks for Next Session:
+- Make dashboard data fully CRUD-able (create/edit/delete agents, traces, issues, alerts in UI)
+- Stripe billing integration (checkout session, customer portal, plan limits)
+- Deep audit of all remaining interactive elements
+- Production deployment configuration
