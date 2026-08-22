@@ -1,0 +1,729 @@
+     1→     1→'use client';
+     2→     2→
+     3→     3→import { motion, useInView } from 'framer-motion';
+     4→     4→import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
+     5→     5→import {
+     6→     6→  LayoutDashboard,
+     7→     7→  GitBranch,
+     8→     8→  AlertTriangle,
+     9→     9→  Bell,
+    10→    10→  Bot,
+    11→    11→  Clock,
+    12→    12→  Search,
+    13→    13→  Filter,
+    14→    14→  X,
+    15→    15→  GitCompareArrows,
+    16→    16→  BarChart3,
+    17→    17→  Heart,
+    18→    18→  Settings,
+    19→    19→  User,
+    20→    20→  Eye,
+    21→    21→} from 'lucide-react';
+    22→    22→import { useSession } from 'next-auth/react';
+    23→    23→import { useAutoRefresh } from '@/hooks/use-auto-refresh';
+    24→    24→import { Input } from '@/components/ui/input';
+    25→    25→import { Badge } from '@/components/ui/badge';
+    26→    26→import { ExportButton } from '@/components/ui/ExportButton';
+    27→    27→import { MetricCards } from './MetricCards';
+    28→    28→import { AgentGrid } from './AgentGrid';
+    29→    29→import { TraceViewer } from './TraceViewer';
+    30→    30→import { IssuesPanel } from './IssuesPanel';
+    31→    31→import { AlertFeed } from './AlertFeed';
+    32→    32→import { ActivityTimeline } from './ActivityTimeline';
+    33→    33→import { MetricsCharts } from './MetricsCharts';
+    34→    34→import { McpPanel } from './McpPanel';
+    35→    35→import { AgentDetailSheet } from './AgentDetailSheet';
+    36→    36→import { AgentComparison } from './AgentComparison';
+    37→    37→import { TraceWaterfall } from './TraceWaterfall';
+    38→    38→import { DashboardSkeleton } from './DashboardSkeleton';
+    39→    39→import { ApiHealthPanel } from './ApiHealthPanel';
+    40→    40→import { SettingsPanel } from './SettingsPanel';
+    41→    41→
+    42→    42→type TabId = 'overview' | 'traces' | 'issues' | 'alerts' | 'api-health';
+    43→    43→
+    44→    44→const tabs: { id: TabId; label: string; icon: React.ElementType }[] = [
+    45→    45→  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    46→    46→  { id: 'traces', label: 'Traces', icon: GitBranch },
+    47→    47→  { id: 'issues', label: 'Issues', icon: AlertTriangle },
+    48→    48→  { id: 'alerts', label: 'Alerts', icon: Bell },
+    49→    49→  { id: 'api-health', label: 'API Health', icon: Heart },
+    50→    50→];
+    51→    51→
+    52→    52→interface Agent {
+    53→    53→  id: string;
+    54→    54→  name: string;
+    55→    55→  description: string;
+    56→    56→  status: 'active' | 'degraded' | 'critical' | 'inactive';
+    57→    57→  framework: string;
+    58→    58→  lastRunAt: string;
+    59→    59→  totalRuns: number;
+    60→    60→  errorRate: number;
+    61→    61→  avgLatency: number;
+    62→    62→}
+    63→    63→
+    64→    64→interface Trace {
+    65→    65→  id: string;
+    66→    66→  agentId: string;
+    67→    67→  traceId: string;
+    68→    68→  status: string;
+    69→    69→  duration: number;
+    70→    70→  inputTokens: number;
+    71→    71→  outputTokens: number;
+    72→    72→  createdAt: string;
+    73→    73→  spans: any[];
+    74→    74→}
+    75→    75→
+    76→    76→interface Issue {
+    77→    77→  id: string;
+    78→    78→  agentId: string;
+    79→    79→  agentName: string;
+    80→    80→  title: string;
+    81→    81→  description: string;
+    82→    82→  severity: 'P0' | 'P1' | 'P2';
+    83→    83→  status: string;
+    84→    84→  affectedRuns: number;
+    85→    85→  totalRuns: number;
+    86→    86→  failureRate: number;
+    87→    87→  rootCause: string;
+    88→    88→  suggestedFix: string;
+    89→    89→  createdAt: string;
+    90→    90→  updatedAt: string;
+    91→    91→}
+    92→    92→
+    93→    93→interface AlertItem {
+    94→    94→  id: string;
+    95→    95→  title: string;
+    96→    96→  message: string;
+    97→    97→  severity: string;
+    98→    98→  status: string;
+    99→    99→  channel: string;
+   100→   100→  createdAt: string;
+   101→   101→}
+   102→   102→
+   103→   103→export function DashboardSection() {
+   104→   104→  const ref = useRef<HTMLDivElement>(null);
+   105→   105→  const isInView = useInView(ref, { once: true, margin: '-100px' });
+   106→   106→  const { data: session } = useSession();
+   107→   107→  const [activeTab, setActiveTab] = useState<TabId>('overview');
+   108→   108→
+   109→   109→  // Auth-aware banner: demo mode vs authenticated user
+   110→   110→  const isAuthenticated = !!session?.user?.email;
+   111→   111→  const [bannerDismissed, setBannerDismissed] = useState(false);
+   112→   112→
+   113→   113→  useEffect(() => {
+   114→   114→    try {
+   115→   115→      const dismissed = localStorage.getItem('sentinel-auth-banner-dismissed');
+   116→   116→      if (dismissed === 'true') setBannerDismissed(true);
+   117→   117→    } catch { /* ignore */ }
+   118→   118→  }, []);
+   119→   119→
+   120→   120→  const handleDismissBanner = useCallback(() => {
+   121→   121→    setBannerDismissed(true);
+   122→   122→    try {
+   123→   123→      localStorage.setItem('sentinel-auth-banner-dismissed', 'true');
+   124→   124→    } catch { /* ignore */ }
+   125→   125→  }, []);
+   126→   126→
+   127→   127→  const showBanner = useMemo(
+   128→   128→    () => !bannerDismissed,
+   129→   129→    [bannerDismissed]
+   130→   130→  );
+   131→   131→
+   132→   132→  // Sync tab to URL hash
+   133→   133→  useEffect(() => {
+   134→   134→    const hash = window.location.hash.replace('#dashboard-', '').replace('#', '');
+   135→   135→    if (['overview', 'traces', 'issues', 'alerts', 'api-health'].includes(hash)) {
+   136→   136→      setActiveTab(hash as TabId);
+   137→   137→    }
+   138→   138→  }, []);
+   139→   139→
+   140→   140→  const handleTabChange = (tab: TabId) => {
+   141→   141→    setActiveTab(tab);
+   142→   142→    window.history.replaceState(null, '', `#dashboard-${tab}`);
+   143→   143→  };
+   144→   144→  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+   145→   145→  const [detailAgent, setDetailAgent] = useState<Agent | null>(null);
+   146→   146→  const [comparisonIds, setComparisonIds] = useState<string[]>([]);
+   147→   147→  const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
+   148→   148→  const [showWaterfall, setShowWaterfall] = useState(true);
+   149→   149→  const [settingsOpen, setSettingsOpen] = useState(false);
+   150→   150→  const [agents, setAgents] = useState<Agent[]>([]);
+   151→   151→  const [traces, setTraces] = useState<Trace[]>([]);
+   152→   152→  const [issues, setIssues] = useState<Issue[]>([]);
+   153→   153→  const [alertItems, setAlertItems] = useState<AlertItem[]>([]);
+   154→   154→  const [metrics, setMetrics] = useState<any>(null);
+   155→   155→  const [loading, setLoading] = useState(true);
+   156→   156→
+   157→   157→  // Search and filter state
+   158→   158→  const [issueSearch, setIssueSearch] = useState('');
+   159→   159→  const [issueSeverityFilter, setIssueSeverityFilter] = useState<string>('all');
+   160→   160→  const [issueStatusFilter, setIssueStatusFilter] = useState<string>('all');
+   161→   161→  const [showFilters, setShowFilters] = useState(false);
+   162→   162→
+   163→   163→  // Trace search and filter state
+   164→   164→  const [traceSearch, setTraceSearch] = useState('');
+   165→   165→  const [traceStatusFilter, setTraceStatusFilter] = useState<string>('all');
+   166→   166→
+   167→   167→  // Filter persistence via localStorage
+   168→   168→  useEffect(() => {
+   169→   169→    try {
+   170→   170→      const saved = localStorage.getItem('sentinel-dash-filters');
+   171→   171→      if (saved) {
+   172→   172→        const f = JSON.parse(saved);
+   173→   173→        if (f.traceSearch) setTraceSearch(f.traceSearch);
+   174→   174→        if (f.issueSearch) setIssueSearch(f.issueSearch);
+   175→   175→        if (f.traceStatusFilter) setTraceStatusFilter(f.traceStatusFilter);
+   176→   176→        if (f.issueSeverityFilter) setIssueSeverityFilter(f.issueSeverityFilter);
+   177→   177→        if (f.issueStatusFilter) setIssueStatusFilter(f.issueStatusFilter);
+   178→   178→      }
+   179→   179→    } catch { /* ignore */ }
+   180→   180→  }, []);
+   181→   181→
+   182→   182→  useEffect(() => {
+   183→   183→    try {
+   184→   184→      localStorage.setItem('sentinel-dash-filters', JSON.stringify({
+   185→   185→        traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter,
+   186→   186→      }));
+   187→   187→    } catch { /* ignore */ }
+   188→   188→  }, [traceSearch, issueSearch, traceStatusFilter, issueSeverityFilter, issueStatusFilter]);
+   189→   189→
+   190→   190→  // Track latest alert ID for pulse animation on the badge
+   191→   191→  const [latestAlertId, setLatestAlertId] = useState<string | null>(null);
+   192→   192→
+   193→   193→  // WebSocket for real-time alerts
+   194→   194→  // NOTE: The alert-streamer mini-service has been upgraded to Socket.IO.
+   195→   195→  //       The raw WebSocket connection below still works because Socket.IO serves
+   196→   196→  //       a plain HTTP server that can accept ws:// upgrades. To fully migrate the
+   197→   197→  //       client to Socket.IO, replace this block with the socket.io-client library
+   198→   198→  //       and listen for 'new-alert' events from the 'alerts' room.
+   199→   199→  useEffect(() => {
+   200→   200→    let ws: WebSocket | null = null;
+   201→   201→    try {
+   202→   202→      ws = new WebSocket('ws://localhost:3001/?XTransformPort=3001');
+   203→   203→      ws.onmessage = (event) => {
+   204→   204→        try {
+   205→   205→          const data = JSON.parse(event.data);
+   206→   206→          if (data.type === 'new_alert') {
+   207→   207→            setAlertItems((prev) => [data.alert, ...prev].slice(0, 20));
+   208→   208→            setLatestAlertId(data.alert.id);
+   209→   209→          }
+   210→   210→        } catch (e) {
+   211→   211→          // ignore parse errors
+   212→   212→        }
+   213→   213→      };
+   214→   214→    } catch (e) {
+   215→   215→      // WebSocket not available, that's ok
+   216→   216→    }
+   217→   217→    return () => {
+   218→   218→      if (ws) ws.close();
+   219→   219→    };
+   220→   220→  }, []);
+   221→   221→
+   222→   222→  const fetchAgents = useCallback(async () => {
+   223→   223→    try {
+   224→   224→      const res = await fetch('/api/agents').then((r) => r.json());
+   225→   225→      setAgents(res);
+   226→   226→    } catch {
+   227→   227→      // silently fail
+   228→   228→    }
+   229→   229→  }, []);
+   230→   230→
+   231→   231→  const fetchAlerts = useCallback(async () => {
+   232→   232→    try {
+   233→   233→      const res = await fetch('/api/alerts').then((r) => r.json());
+   234→   234→      setAlertItems(res);
+   235→   235→    } catch {
+   236→   236→      // silently fail
+   237→   237→    }
+   238→   238→  }, []);
+   239→   239→
+   240→   240→  const fetchIssues = useCallback(async () => {
+   241→   241→    try {
+   242→   242→      const issuesRes = await fetch('/api/issues').then((r) => r.json());
+   243→   243→      setIssues(issuesRes);
+   244→   244→    } catch {
+   245→   245→      // silently fail
+   246→   246→    }
+   247→   247→  }, []);
+   248→   248→
+   249→   249→  // Auto-refresh: agents every 60s, alerts every 15s
+   250→   250→  useAutoRefresh(fetchAgents, 60000);
+   251→   251→  useAutoRefresh(fetchAlerts, 15000);
+   252→   252→
+   253→   253→  useEffect(() => {
+   254→   254→    async function fetchData() {
+   255→   255→      try {
+   256→   256→        const [agentsRes, tracesRes, issuesRes, alertsRes, metricsRes] =
+   257→   257→          await Promise.all([
+   258→   258→            fetch('/api/agents').then((r) => r.json()),
+   259→   259→            fetch('/api/traces').then((r) => r.json()),
+   260→   260→            fetch('/api/issues').then((r) => r.json()),
+   261→   261→            fetch('/api/alerts').then((r) => r.json()),
+   262→   262→            fetch('/api/metrics').then((r) => r.json()),
+   263→   263→          ]);
+   264→   264→        setAgents(agentsRes);
+   265→   265→        setTraces(tracesRes);
+   266→   266→        setIssues(issuesRes);
+   267→   267→        setAlertItems(alertsRes);
+   268→   268→        setMetrics(metricsRes);
+   269→   269→      } catch (e) {
+   270→   270→        console.error('Failed to fetch dashboard data:', e);
+   271→   271→      } finally {
+   272→   272→        setLoading(false);
+   273→   273→      }
+   274→   274→    }
+   275→   275→    fetchData();
+   276→   276→  }, []);
+   277→   277→
+   278→   278→  const handleCompareAgent = (agent: Agent) => {
+   279→   279→    if (comparisonIds.includes(agent.id)) {
+   280→   280→      setComparisonIds(comparisonIds.filter(id => id !== agent.id));
+   281→   281→      return;
+   282→   282→    }
+   283→   283→    const newIds = [...comparisonIds, agent.id].slice(-2);
+   284→   284→    setComparisonIds(newIds);
+   285→   285→    if (newIds.length === 2) {
+   286→   286→      const a = agents.find(a => a.id === newIds[0]);
+   287→   287→      const b = agents.find(a => a.id === newIds[1]);
+   288→   288→      if (a && b) {
+   289→   289→        setComparisonAgents([a, b]);
+   290→   290→        setComparisonIds([]);
+   291→   291→      }
+   292→   292→    }
+   293→   293→  };
+   294→   294→
+   295→   295→  const filteredTraces = traces.filter((t) => {
+   296→   296→    const matchesAgent = !selectedAgentId || t.agentId === selectedAgentId;
+   297→   297→    const matchesSearch = !traceSearch ||
+   298→   298→      t.traceId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   299→   299→      t.agentId.toLowerCase().includes(traceSearch.toLowerCase()) ||
+   300→   300→      t.status.toLowerCase().includes(traceSearch.toLowerCase());
+   301→   301→    const matchesStatus = traceStatusFilter === 'all' || t.status === traceStatusFilter;
+   302→   302→    return matchesAgent && matchesSearch && matchesStatus;
+   303→   303→  });
+   304→   304→
+   305→   305→  const filteredIssues = issues.filter((issue) => {
+   306→   306→    const matchesSearch = !issueSearch ||
+   307→   307→      issue.title.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   308→   308→      issue.agentName.toLowerCase().includes(issueSearch.toLowerCase()) ||
+   309→   309→      issue.description.toLowerCase().includes(issueSearch.toLowerCase());
+   310→   310→    const matchesSeverity = issueSeverityFilter === 'all' || issue.severity === issueSeverityFilter;
+   311→   311→    const matchesStatus = issueStatusFilter === 'all' || issue.status === issueStatusFilter;
+   312→   312→    return matchesSearch && matchesSeverity && matchesStatus;
+   313→   313→  });
+   314→   314→
+   315→   315→  return (
+   316→   316→    <section id="dashboard" className="relative py-24 sm:py-32 bg-gray-50/50 dark:bg-gray-900/30">
+   317→   317→      <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+   318→   318→      <div ref={ref} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+   319→   319→        {/* Section header */}
+   320→   320→        <motion.div
+   321→   321→          initial={{ opacity: 0, y: 20 }}
+   322→   322→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   323→   323→          transition={{ duration: 0.6 }}
+   324→   324→          className="text-center mb-10"
+   325→   325→        >
+   326→   326→          <div className="inline-flex items-center gap-2 rounded-full border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/30 px-3.5 py-1.5 text-xs font-medium text-[#dc2626] mb-4">
+   327→   327→            <div className="h-2 w-2 rounded-full bg-[#dc2626] animate-pulse" />
+   328→   328→            Live Demo
+   329→   329→          </div>
+   330→   330→          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+   331→   331→            The{'\u00A0'}
+   332→   332→            <span className="text-gradient">observability dashboard</span>
+   333→   333→          </h2>
+   334→   334→          <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+   335→   335→            Real-time monitoring of AI agent traces, issues, and metrics —
+   336→   336→            everything running live below.
+   337→   337→          </p>
+   338→   338→        </motion.div>
+   339→   339→
+   340→   340→        {/* Dashboard container */}
+   341→   341→        <motion.div
+   342→   342→          initial={{ opacity: 0, y: 30 }}
+   343→   343→          animate={isInView ? { opacity: 1, y: 0 } : {}}
+   344→   344→          transition={{ duration: 0.7, delay: 0.1 }}
+   345→   345→          className="animated-border rounded-2xl bg-white dark:bg-gray-950 shadow-xl shadow-gray-200/50 dark:shadow-gray-900/50 overflow-hidden"
+   346→   346→        >
+   347→   347→          {/* Dashboard header with tabs */}
+   348→   348→          <div className="border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6">
+   349→   349→            <div className="flex items-center justify-between">
+   350→   350→              <div data-tour="tabs" className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+   351→   351→                {tabs.map((tab) => {
+   352→   352→                  const Icon = tab.icon;
+   353→   353→                  const isActive = activeTab === tab.id;
+   354→   354→                  return (
+   355→   355→                    <button
+   356→   356→                      key={tab.id}
+   357→   357→                      onClick={() => handleTabChange(tab.id)}
+   358→   358→                      className={`relative flex items-center gap-1.5 px-4 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 -mb-px transition-all duration-200 ${
+   359→   359→                        isActive
+   360→   360→                          ? 'text-[#dc2626] border-[#dc2626]'
+   361→   361→                          : 'text-gray-400 dark:text-gray-500 border-transparent hover:text-gray-600 dark:hover:text-gray-300'
+   362→   362→                      }`}
+   363→   363→                    >
+   364→   364→                      <Icon className="h-4 w-4" />
+   365→   365→                      {tab.label}
+   366→   366→                      {isActive && (
+   367→   367→                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-gradient-to-r from-transparent via-[#dc2626] to-transparent rounded-full" />
+   368→   368→                      )}
+   369→   369→                      {tab.id === 'issues' && issues.length > 0 && (
+   370→   370→                        <span className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white">
+   371→   371→                          {issues.filter((i) => i.status !== 'resolved').length}
+   372→   372→                        </span>
+   373→   373→                      )}
+   374→   374→                      {tab.id === 'alerts' && alertItems.filter((a) => a.status === 'unread').length > 0 && (
+   375→   375→                        <motion.span
+   376→   376→                          key={latestAlertId ?? 'badge'}
+   377→   377→                          initial={{ scale: 1.3 }}
+   378→   378→                          animate={{ scale: 1 }}
+   379→   379→                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+   380→   380→                          className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white"
+   381→   381→                        >
+   382→   382→                          {alertItems.filter((a) => a.status === 'unread').length}
+   383→   383→                        </motion.span>
+   384→   384→                      )}
+   385→   385→                    </button>
+   386→   386→                  );
+   387→   387→                })}
+   388→   388→              </div>
+   389→   389→              <div className="hidden sm:flex items-center gap-2">
+   390→   390→                <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
+   391→   391→                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+   392→   392→                  Live
+   393→   393→                </div>
+   394→   394→                <button
+   395→   395→                  onClick={() => setSettingsOpen(true)}
+   396→   396→                  className="ml-2 h-7 w-7 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-[#dc2626] hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors focus-ring"
+   397→   397→                  aria-label="Open settings"
+   398→   398→                >
+   399→   399→                  <Settings className="h-4 w-4" />
+   400→   400→                </button>
+   401→   401→              </div>
+   402→   402→            </div>
+   403→   403→          </div>
+   404→   404→
+   405→   405→          {/* Auth-aware banner: Demo Mode or Authenticated User */}
+   406→   406→          {showBanner && (
+   407→   407→            <div className="border-b border-gray-100 dark:border-gray-800">
+   408→   408→              <div className="px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+   409→   409→                {isAuthenticated ? (
+   410→   410→                  <div className="flex items-center gap-2.5 min-w-0">
+   411→   411→                    <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+   412→   412→                      <User className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+   413→   413→                    </div>
+   414→   414→                    <div className="min-w-0">
+   415→   415→                      <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
+   416→   416→                        Signed in as{' '}
+   417→   417→                        <span className="font-semibold text-gray-900 dark:text-gray-100">{session.user.name || session.user.email}</span>
+   418→   418→                      </p>
+   419→   419→                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{(session.user as { role?: string }).role || 'viewer'}</p>
+   420→   420→                    </div>
+   421→   421→                    <Badge variant="outline" className="ml-2 shrink-0 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] px-2">
+   422→   422→                      Authenticated
+   423→   423→                    </Badge>
+   424→   424→                  </div>
+   425→   425→                ) : (
+   426→   426→                  <div className="flex items-center gap-2.5 min-w-0">
+   427→   427→                    <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+   428→   428→                      <Eye className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+   429→   429→                    </div>
+   430→   430→                    <p className="text-xs text-amber-700 dark:text-amber-300 min-w-0">
+   431→   431→                      <span className="font-semibold">Demo Mode</span>{' — '}
+   432→   432→                      <span className="text-amber-600 dark:text-amber-400">Viewing simulated data</span>
+   433→   433→                    </p>
+   434→   434→                    <Badge variant="outline" className="ml-2 shrink-0 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 text-[10px] px-2">
+   435→   435→                      Unauthenticated
+   436→   436→                    </Badge>
+   437→   437→                  </div>
+   438→   438→                )}
+   439→   439→                <button
+   440→   440→                  onClick={handleDismissBanner}
+   441→   441→                  className="h-6 w-6 rounded-md flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 focus-ring"
+   442→   442→                  aria-label="Dismiss banner"
+   443→   443→                >
+   444→   444→                  <X className="h-3.5 w-3.5" />
+   445→   445→                </button>
+   446→   446→              </div>
+   447→   447→            </div>
+   448→   448→          )}
+   449→   449→
+   450→   450→          {/* Dashboard content */}
+   451→   451→          <div className="p-4 sm:p-6">
+   452→   452→            {loading ? (
+   453→   453→              <DashboardSkeleton />
+   454→   454→            ) : (
+   455→   455→              <>
+   456→   456→                {/* OVERVIEW TAB */}
+   457→   457→                {activeTab === 'overview' && (
+   458→   458→                  <div className="space-y-6"
+   459→   459→                  >
+   460→   460→                    {metrics?.cards && (
+   461→   461→                      <div data-tour="metrics">
+   462→   462→                        <MetricCards cards={metrics.cards} />
+   463→   463→                      </div>
+   464→   464→                    )}
+   465→   465→
+   466→   466→                    <div className="grid lg:grid-cols-3 gap-6">
+   467→   467→                      <div className="lg:col-span-2">
+   468→   468→                        <div className="flex items-center gap-2 mb-4">
+   469→   469→                          <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   470→   470→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
+   471→   471→                          <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
+   472→   472→                        </div>
+   473→   473→                        <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} onCompare={handleCompareAgent} comparisonIds={comparisonIds} />
+   474→   474→                        {comparisonIds.length === 1 && (
+   475→   475→                          <p className="text-xs text-[#dc2626] mt-2 flex items-center gap-1.5"><GitCompareArrows className="h-3 w-3" />1 agent selected — click another to compare</p>
+   476→   476→                        )}
+   477→   477→                        </div>
+   478→   478→                      </div>
+   479→   479→                      <div>
+   480→   480→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">MCP Fix Workflow</h3>
+   481→   481→                        <div data-tour="mcp"><McpPanel /></div>
+   482→   482→                      </div>
+   483→   483→                    </div>
+   484→   484→
+   485→   485→                    {metrics?.timeSeries && metrics?.severityBreakdown && metrics?.frameworkDistribution && (
+   486→   486→                      <div data-tour="charts">
+   487→   487→                        <MetricsCharts
+   488→   488→                          timeSeries={metrics.timeSeries}
+   489→   489→                          severity={metrics.severityBreakdown}
+   490→   490→                          frameworks={metrics.frameworkDistribution}
+   491→   491→                        />
+   492→   492→                      </div>
+   493→   493→                    )}
+   494→   494→                  </div>
+   495→   495→                )}
+   496→   496→
+   497→   497→                {/* TRACES TAB */}
+   498→   498→                {activeTab === 'traces' && (
+   499→   499→                  <div>
+   500→   500→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   501→   501→                      <div className="flex items-center gap-2">
+   502→   502→                        <GitBranch className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   503→   503→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Trace Explorer</h3>
+   504→   504→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
+   505→   505→                      </div>
+   506→   506→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   507→   507→                        <div className="relative flex-1 sm:flex-none">
+   508→   508→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   509→   509→                          <Input
+   510→   510→                            placeholder="Search traces..."
+   511→   511→                            value={traceSearch}
+   512→   512→                            onChange={(e) => setTraceSearch(e.target.value)}
+   513→   513→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   514→   514→                          />
+   515→   515→                          {traceSearch && (
+   516→   516→                            <button
+   517→   517→                              onClick={() => setTraceSearch('')}
+   518→   518→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   519→   519→                            >
+   520→   520→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   521→   521→                            </button>
+   522→   522→                          )}
+   523→   523→                        </div>
+   524→   524→                        <ExportButton
+   525→   525→                          data={filteredTraces as unknown as Record<string, unknown>[]}
+   526→   526→                          filename="sentinel-traces"
+   527→   527→                          columns={['traceId', 'agentId', 'status', 'duration', 'inputTokens', 'outputTokens', 'createdAt']}
+   528→   528→                          label="Export"
+   529→   529→                        />
+   530→   530→                      </div>
+   531→   531→                    </div>
+   532→   532→
+   533→   533→                    <div className="flex flex-wrap items-center gap-2 mb-4">
+   534→   534→                      <button
+   535→   535→                        onClick={() => setShowWaterfall(!showWaterfall)}
+   536→   536→                        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${showWaterfall ? 'bg-[#dc2626] text-white' : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'}`}
+   537→   537→                      >
+   538→   538→                        <BarChart3 className="h-3 w-3" />
+   539→   539→                        Waterfall
+   540→   540→                      </button>
+   541→   541→                      {selectedAgentId && (
+   542→   542→                        <button
+   543→   543→                          onClick={() => setSelectedAgentId(null)}
+   544→   544→                          className="px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/20 hover:bg-[#dc2626]/20 transition-colors"
+   545→   545→                        >
+   546→   546→                          ← All agents
+   547→   547→                        </button>
+   548→   548→                      )}
+   549→   549→                      {['all', 'success', 'error'].map((stat) => (
+   550→   550→                        <button
+   551→   551→                          key={stat}
+   552→   552→                          onClick={() => setTraceStatusFilter(stat)}
+   553→   553→                          className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   554→   554→                            traceStatusFilter === stat
+   555→   555→                              ? stat === 'success' ? 'bg-emerald-500 text-white'
+   556→   556→                                : stat === 'error' ? 'bg-[#dc2626] text-white'
+   557→   557→                                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   558→   558→                              : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   559→   559→                          }`}
+   560→   560→                        >
+   561→   561→                          {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   562→   562→                        </button>
+   563→   563→                      ))}
+   564→   564→                    </div>
+   565→   565→
+   566→   566→                    {filteredTraces.length === 0 ? (
+   567→   567→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   568→   568→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   569→   569→                        <p className="text-sm">No traces match your filters</p>
+   570→   570→                      </div>
+   571→   571→                    ) : (
+   572→   572→                      <TraceViewer traces={filteredTraces} />
+   573→   573→                    )}
+   574→   574→                    {showWaterfall && filteredTraces.length > 0 && (
+   575→   575→                      <div className="mt-6">
+   576→   576→                        <div className="flex items-center gap-2 mb-3">
+   577→   577→                          <BarChart3 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   578→   578→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Waterfall Timeline</h3>
+   579→   579→                        </div>
+   580→   580→                        <TraceWaterfall spans={filteredTraces[0]?.spans ?? []} totalDuration={filteredTraces[0]?.duration ?? 1} />
+   581→   581→                      </div>
+   582→   582→                    )}
+   583→   583→                  </div>
+   584→   584→                )}
+   585→   585→
+   586→   586→                {/* ISSUES TAB */}
+   587→   587→                {activeTab === 'issues' && (
+   588→   588→                  <div>
+   589→   589→                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+   590→   590→                      <div className="flex items-center gap-2">
+   591→   591→                        <AlertTriangle className="h-4 w-4 text-[#dc2626]" />
+   592→   592→                        <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Detected Issues</h3>
+   593→   593→                        <span className="text-xs text-gray-400 dark:text-gray-500">({filteredIssues.length}/{issues.length})</span>
+   594→   594→                      </div>
+   595→   595→                      <div className="flex items-center gap-2 w-full sm:w-auto">
+   596→   596→                        <div className="relative flex-1 sm:flex-none">
+   597→   597→                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
+   598→   598→                          <Input
+   599→   599→                            placeholder="Search issues..."
+   600→   600→                            value={issueSearch}
+   601→   601→                            onChange={(e) => setIssueSearch(e.target.value)}
+   602→   602→                            className="h-8 pl-8 pr-8 text-xs bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 w-full sm:w-56"
+   603→   603→                          />
+   604→   604→                          {issueSearch && (
+   605→   605→                            <button
+   606→   606→                              onClick={() => setIssueSearch('')}
+   607→   607→                              className="absolute right-2 top-1/2 -translate-y-1/2"
+   608→   608→                            >
+   609→   609→                              <X className="h-3 w-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300" />
+   610→   610→                            </button>
+   611→   611→                          )}
+   612→   612→                        </div>
+   613→   613→                        <button
+   614→   614→                          onClick={() => setShowFilters(!showFilters)}
+   615→   615→                          className={`flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium border transition-colors ${
+   616→   616→                            showFilters
+   617→   617→                              ? 'bg-[#dc2626] text-white border-[#dc2626]'
+   618→   618→                              : 'bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   619→   619→                          }`}
+   620→   620→                        >
+   621→   621→                          <Filter className="h-3.5 w-3.5" />
+   622→   622→                          Filters
+   623→   623→                        </button>
+   624→   624→                        <ExportButton
+   625→   625→                          data={filteredIssues as unknown as Record<string, unknown>[]}
+   626→   626→                          filename="sentinel-issues"
+   627→   627→                          columns={['agentName', 'title', 'severity', 'status', 'failureRate', 'affectedRuns', 'createdAt']}
+   628→   628→                          label="Export"
+   629→   629→                        />
+   630→   630→                      </div>
+   631→   631→                    </div>
+   632→   632→
+   633→   633→                    {showFilters && (
+   634→   634→                      <motion.div
+   635→   635→                        initial={{ height: 0, opacity: 0 }}
+   636→   636→                        animate={{ height: 'auto', opacity: 1 }}
+   637→   637→                        exit={{ height: 0, opacity: 0 }}
+   638→   638→                        className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800"
+   639→   639→                      >
+   640→   640→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Severity:</span>
+   641→   641→                        {['all', 'P0', 'P1', 'P2'].map((sev) => (
+   642→   642→                          <button
+   643→   643→                            key={sev}
+   644→   644→                            onClick={() => setIssueSeverityFilter(sev)}
+   645→   645→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   646→   646→                              issueSeverityFilter === sev
+   647→   647→                                ? sev === 'P0' ? 'bg-[#dc2626] text-white'
+   648→   648→                                  : sev === 'P1' ? 'bg-amber-500 text-white'
+   649→   649→                                  : sev === 'P2' ? 'bg-gray-500 text-white'
+   650→   650→                                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+   651→   651→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   652→   652→                            }`}
+   653→   653→                          >
+   654→   654→                            {sev === 'all' ? 'All' : sev}
+   655→   655→                          </button>
+   656→   656→                        ))}
+   657→   657→                        <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+   658→   658→                        <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">Status:</span>
+   659→   659→                        {['all', 'open', 'investigating', 'resolved', 'reopened'].map((stat) => (
+   660→   660→                          <button
+   661→   661→                            key={stat}
+   662→   662→                            onClick={() => setIssueStatusFilter(stat)}
+   663→   663→                            className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors ${
+   664→   664→                              issueStatusFilter === stat
+   665→   665→                                ? 'bg-[#dc2626] text-white'
+   666→   666→                                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+   667→   667→                            }`}
+   668→   668→                          >
+   669→   669→                            {stat.charAt(0).toUpperCase() + stat.slice(1)}
+   670→   670→                          </button>
+   671→   671→                        ))}
+   672→   672→                      </motion.div>
+   673→   673→                    )}
+   674→   674→
+   675→   675→                    {filteredIssues.length === 0 ? (
+   676→   676→                      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+   677→   677→                        <Search className="h-8 w-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+   678→   678→                        <p className="text-sm">No issues match your filters</p>
+   679→   679→                      </div>
+   680→   680→                    ) : (
+   681→   681→                      <IssuesPanel issues={filteredIssues} onUpdate={fetchIssues} />
+   682→   682→                    )}
+   683→   683→                  </div>
+   684→   684→                )}
+   685→   685→
+   686→   686→                {/* API HEALTH TAB */}
+   687→   687→                {activeTab === 'api-health' && (
+   688→   688→                  <ApiHealthPanel />
+   689→   689→                )}
+   690→   690→
+   691→   691→                {/* ALERTS TAB */}
+   692→   692→                {activeTab === 'alerts' && (
+   693→   693→                  <div>
+   694→   694→                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+   695→   695→                      <div className="lg:col-span-2">
+   696→   696→                        <div className="flex items-center gap-2 mb-3">
+   697→   697→                          <Clock className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+   698→   698→                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Recent{'\u00A0'}Activity</h3>
+   699→   699→                        </div>
+   700→   700→                        <div className="rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-4 max-h-[600px] overflow-y-auto dashboard-scroll">
+   701→   701→                          <ActivityTimeline />
+   702→   702→                        </div>
+   703→   703→                      </div>
+   704→   704→                      <div className="lg:col-span-3">
+   705→   705→                        <AlertFeed alerts={alertItems} />
+   706→   706→                      </div>
+   707→   707→                    </div>
+   708→   708→                  </div>
+   709→   709→                )}
+   710→   710→              </>
+   711→   711→            )}
+   712→   712→          </div>
+   713→   713→        </motion.div>
+   714→   714→      </div>
+   715→   715→
+   716→   716→      <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
+   717→   717→      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+   718→   718→      {comparisonAgents && (
+   719→   719→        <AgentComparison
+   720→   720→          agentA={comparisonAgents[0]}
+   721→   721→          agentB={comparisonAgents[1]}
+   722→   722→          open={!!comparisonAgents}
+   723→   723→          onClose={() => { setComparisonAgents(null); setComparisonIds([]); }}
+   724→   724→        />
+   725→   725→      )}
+   726→   726→    </section>
+   727→   727→  );
+   728→   728→}
+   729→   729→

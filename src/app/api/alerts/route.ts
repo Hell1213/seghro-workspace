@@ -6,6 +6,7 @@ import { error, validationError } from '@/lib/api-response';
 
 const patchSchema = z.object({
   id: z.string().min(1),
+  status: z.enum(['read', 'acknowledged', 'resolved']).optional(),
 });
 
 export async function GET() {
@@ -52,9 +53,10 @@ export async function PATCH(request: NextRequest) {
       return validationError(parsed.error.flatten());
     }
 
+    const newStatus = parsed.data.status ?? 'read';
     const updated = await db.alert.update({
       where: { id: parsed.data.id },
-      data: { status: 'read' },
+      data: { status: newStatus },
     });
 
     return Response.json({

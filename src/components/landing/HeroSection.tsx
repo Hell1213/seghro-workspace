@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { ArrowDown, Activity, Zap, ShieldCheck, Shield, Globe } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import ParticleCanvas from '@/components/ui/ParticleCanvas';
 import { useState, useEffect } from 'react';
@@ -112,6 +113,7 @@ function AnimatedTrace() {
 }
 
 export function HeroSection() {
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -190,6 +192,7 @@ export function HeroSection() {
             >
               <Button
                 size="lg"
+                onClick={() => router.push('/register')}
                 className="bg-[#dc2626] hover:bg-[#b91c1c] text-white px-6 sm:px-7 shadow-lg shadow-red-200 dark:shadow-red-900/30 hover:shadow-red-300 dark:hover:shadow-red-900/50 transition-all hover:scale-[1.02] btn-glow"
               >
                 <Activity className="mr-2 h-4 w-4 self-center" />

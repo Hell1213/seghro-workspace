@@ -18,6 +18,8 @@ import {
   Settings,
   User,
   Eye,
+  Plus,
+  Zap,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
@@ -38,6 +40,8 @@ import { TraceWaterfall } from './TraceWaterfall';
 import { DashboardSkeleton } from './DashboardSkeleton';
 import { ApiHealthPanel } from './ApiHealthPanel';
 import { SettingsPanel } from './SettingsPanel';
+import { CreateAgentDialog } from './CreateAgentDialog';
+import { SimulateTraceDialog } from './SimulateTraceDialog';
 
 type TabId = 'overview' | 'traces' | 'issues' | 'alerts' | 'api-health';
 
@@ -147,6 +151,8 @@ export function DashboardSection() {
   const [comparisonAgents, setComparisonAgents] = useState<[Agent, Agent] | null>(null);
   const [showWaterfall, setShowWaterfall] = useState(true);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [createAgentOpen, setCreateAgentOpen] = useState(false);
+  const [simulateTraceOpen, setSimulateTraceOpen] = useState(false);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [traces, setTraces] = useState<Trace[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -241,6 +247,15 @@ export function DashboardSection() {
     try {
       const issuesRes = await fetch('/api/issues').then((r) => r.json());
       setIssues(issuesRes);
+    } catch {
+      // silently fail
+    }
+  }, []);
+
+  const fetchTraces = useCallback(async () => {
+    try {
+      const tracesRes = await fetch('/api/traces').then((r) => r.json());
+      setTraces(tracesRes);
     } catch {
       // silently fail
     }
@@ -465,10 +480,19 @@ export function DashboardSection() {
 
                     <div className="grid lg:grid-cols-3 gap-6">
                       <div className="lg:col-span-2">
-                        <div className="flex items-center gap-2 mb-4">
-                          <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
+                        <div className="flex items-center justify-between gap-2 mb-4">
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Monitored Agents</h3>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">({agents.length})</span>
+                          </div>
+                          <button
+                            onClick={() => setCreateAgentOpen(true)}
+                            className="flex items-center gap-1.5 h-7 px-3 rounded-lg text-xs font-medium bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors focus-ring"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                            Create Agent
+                          </button>
                         </div>
                         <div data-tour="agents"><AgentGrid agents={agents} onSelect={(agent) => setDetailAgent(agent)} onCompare={handleCompareAgent} comparisonIds={comparisonIds} />
                         {comparisonIds.length === 1 && (
@@ -504,6 +528,13 @@ export function DashboardSection() {
                         <span className="text-xs text-gray-400 dark:text-gray-500">({filteredTraces.length}/{traces.length} traces)</span>
                       </div>
                       <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <button
+                          onClick={() => setSimulateTraceOpen(true)}
+                          className="flex items-center gap-1.5 h-8 px-3 rounded-lg text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors focus-ring shrink-0"
+                        >
+                          <Zap className="h-3.5 w-3.5" />
+                          Simulate Trace
+                        </button>
                         <div className="relative flex-1 sm:flex-none">
                           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 dark:text-gray-500" />
                           <Input
@@ -702,7 +733,7 @@ export function DashboardSection() {
                         </div>
                       </div>
                       <div className="lg:col-span-3">
-                        <AlertFeed alerts={alertItems} />
+                        <AlertFeed alerts={alertItems} onUpdate={fetchAlerts} />
                       </div>
                     </div>
                   </div>
@@ -715,6 +746,8 @@ export function DashboardSection() {
 
       <AgentDetailSheet agent={detailAgent} open={!!detailAgent} onClose={() => setDetailAgent(null)} />
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      <CreateAgentDialog open={createAgentOpen} onOpenChange={setCreateAgentOpen} onSuccess={fetchAgents} />
+      <SimulateTraceDialog open={simulateTraceOpen} onOpenChange={setSimulateTraceOpen} onSuccess={fetchTraces} agents={agents.map(a => ({ id: a.id, name: a.name, framework: a.framework }))} />
       {comparisonAgents && (
         <AgentComparison
           agentA={comparisonAgents[0]}

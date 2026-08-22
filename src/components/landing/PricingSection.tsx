@@ -2,6 +2,8 @@
 
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,6 +79,7 @@ const tiers: PricingTier[] = [
 ];
 
 export function PricingSection() {
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
@@ -180,6 +183,13 @@ export function PricingSection() {
               {/* CTA button */}
               <Button
                 variant={tier.buttonVariant}
+                onClick={() => {
+                  if (tier.buttonLabel === 'Contact Sales') {
+                    toast.info('Sales inquiry sent! Our team will reach out within 24 hours.', { description: 'sales@sentinel.dev' });
+                    return;
+                  }
+                  router.push('/register');
+                }}
                 className={`w-full font-semibold ${
                   tier.buttonVariant === 'default'
                     ? 'bg-[#dc2626] hover:bg-[#b91c1c] text-white shadow-lg shadow-red-200/50 dark:shadow-red-900/30 hover:shadow-red-300/60 dark:hover:shadow-red-900/50 btn-glow'

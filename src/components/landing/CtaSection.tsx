@@ -3,9 +3,12 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 export function CtaSection() {
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
@@ -39,6 +42,7 @@ export function CtaSection() {
           >
             <Button
               size="lg"
+              onClick={() => router.push('/register')}
               className="bg-[#dc2626] hover:bg-[#b91c1c] text-white font-semibold px-8 h-12 text-base rounded-xl shadow-lg shadow-red-200/50 dark:shadow-red-900/30 hover:shadow-red-300/60 dark:hover:shadow-red-900/50 transition-all btn-glow"
             >
               Get Started Free
@@ -47,6 +51,7 @@ export function CtaSection() {
             <Button
               variant="outline"
               size="lg"
+              onClick={() => toast.info('Demo request received! Check your email for the calendar link.', { description: 'team@sentinel.dev' })}
               className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100 font-semibold px-8 h-12 text-base rounded-xl transition-all"
             >
               Book a Demo

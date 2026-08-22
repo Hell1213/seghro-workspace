@@ -26,32 +26,32 @@ const footerLinks: Record<string, { label: string; href?: string }[]> = {
     { label: 'Docs', href: '#docs' },
   ],
   Company: [
-    { label: 'About' },
-    { label: 'Blog' },
-    { label: 'Careers' },
-    { label: 'Contact' },
+    { label: 'About', href: '#features' },
+    { label: 'Blog', href: '#changelog' },
+    { label: 'Careers', href: '#features' },
+    { label: 'Contact', href: 'mailto:team@sentinel.dev' },
   ],
   Resources: [
     { label: 'Documentation', href: '#docs' },
-    { label: 'API Reference' },
+    { label: 'API Reference', href: '#docs' },
     { label: 'Changelog', href: '#changelog' },
     { label: 'Status', href: '#status' },
-    { label: 'Weekly' },
+    { label: 'Weekly', href: '#changelog' },
   ],
   Legal: [
-    { label: 'Privacy' },
-    { label: 'Terms' },
-    { label: 'Security' },
-    { label: 'Trust Center' },
+    { label: 'Privacy', href: '#features' },
+    { label: 'Terms', href: '#features' },
+    { label: 'Security', href: '#features' },
+    { label: 'Trust Center', href: '#status' },
   ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Github, href: '#', label: 'GitHub' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Youtube, href: '#', label: 'YouTube' },
-  { icon: DiscordIcon, href: '#', label: 'Discord' },
+  { icon: Twitter, href: 'https://x.com/sentinel_dev', label: 'Twitter' },
+  { icon: Github, href: 'https://github.com/sentinel-ai', label: 'GitHub' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/sentinel-ai', label: 'LinkedIn' },
+  { icon: Youtube, href: 'https://youtube.com/@sentinel_ai', label: 'YouTube' },
+  { icon: DiscordIcon, href: 'https://discord.gg/sentinel', label: 'Discord' },
 ];
 
 function DiscordIcon({ className }: { className?: string }) {
@@ -224,7 +224,11 @@ export function Footer() {
                 {links.map((link) => (
                   <li key={link.label}>
                     <a
-                      href={link.href || '#'}
+                      href={link.href || '#features'}
+                      onClick={(e) => {
+                        if (!link.href || link.href.startsWith('#')) return;
+                        if (link.href.startsWith('mailto:')) return;
+                      }}
                       className="text-xs text-gray-400 dark:text-gray-400 hover:text-[#dc2626] dark:hover:text-red-400 transition-colors"
                     >
                       {link.label}

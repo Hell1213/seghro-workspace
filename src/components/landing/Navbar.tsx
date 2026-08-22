@@ -3,6 +3,7 @@
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
 import { Shield, Menu, X, Moon, Sun, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 
@@ -11,6 +12,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ onSearchClick }: NavbarProps) {
+  const router = useRouter();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -147,7 +149,10 @@ export function Navbar({ onSearchClick }: NavbarProps) {
             )}
 
             {/* Get Started CTA — visible on md+ */}
-            <Button className="hidden md:inline-flex bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-4 lg:px-5 shadow-md shadow-red-200 hover:shadow-red-300 btn-glow shrink-0">
+            <Button
+              onClick={() => router.push('/register')}
+              className="hidden md:inline-flex bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm px-4 lg:px-5 shadow-md shadow-red-200 hover:shadow-red-300 btn-glow shrink-0"
+            >
               Get Started
             </Button>
 
@@ -200,7 +205,10 @@ export function Navbar({ onSearchClick }: NavbarProps) {
                 {link.label}
               </a>
             ))}
-            <Button className="w-full mt-3 bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm btn-glow">
+            <Button
+              onClick={() => { setMobileOpen(false); router.push('/register'); }}
+              className="w-full mt-3 bg-[#dc2626] hover:bg-[#b91c1c] text-white text-sm btn-glow"
+            >
               Get Started
             </Button>
           </motion.div>
