@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { getAuthSession } from '@/lib/auth-guard';
+import { getUserOrgId } from '@/lib/org-scope';
 import { z } from 'zod';
 import { error } from '@/lib/api-response';
 
@@ -10,9 +10,9 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Soft auth check — log warning if no session, but still return data for demo
-    const session = await getAuthSession();
-    if (!session) {
+    // Org-scoped auth check
+    const orgId = await getUserOrgId();
+    if (!orgId) {
       console.warn('[/api/agents] No auth session — returning data in demo mode');
     }
 
@@ -22,6 +22,9 @@ export async function GET(request: NextRequest) {
     });
 
     const where: Record<string, unknown> = {};
+    if (orgId) {
+      where.orgId = orgId;
+    }
     if (parsed.success && parsed.data.search) {
       where.name = { contains: parsed.data.search };
     }

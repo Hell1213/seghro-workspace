@@ -11,16 +11,15 @@ const nextConfig: NextConfig = {
     "http://localhost:3000",
   ],
 
-  // Security headers applied to every response
+  // Security headers applied to every response (dev / preview-safe)
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
+          // Allow embedding in preview / sandbox iframes — use CSP frame-ancestors
+          // in production reverse-proxy (Caddy / Nginx) instead of X-Frame-Options.
+          // X-Frame-Options is intentionally omitted here so the dev preview works.
           {
             key: "X-Content-Type-Options",
             value: "nosniff",

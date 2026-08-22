@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
+import { getUserOrgId } from '@/lib/org-scope';
 import { z } from 'zod';
 import { error, validationError } from '@/lib/api-response';
 
@@ -9,7 +10,19 @@ const patchSchema = z.object({
 
 export async function GET() {
   try {
+    // Org-scoped auth check
+    const orgId = await getUserOrgId();
+    if (!orgId) {
+      console.warn('[/api/alerts] No auth session — returning data in demo mode');
+    }
+
+    const where: Record<string, unknown> = {};
+    if (orgId) {
+      where.agent = { orgId };
+    }
+
     const alerts = await db.alert.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
     });
 

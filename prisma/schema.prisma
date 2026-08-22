@@ -38,6 +38,7 @@ model Agent {
   description String?
   status      String   @default("active")
   framework   String?
+  orgId       String?
   lastRunAt   DateTime?
   totalRuns   Int      @default(0)
   errorRate   Float    @default(0)
@@ -46,6 +47,7 @@ model Agent {
   updatedAt   DateTime @updatedAt
   traces      Trace[]
   issues      Issue[]
+  alerts      Alert[]
 }
 
 model Trace {
@@ -100,6 +102,7 @@ model Alert {
   id        String   @id @default(cuid())
   issueId   String?
   agentId   String?
+  agent     Agent?  @relation(fields: [agentId], references: [id])
   channel   String   @default("slack")
   title     String
   message   String?
@@ -130,12 +133,42 @@ model ApiKey {
 }
 
 model Webhook {
-  id        String   @id @default(cuid())
-  orgId     String?
-  url       String
-  events    String   // JSON array of event types
-  secret    String?
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  orgId      String?
+  url        String
+  events     String    // JSON array of event types
+  secret     String?
+  active     Boolean   @default(true)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model MonitoredEndpoint {
+  id             String   @id @default(cuid())
+  name           String
+  baseUrl        String
+  status         String   @default("healthy")
+  responseTime   Float    @default(0)
+  errorRate      Float    @default(0)
+  lastChecked    DateTime @default(now())
+  circuitBreaker String   @default("closed")
+  category       String   @default("llm")
+  orgId          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model HealingAction {
+  id           String   @id @default(cuid())
+  type         String
+  endpointName String
+  action       String
+  result       String
+  severity     String   @default("info")
+  reasoning    String?
+  steps        String
+  timestamp    DateTime @default(now())
+  orgId        String?
+  createdAt    DateTime @default(now())
 }

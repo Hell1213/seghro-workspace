@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   LayoutDashboard,
   GitBranch,
@@ -16,9 +16,13 @@ import {
   BarChart3,
   Heart,
   Settings,
+  User,
+  Eye,
 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { useAutoRefresh } from '@/hooks/use-auto-refresh';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { ExportButton } from '@/components/ui/ExportButton';
 import { MetricCards } from './MetricCards';
 import { AgentGrid } from './AgentGrid';
@@ -99,7 +103,31 @@ interface AlertItem {
 export function DashboardSection() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+
+  // Auth-aware banner: demo mode vs authenticated user
+  const isAuthenticated = !!session?.user?.email;
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem('sentinel-auth-banner-dismissed');
+      if (dismissed === 'true') setBannerDismissed(true);
+    } catch { /* ignore */ }
+  }, []);
+
+  const handleDismissBanner = useCallback(() => {
+    setBannerDismissed(true);
+    try {
+      localStorage.setItem('sentinel-auth-banner-dismissed', 'true');
+    } catch { /* ignore */ }
+  }, []);
+
+  const showBanner = useMemo(
+    () => !bannerDismissed,
+    [bannerDismissed]
+  );
 
   // Sync tab to URL hash
   useEffect(() => {
@@ -373,6 +401,51 @@ export function DashboardSection() {
               </div>
             </div>
           </div>
+
+          {/* Auth-aware banner: Demo Mode or Authenticated User */}
+          {showBanner && (
+            <div className="border-b border-gray-100 dark:border-gray-800">
+              <div className="px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="h-7 w-7 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center shrink-0">
+                      <User className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs text-gray-700 dark:text-gray-300 truncate">
+                        Signed in as{' '}
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">{session.user.name || session.user.email}</span>
+                      </p>
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500">{(session.user as { role?: string }).role || 'viewer'}</p>
+                    </div>
+                    <Badge variant="outline" className="ml-2 shrink-0 border-emerald-200 dark:border-emerald-800/50 text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] px-2">
+                      Authenticated
+                    </Badge>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="h-7 w-7 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                      <Eye className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 min-w-0">
+                      <span className="font-semibold">Demo Mode</span>{' — '}
+                      <span className="text-amber-600 dark:text-amber-400">Viewing simulated data</span>
+                    </p>
+                    <Badge variant="outline" className="ml-2 shrink-0 border-amber-200 dark:border-amber-800/50 text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 text-[10px] px-2">
+                      Unauthenticated
+                    </Badge>
+                  </div>
+                )}
+                <button
+                  onClick={handleDismissBanner}
+                  className="h-6 w-6 rounded-md flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors shrink-0 focus-ring"
+                  aria-label="Dismiss banner"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Dashboard content */}
           <div className="p-4 sm:p-6">

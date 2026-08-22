@@ -6,8 +6,16 @@ export const config = {
   matcher: ['/dashboard/:path*', '/api/:path*'],
 }
 
+// Generate a short request ID for log correlation (Edge-compatible)
+function requestId(): string {
+  const ts = Date.now().toString(36)
+  const rand = Math.random().toString(36).slice(2, 10)
+  return `${ts}-${rand}`
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const reqId = requestId()
 
   // ---------- Rate limiting for /api/* ----------
   if (pathname.startsWith('/api')) {
@@ -15,19 +23,21 @@ export function middleware(request: NextRequest) {
 
     if (!rl.allowed) {
       return NextResponse.json(
-        { error: 'Too many requests', retryAfter: Math.ceil((rl.resetAt - Date.now()) / 1000) },
+        { error: 'Too many requests', requestId: reqId, retryAfter: Math.ceil((rl.resetAt - Date.now()) / 1000) },
         {
           status: 429,
           headers: {
             'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)),
             'X-RateLimit-Remaining': '0',
             'X-RateLimit-Reset': String(rl.resetAt),
+            'X-Request-Id': reqId,
           },
         }
       )
     }
 
     const response = NextResponse.next()
+    response.headers.set('X-Request-Id', reqId)
     response.headers.set('X-RateLimit-Remaining', String(rl.remaining))
     response.headers.set('X-RateLimit-Limit', String(rl.limit))
     response.headers.set('X-RateLimit-Reset', String(rl.resetAt))
@@ -46,13 +56,10 @@ export function middleware(request: NextRequest) {
 
   // Add security headers
   const response = NextResponse.next()
-  response.headers.set('X-Frame-Options', 'DENY')
+  // X-Frame-Options omitted — handled by reverse-proxy in production
+  response.headers.set('X-Request-Id', reqId)
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set(
-    'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss:;"
-  )
 
   return response
 }
