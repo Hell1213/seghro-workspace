@@ -1643,3 +1643,22 @@ Stage Summary:
 - App fully renamed to "Seghro" across entire codebase (30+ files, ~50+ replacements)
 - Lint passes clean with zero errors
 - Google Console URIs needed for OAuth to work in sandbox
+
+---
+Task ID: 2-5
+Agent: main
+Task: Deep production readiness audit + agents.md creation
+
+Work Log:
+- Launched backend audit subagent: checked all 24 API routes, auth system, database schema, security config, file structure
+- Launched frontend audit subagent: checked all links, page completeness, component health, UX/accessibility, dead code, bundle
+- Backend audit found: 10 CRITICAL, 14 HIGH, 11 MEDIUM, 4 LOW issues
+- Frontend audit found: 2 CRITICAL, 1 HIGH, 8 MEDIUM, 2 LOW issues
+- Created comprehensive agents.md (350+ lines) covering: project overview, structure, database schema, all 24 API routes, auth system, UI architecture, conventions, roadmap
+- Verified agents.md covers every file, model, route, and pattern in the codebase
+
+Stage Summary:
+- agents.md created at /home/z/my-project/agents.md
+- Production readiness: NOT READY — 12 CRITICAL issues must be fixed first
+- Top blockers: broken org-scoping, no bcrypt in credentials auth, 13 unprotected API routes, no CSRF, SQLite in prod, missing .gitignore
+- The app works as a demo/showcase but cannot be given to real users in current state
