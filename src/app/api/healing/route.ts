@@ -1,39 +1,41 @@
-import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { healingActions as seedHealingActions } from '@/lib/self-healing-data';
-import { error } from '@/lib/api-response';
+import { error, success } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
 /** Seed healing actions from self-healing-data.ts into the database */
 async function seedHealingActionsFromData() {
-  const [row] = await db.$queryRawUnsafe<{ c: number }[]>('SELECT COUNT(*) as c FROM HealingAction');
-  if (row.c > 0) return;
+  const count = await db.healingAction.count();
+  if (count > 0) return;
 
-  for (const ha of seedHealingActions) {
-    await db.$executeRawUnsafe(
-      `INSERT INTO HealingAction (id, type, endpointName, action, result, severity, reasoning, steps, timestamp, createdAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))`,
-      ha.id, ha.type, ha.endpointName, ha.action, ha.result, ha.severity, ha.details, '[]',
-      new Date(ha.timestamp).toISOString()
-    );
-  }
+  await db.healingAction.createMany({
+    data: seedHealingActions.map((ha) => ({
+      id: ha.id,
+      type: ha.type,
+      endpointName: ha.endpointName,
+      action: ha.action,
+      result: ha.result,
+      severity: ha.severity,
+      reasoning: ha.details,
+      steps: '[]',
+      timestamp: new Date(ha.timestamp),
+    })),
+  });
 }
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return error('Unauthorized', 401);
     }
 
     await seedHealingActionsFromData();
 
-    const actions = await db.$queryRawUnsafe<{
-      id: string; type: string; endpointName: string; action: string;
-      result: string; severity: string; reasoning: string | null;
-      timestamp: string;
-    }[]>('SELECT id, type, endpointName, action, result, severity, reasoning, timestamp FROM HealingAction ORDER BY timestamp DESC');
+    const actions = await db.healingAction.findMany({
+      orderBy: { timestamp: 'desc' },
+    });
 
     const totalActions = actions.length;
     const automaticCount = actions.filter((a) => a.type === 'automatic').length;
@@ -44,7 +46,7 @@ export async function GET() {
         ? Math.round((successCount / totalActions) * 10000) / 100
         : 0;
 
-    return NextResponse.json({
+    return success({
       actions: actions.map((a) => ({
         id: a.id,
         endpointId: '',
@@ -54,14 +56,14 @@ export async function GET() {
         severity: a.severity,
         details: a.reasoning ?? '',
         result: a.result,
-        timestamp: a.timestamp,
+        timestamp: a.timestamp.toISOString(),
       })),
       summary: {
         totalActions,
         automaticCount,
         manualCount,
         successRate,
-        lastAction: actions[0]?.timestamp ?? null,
+        lastAction: actions[0]?.timestamp.toISOString() ?? null,
       },
     });
   } catch (err) {

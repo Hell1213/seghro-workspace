@@ -1,0 +1,14 @@
+{
+  "test1": {
+    "pass": false,
+    "details": "HTTP 200, textLen=2451, branding=true, footer=true, appErrors=0"
+  },
+  "test2": {
+    "pass": false,
+    "details": "filled=[true,true] errorShown=false redirected=false url=http://127.0.0.1:3000/login?callbackUrl=%2Fdashboard appErrors=0"
+  },
+  "test3": {
+    "pass": false,
+    "details": "Could not reach dashboard (stuck at: http://127.0.0.1:3000/login?callbackUrl=%2Fdashboard)"
+  }
+}

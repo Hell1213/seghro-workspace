@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { success, error, validationError } from '@/lib/api-response';
 import { createCheckoutSession, isValidPlan, type PlanType } from '@/lib/billing';
 import { getServerSession } from 'next-auth';
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return error('Unauthorized', 401);
     }
 
     const body = (await request.json()) as { plan?: string };

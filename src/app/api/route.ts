@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { success } from "@/lib/api-response";
 
 const startTime = Date.now();
 
@@ -19,7 +19,7 @@ export async function GET() {
   const uptimeMs = Date.now() - startTime;
   const totalLatencyMs = Math.round((performance.now() - start) * 100) / 100;
 
-  return NextResponse.json({
+  return success({
     status: dbStatus === "up" ? "healthy" : "degraded",
     timestamp: new Date().toISOString(),
     uptime: uptimeMs,

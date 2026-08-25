@@ -114,12 +114,12 @@ export async function dispatchWebhooks(
           )
           return false
         } finally {
-          // Update lastUsedAt via raw SQL to handle potentially stale Prisma client
+          // Update lastUsedAt (updatedAt handled automatically by @updatedAt)
           try {
-            const now = new Date().toISOString()
-            await db.$queryRawUnsafe(
-              `UPDATE "Webhook" SET "lastUsedAt" = '${now}', "updatedAt" = '${now}' WHERE "id" = '${webhook.id}'`
-            )
+            await db.webhook.update({
+              where: { id: webhook.id },
+              data: { lastUsedAt: new Date() },
+            })
           } catch (updateErr) {
             console.error(
               `[webhook-dispatcher] Failed to update lastUsedAt for webhook ${webhook.id}:`,

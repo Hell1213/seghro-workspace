@@ -1,6 +1,5 @@
-import { NextResponse } from 'next/server';
 import { apiEndpoints } from '@/lib/self-healing-data';
-import { error } from '@/lib/api-response';
+import { error, success } from '@/lib/api-response';
 
 // TODO: Move to database when backend is extracted
 
@@ -20,7 +19,7 @@ export async function GET() {
           100,
       ) / 100;
 
-    return NextResponse.json({
+    return success({
       endpoints: apiEndpoints,
       summary: {
         healthy,

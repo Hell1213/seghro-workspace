@@ -1,0 +1,16 @@
+[alert-streamer] Installing dependencies...
+bun install v1.3.14 (0d9b296a)
+
+Checked 22 installs across 23 packages (no changes) [2.00ms]
+[alert-streamer] Running bun run dev...
+$ bun --hot index.ts
+[AlertStreamer] Socket.IO server starting on port 3001
+46 |     }
+47 |   }
+48 |   let er;
+49 |   if (args.length > 0)
+50 |     er = args[0];
+51 |     throw er;
+                 ^
+error: Failed to start server. Is port 3001 in use?
+      at emitError (node:events:51:13)

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
-import { error } from '@/lib/api-response';
+import { error, success } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
 
     const timeSeries = await Promise.all(timeSeriesPromises);
 
-    return Response.json({
+    return success({
       timeSeries,
       cards,
       severityBreakdown,

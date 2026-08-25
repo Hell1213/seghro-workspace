@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { success, error } from '@/lib/api-response'
 
 /** DELETE — revoke an API key */
 export async function DELETE(
@@ -11,7 +12,7 @@ export async function DELETE(
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return error('Unauthorized', 401)
     }
 
     const userId = (session.user as { id: string }).id
@@ -19,19 +20,19 @@ export async function DELETE(
 
     const existing = await db.apiKey.findUnique({ where: { id } })
     if (!existing) {
-      return NextResponse.json({ error: 'API key not found' }, { status: 404 })
+      return error('API key not found', 404)
     }
 
     // Verify ownership
     if (existing.userId !== userId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      return error('Forbidden', 403)
     }
 
     await db.apiKey.delete({ where: { id } })
 
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    console.error('[API Keys DELETE] Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return success({ deleted: true })
+  } catch (err) {
+    console.error('[API Keys DELETE] Error:', err)
+    return error('Internal server error')
   }
 }

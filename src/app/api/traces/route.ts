@@ -48,8 +48,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Map to frontend-expected shape
-    return Response.json(
-      traces.map((t) => ({
+    return success(traces.map((t) => ({
         id: t.id,
         agentId: t.agentId,
         traceId: t.traceId,
@@ -71,8 +70,7 @@ export async function GET(request: NextRequest) {
           inputTokens: s.inputTokens,
           outputTokens: s.outputTokens,
         })),
-      })),
-    );
+      })))
   } catch (err) {
     console.error('[/api/traces] Error:', err);
     return error('Failed to fetch traces');

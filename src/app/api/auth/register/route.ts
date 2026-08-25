@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
+import { success, error, validationError } from '@/lib/api-response'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -17,10 +18,7 @@ export async function POST(request: NextRequest) {
     // Validate input
     const parsed = registerSchema.safeParse(body)
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.issues[0]?.message ?? 'Validation failed' },
-        { status: 400 }
-      )
+      return validationError(parsed.error.issues)
     }
 
     const { name, workspace, email, password } = parsed.data
@@ -28,10 +26,7 @@ export async function POST(request: NextRequest) {
     // Check if email already exists
     const existing = await db.user.findUnique({ where: { email } })
     if (existing) {
-      return NextResponse.json(
-        { error: 'An account with this email already exists' },
-        { status: 409 }
-      )
+      return error('An account with this email already exists', 409)
     }
 
     // Hash password
@@ -68,12 +63,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ user }, { status: 201 })
-  } catch (error) {
-    console.error('[Register API] Error:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return success({ user }, 201)
+  } catch (err) {
+    console.error('[Register API] Error:', err)
+    return error('Internal server error')
   }
 }

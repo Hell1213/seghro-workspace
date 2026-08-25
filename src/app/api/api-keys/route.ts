@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { success, error } from '@/lib/api-response'
 
 /** Generate a random 32-char hex string */
 function generateKeySuffix(): string {
@@ -15,7 +16,7 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return error('Unauthorized', 401)
     }
 
     const userId = (session.user as { id: string }).id
@@ -33,10 +34,10 @@ export async function GET() {
       },
     })
 
-    return NextResponse.json({ keys })
-  } catch (error) {
-    console.error('[API Keys GET] Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return success(keys)
+  } catch (err) {
+    console.error('[API Keys GET] Error:', err)
+    return error('Internal server error')
   }
 }
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return error('Unauthorized', 401)
     }
 
     const userId = (session.user as { id: string }).id
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
     const { name } = body
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+      return error('Name is required', 400)
     }
 
     // Generate the full key
@@ -79,9 +80,9 @@ export async function POST(request: NextRequest) {
     })
 
     // Return the full key ONLY on creation
-    return NextResponse.json({ apiKey, fullKey }, { status: 201 })
-  } catch (error) {
-    console.error('[API Keys POST] Error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return success({ apiKey, fullKey }, 201)
+  } catch (err) {
+    console.error('[API Keys POST] Error:', err)
+    return error('Internal server error')
   }
 }

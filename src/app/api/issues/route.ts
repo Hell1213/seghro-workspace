@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserOrgId } from '@/lib/org-scope';
 import { z } from 'zod';
-import { error, validationError } from '@/lib/api-response';
+import { error, success, validationError } from '@/lib/api-response';
 
 const querySchema = z.object({
   agentId: z.string().optional(),
@@ -47,8 +47,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Map to frontend-expected shape (includes agentName)
-    return Response.json(
-      issues.map((i) => ({
+    return success(issues.map((i) => ({
         id: i.id,
         agentId: i.agentId,
         agentName: i.agent.name,
@@ -63,8 +62,7 @@ export async function GET(request: NextRequest) {
         suggestedFix: i.suggestedFix ?? '',
         createdAt: i.createdAt.toISOString(),
         updatedAt: i.updatedAt.toISOString(),
-      })),
-    );
+      })))
   } catch (err) {
     console.error('[/api/issues] Error:', err);
     return error('Failed to fetch issues');
@@ -85,7 +83,7 @@ export async function PATCH(request: NextRequest) {
       data: { status: parsed.data.status },
     });
 
-    return Response.json({
+    return success({
       id: updated.id,
       status: updated.status,
       updatedAt: updated.updatedAt.toISOString(),

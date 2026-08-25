@@ -45,8 +45,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Map to match the frontend-expected shape (plain fields, ISO date strings)
-    return Response.json(
-      agents.map((a) => ({
+    return success(agents.map((a) => ({
         id: a.id,
         name: a.name,
         description: a.description ?? '',
@@ -57,8 +56,7 @@ export async function GET(request: NextRequest) {
         errorRate: a.errorRate,
         avgLatency: a.avgLatency,
         _count: a._count,
-      })),
-    );
+      })))
   } catch (err) {
     console.error('[/api/agents] Error:', err);
     return error('Failed to fetch agents');

@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { apiEndpoints, type ApiEndpoint } from '@/lib/self-healing-data';
+import { apiEndpoints } from '@/lib/self-healing-data';
 import { z } from 'zod';
-import { error, validationError } from '@/lib/api-response';
+import { error, success, validationError } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { Prisma } from '@prisma/client';
 
 const postSchema = z.object({
   action: z.enum(['add', 'remove', 'health-check', 'reset-circuit']),
@@ -18,34 +19,38 @@ const postSchema = z.object({
 
 /** Seed endpoints from self-healing-data.ts into the database */
 async function seedEndpointsFromData() {
-  const [row] = await db.$queryRawUnsafe<{ c: number }[]>('SELECT COUNT(*) as c FROM MonitoredEndpoint');
-  if (row.c > 0) return;
+  const count = await db.monitoredEndpoint.count();
+  if (count > 0) return;
 
-  for (const ep of apiEndpoints) {
-    await db.$executeRawUnsafe(
-      `INSERT INTO MonitoredEndpoint (id, name, baseUrl, status, responseTime, errorRate, lastChecked, circuitBreaker, category, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-      ep.id, ep.name, ep.baseUrl, ep.status, ep.latency, ep.errorRate,
-      new Date(ep.lastCheck).toISOString(), ep.circuitBreaker, ep.category
-    );
-  }
+  await db.monitoredEndpoint.createMany({
+    skipDuplicates: true,
+    data: apiEndpoints.map((ep) => ({
+      id: ep.id,
+      name: ep.name,
+      baseUrl: ep.baseUrl,
+      status: ep.status,
+      responseTime: ep.latency,
+      errorRate: ep.errorRate,
+      lastChecked: new Date(ep.lastCheck),
+      circuitBreaker: ep.circuitBreaker,
+      category: ep.category,
+    })),
+  });
 }
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return error('Unauthorized', 401);
     }
 
     await seedEndpointsFromData();
-    const rows = await db.$queryRawUnsafe<{
-      id: string; name: string; baseUrl: string; status: string;
-      responseTime: number; errorRate: number; lastChecked: string;
-      circuitBreaker: string; category: string;
-    }[]>('SELECT id, name, baseUrl, status, responseTime, errorRate, lastChecked, circuitBreaker, category FROM MonitoredEndpoint ORDER BY createdAt ASC');
+    const rows = await db.monitoredEndpoint.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
 
-    return NextResponse.json(rows.map(ep => ({
+    return success(rows.map(ep => ({
       id: ep.id,
       name: ep.name,
       baseUrl: ep.baseUrl,
@@ -54,7 +59,7 @@ export async function GET() {
       circuitBreaker: ep.circuitBreaker,
       latency: ep.responseTime,
       errorRate: ep.errorRate,
-      lastCheck: ep.lastChecked,
+      lastCheck: ep.lastChecked.toISOString(),
     })));
   } catch (err) {
     console.error('[/api/endpoints] Error:', err);
@@ -66,7 +71,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return error('Unauthorized', 401);
     }
 
     const body = await request.json();
@@ -83,12 +88,22 @@ export async function POST(request: NextRequest) {
         if (!endpoint) {
           return validationError({ endpoint: ['endpoint object is required for add action'] });
         }
-        await db.$executeRawUnsafe(
-          `INSERT OR IGNORE INTO MonitoredEndpoint (id, name, baseUrl, createdAt, updatedAt) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
-          endpoint.id, endpoint.name, endpoint.baseUrl
-        );
-        return NextResponse.json({
-          success: true,
+        try {
+          await db.monitoredEndpoint.create({
+            data: {
+              id: endpoint.id,
+              name: endpoint.name,
+              baseUrl: endpoint.baseUrl,
+            },
+          });
+        } catch (e) {
+          if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+            // Duplicate — silently ignore (mirrors INSERT OR IGNORE)
+          } else {
+            throw e;
+          }
+        }
+        return success({
           message: `Endpoint "${endpoint.name}" added successfully`,
           endpointId: endpoint.id,
         });
@@ -98,12 +113,14 @@ export async function POST(request: NextRequest) {
         if (!endpointId) {
           return validationError({ endpointId: ['endpointId is required'] });
         }
-        const [target] = await db.$queryRawUnsafe<{ name: string }[]>(
-          'SELECT name FROM MonitoredEndpoint WHERE id = ?', endpointId
-        );
-        await db.$executeRawUnsafe('DELETE FROM MonitoredEndpoint WHERE id = ?', endpointId);
-        return NextResponse.json({
-          success: true,
+        const target = await db.monitoredEndpoint.findFirst({
+          where: { id: endpointId },
+          select: { name: true },
+        });
+        await db.monitoredEndpoint.delete({
+          where: { id: endpointId },
+        });
+        return success({
           message: target
             ? `Endpoint "${target.name}" removed successfully`
             : `Endpoint "${endpointId}" not found`,
@@ -115,15 +132,15 @@ export async function POST(request: NextRequest) {
         if (!endpointId) {
           return validationError({ endpointId: ['endpointId is required'] });
         }
-        const [target] = await db.$queryRawUnsafe<{ name: string }[]>(
-          'SELECT name FROM MonitoredEndpoint WHERE id = ?', endpointId
-        );
-        await db.$executeRawUnsafe(
-          "UPDATE MonitoredEndpoint SET lastChecked = datetime('now') WHERE id = ?",
-          endpointId
-        );
-        return NextResponse.json({
-          success: true,
+        const target = await db.monitoredEndpoint.findFirst({
+          where: { id: endpointId },
+          select: { name: true },
+        });
+        await db.monitoredEndpoint.update({
+          where: { id: endpointId },
+          data: { lastChecked: new Date() },
+        });
+        return success({
           message: target
             ? `Health check initiated for "${target.name}"`
             : `Health check initiated for "${endpointId}"`,
@@ -136,16 +153,16 @@ export async function POST(request: NextRequest) {
         if (!endpointId) {
           return validationError({ endpointId: ['endpointId is required'] });
         }
-        const [target] = await db.$queryRawUnsafe<{ name: string; circuitBreaker: string }[]>(
-          'SELECT name, circuitBreaker FROM MonitoredEndpoint WHERE id = ?', endpointId
-        );
+        const target = await db.monitoredEndpoint.findFirst({
+          where: { id: endpointId },
+          select: { name: true, circuitBreaker: true },
+        });
         const previousState = target?.circuitBreaker ?? 'unknown';
-        await db.$executeRawUnsafe(
-          "UPDATE MonitoredEndpoint SET circuitBreaker = 'closed' WHERE id = ?",
-          endpointId
-        );
-        return NextResponse.json({
-          success: true,
+        await db.monitoredEndpoint.update({
+          where: { id: endpointId },
+          data: { circuitBreaker: 'closed' },
+        });
+        return success({
           message: target
             ? `Circuit breaker reset to CLOSED for "${target.name}"`
             : `Circuit breaker reset for "${endpointId}"`,

@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { error } from '@/lib/api-response';
+import { error, success } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -110,7 +110,7 @@ export async function GET() {
       (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
     );
 
-    return Response.json(events.slice(0, 20));
+    return success(events.slice(0, 20));
   } catch (err) {
     console.error('[/api/activity] Error:', err);
     return error('Failed to fetch activity');

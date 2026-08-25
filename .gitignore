@@ -1,18 +1,18 @@
 # dependencies
-/node_modules
-/.pnp
+node_modules/
+.pnp
 .pnp.js
 .yarn/install-state.gz
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
 
 # misc
 .DS_Store
@@ -35,25 +35,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# database
-/db/*.db
-/db/*.db-journal
-/db/*.db-wal
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# tool artifacts
-/tool-results/
-/upload/
-*.png
-!public/logo*.svg
-*.log
-dev.log
-server.log
-
-# bun
-bun.lockb
+# prisma
+db/*.db
+prisma/migrations/

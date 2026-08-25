@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import {
   matchBuiltinRule,
   getNextFallback,
@@ -7,6 +7,7 @@ import {
   type HealingContext,
   type HealingDecision,
 } from "@/lib/self-healing-agent";
+import { success, error } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return error('Unauthorized', 401);
     }
 
     const body = await request.json();
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Step 1: Try built-in pattern matching (instant, no LLM call)
     const builtinResult = matchBuiltinRule(ctx);
     if (builtinResult) {
-      return NextResponse.json({
+      return success({
         source: "builtin-rule",
         decision: builtinResult,
         nextFallback: getNextFallback(ctx.category, ctx.endpointName),
@@ -63,18 +64,15 @@ export async function POST(request: NextRequest) {
       // LLM analysis failed — built-in rules already handled it
     });
 
-    return NextResponse.json({
+    return success({
       source: "safe-defaults",
       decision: llmDecision,
       nextFallback: getNextFallback(ctx.category, ctx.endpointName),
       systemPrompt: SELF_HEALING_SYSTEM_PROMPT.slice(0, 120) + "...",
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to process healing request", details: String(error) },
-      { status: 500 }
-    );
+  } catch (err) {
+    return error('Failed to process healing request');
   }
 }
 
@@ -112,7 +110,7 @@ async function analyzeWithLLM(ctx: HealingContext) {
 
 // GET endpoint — returns the system prompt and available providers (for UI display)
 export async function GET() {
-  return NextResponse.json({
+  return success({
     capabilities: [
       "Circuit breaker: closed → open → half-open state machine",
       "Automatic fallback routing across LLM providers",

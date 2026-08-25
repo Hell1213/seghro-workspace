@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { getUserOrgId } from '@/lib/org-scope';
 import { z } from 'zod';
-import { error, validationError } from '@/lib/api-response';
+import { error, success, validationError } from '@/lib/api-response';
 
 const patchSchema = z.object({
   id: z.string().min(1),
@@ -27,8 +27,7 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return Response.json(
-      alerts.map((a) => ({
+    return success(alerts.map((a) => ({
         id: a.id,
         title: a.title,
         message: a.message ?? '',
@@ -36,8 +35,7 @@ export async function GET() {
         status: a.status,
         channel: a.channel,
         createdAt: a.createdAt.toISOString(),
-      })),
-    );
+      })))
   } catch (err) {
     console.error('[/api/alerts] Error:', err);
     return error('Failed to fetch alerts');
@@ -59,7 +57,7 @@ export async function PATCH(request: NextRequest) {
       data: { status: newStatus },
     });
 
-    return Response.json({
+    return success({
       id: updated.id,
       status: updated.status,
     });
