@@ -1,8 +1,24 @@
 import { db } from '@/lib/db';
 import { success, error } from '@/lib/api-response';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function GET() {
   try {
+    // Optional auth — demo mode if unauthenticated
+    let orgId: string | null = null
+    try {
+      const session = await getServerSession(authOptions)
+      if (session?.user) {
+        const user = session.user as { orgId?: string | null }
+        orgId = user.orgId ?? null
+      }
+    } catch { /* unauthenticated — demo mode */ }
+
+    const agentWhere = orgId ? { orgId } : {};
+    const traceWhere = orgId ? { agent: { orgId } } : {};
+    const issueWhere = orgId ? { agent: { orgId } } : {};
+
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const [
@@ -15,17 +31,18 @@ export async function GET() {
       agentAggregations,
       tokenAggregation,
     ] = await Promise.all([
-      db.agent.count(),
-      db.agent.count({ where: { status: 'active' } }),
-      db.trace.count(),
-      db.issue.count(),
-      db.issue.count({ where: { status: 'open' } }),
-      db.issue.count({ where: { severity: 'P0' } }),
+      db.agent.count({ where: agentWhere }),
+      db.agent.count({ where: { status: 'active', ...agentWhere } }),
+      db.trace.count({ where: traceWhere }),
+      db.issue.count({ where: issueWhere }),
+      db.issue.count({ where: { status: 'open', ...issueWhere } }),
+      db.issue.count({ where: { severity: 'P0', ...issueWhere } }),
       db.agent.aggregate({
         _avg: {
           errorRate: true,
           avgLatency: true,
         },
+        where: agentWhere,
       }),
       db.trace.aggregate({
         _sum: {
@@ -34,6 +51,7 @@ export async function GET() {
         },
         where: {
           createdAt: { gte: twentyFourHoursAgo },
+          ...traceWhere,
         },
       }),
     ]);

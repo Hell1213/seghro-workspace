@@ -176,7 +176,7 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
                 className="flex-1 h-11 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 gap-2"
               >
                 <Home className="w-4 h-4" />
-                Go to Dashboard
+                Go to Home
               </Button>
             </motion.div>
           </CardContent>

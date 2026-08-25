@@ -2,17 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 /** Generate a random 32-char hex string */
 function generateKeySuffix(): string {
   return crypto.randomBytes(16).toString('hex')
 }
 
-/** GET — list API keys for the authenticated user (mock userId for now) */
-export async function GET(request: NextRequest) {
+/** GET — list API keys for the authenticated user */
+export async function GET() {
   try {
-    // In a real app, get userId from session. For demo purposes we list all.
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userId = (session.user as { id: string }).id
+
     const keys = await db.apiKey.findMany({
+      where: { userId },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -34,6 +43,13 @@ export async function GET(request: NextRequest) {
 /** POST — create a new API key */
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const userId = (session.user as { id: string }).id
+
     const body = await request.json()
     const { name } = body
 
@@ -47,15 +63,9 @@ export async function POST(request: NextRequest) {
     const keyPrefix = fullKey.slice(0, 18) // "seghro_sk_" + first 8 of hex
     const keyHash = await bcrypt.hash(fullKey, 12)
 
-    // For demo purposes, use first user. In real app, use session userId.
-    const firstUser = await db.user.findFirst({ select: { id: true } })
-    if (!firstUser) {
-      return NextResponse.json({ error: 'No user found' }, { status: 400 })
-    }
-
     const apiKey = await db.apiKey.create({
       data: {
-        userId: firstUser.id,
+        userId,
         name: name.trim(),
         keyHash,
         keyPrefix,

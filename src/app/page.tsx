@@ -22,8 +22,8 @@ const StatsSection = dynamic(
   () => import('@/components/landing/StatsSection').then(m => ({ default: m.StatsSection })),
   { ssr: false }
 );
-const DashboardSection = dynamic(
-  () => import('@/components/dashboard/DashboardSection').then(m => ({ default: m.DashboardSection })),
+const DashboardPreview = dynamic(
+  () => import('@/components/landing/DashboardPreview').then(m => ({ default: m.DashboardPreview })),
   { ssr: false }
 );
 const TestimonialsSection = dynamic(
@@ -87,7 +87,7 @@ export default function Home() {
         <StatsSection />
 
         <div className="section-divider max-w-7xl mx-auto" />
-        <DashboardSection />
+        <DashboardPreview />
 
         <div className="section-divider max-w-7xl mx-auto" />
         <DocsSection />

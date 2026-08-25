@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Eye, EyeOff, Github, Loader2, AlertCircle, Check, TrendingUp, Sparkles, Target } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { SeghroLogo } from '@/components/SeghroLogo'
@@ -200,9 +201,9 @@ export default function LoginPage() {
                 <label htmlFor="password" className="block text-[11px] font-semibold uppercase tracking-[0.06em] text-gray-500 dark:text-gray-400">
                   Password
                 </label>
-                <a href="#" className="text-xs text-[#dc2626] hover:text-[#b91c1c] font-medium">
+                <button type="button" onClick={(e) => { e.preventDefault(); toast({ title: 'Password reset coming soon. Contact support@seghro.dev for help.' }) }} className="text-xs text-[#dc2626] hover:text-[#b91c1c] font-medium cursor-pointer">
                   Forgot password?
-                </a>
+                </button>
               </div>
               <div className="relative">
                 <Input
@@ -294,12 +295,14 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          {/* Demo credentials */}
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-400 dark:text-gray-600">
-              Demo: <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo@seghro.dev</code> / <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo1234</code>
-            </p>
-          </div>
+          {/* Demo credentials — hidden in production */}
+          {process.env.NODE_ENV !== 'production' && (
+            <div className="mt-6 text-center">
+              <p className="text-xs text-gray-400 dark:text-gray-600">
+                Demo: <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo@seghro.dev</code> / <code className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800/60 text-gray-500 dark:text-gray-400 font-mono text-[11px]">demo1234</code>
+              </p>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

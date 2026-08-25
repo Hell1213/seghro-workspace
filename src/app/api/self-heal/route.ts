@@ -7,9 +7,16 @@ import {
   type HealingContext,
   type HealingDecision,
 } from "@/lib/self-healing-agent";
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const ctx: HealingContext = {
       endpointName: body.endpointName ?? "unknown",

@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import { apiEndpoints, type ApiEndpoint } from '@/lib/self-healing-data';
 import { z } from 'zod';
 import { error, validationError } from '@/lib/api-response';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const postSchema = z.object({
   action: z.enum(['add', 'remove', 'health-check', 'reset-circuit']),
@@ -31,6 +33,11 @@ async function seedEndpointsFromData() {
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await seedEndpointsFromData();
     const rows = await db.$queryRawUnsafe<{
       id: string; name: string; baseUrl: string; status: string;
@@ -57,6 +64,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const parsed = postSchema.safeParse(body);
 

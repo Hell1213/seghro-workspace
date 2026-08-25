@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { healingActions as seedHealingActions } from '@/lib/self-healing-data';
 import { error } from '@/lib/api-response';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 /** Seed healing actions from self-healing-data.ts into the database */
 async function seedHealingActionsFromData() {
@@ -20,6 +22,11 @@ async function seedHealingActionsFromData() {
 
 export async function GET() {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     await seedHealingActionsFromData();
 
     const actions = await db.$queryRawUnsafe<{

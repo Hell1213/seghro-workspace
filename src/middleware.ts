@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { rateLimitMiddleware } from '@/lib/rate-limit'
+import { jwt } from 'next-auth/jwt'
 
 export const config = {
   matcher: ['/dashboard/:path*', '/api/:path*'],
@@ -13,7 +14,7 @@ function requestId(): string {
   return `${ts}-${rand}`
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const reqId = requestId()
 
@@ -45,21 +46,42 @@ export function middleware(request: NextRequest) {
   }
 
   // ---------- Auth guard for /dashboard/* ----------
-  const token = request.cookies.get('next-auth.session-token')
-    || request.cookies.get('__Secure-next-auth.session-token')
-
-  if (!token) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('callbackUrl', pathname)
-    return NextResponse.redirect(loginUrl)
+  const secret = process.env.NEXTAUTH_SECRET
+  if (!secret) {
+    // Fallback: just check cookie existence if secret not configured
+    const token = request.cookies.get('next-auth.session-token')
+      || request.cookies.get('__Secure-next-auth.session-token')
+    if (!token) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+  } else {
+    // Validate JWT token signature and expiry
+    try {
+      const token = request.cookies.get('next-auth.session-token')?.value
+        || request.cookies.get('__Secure-next-auth.session-token')?.value
+      if (!token) {
+        const loginUrl = new URL('/login', request.url)
+        loginUrl.searchParams.set('callbackUrl', pathname)
+        return NextResponse.redirect(loginUrl)
+      }
+      await jwt({ token, secret, secureCookie: pathname.startsWith('https://') })
+    } catch {
+      // Invalid or expired token — redirect to login
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
   }
 
   // Add security headers
   const response = NextResponse.next()
-  // X-Frame-Options omitted — handled by reverse-proxy in production
   response.headers.set('X-Request-Id', reqId)
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  response.headers.set('X-Frame-Options', 'DENY')
+  response.headers.set('X-XSS-Protection', '1; mode=block')
 
   return response
 }

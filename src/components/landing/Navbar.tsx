@@ -192,7 +192,6 @@ export function Navbar({ onSearchClick }: NavbarProps) {
               { label: 'How It Works', href: '#how-it-works' },
               { label: 'Integrations', href: '#integrations' },
               { label: 'Status', href: '#status' },
-              { label: 'Documentation', href: '#docs' },
             ].map((link) => (
               <a
                 key={link.href + link.label}

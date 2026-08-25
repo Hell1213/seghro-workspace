@@ -1,5 +1,7 @@
 import { db } from '@/lib/db';
 import { error } from '@/lib/api-response';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 interface ActivityEvent {
   id: string;
@@ -14,21 +16,38 @@ interface ActivityEvent {
 
 export async function GET() {
   try {
+    // Optional auth — demo mode if unauthenticated
+    let orgId: string | null = null
+    try {
+      const session = await getServerSession(authOptions)
+      if (session?.user) {
+        const user = session.user as { orgId?: string | null }
+        orgId = user.orgId ?? null
+      }
+    } catch { /* unauthenticated — demo mode */ }
+
+    const traceWhere = orgId ? { agent: { orgId } } : {};
+    const issueWhere = orgId ? { agent: { orgId } } : {};
+    const alertWhere = orgId ? { agent: { orgId } } : {};
+
     // Fetch recent traces, issues, and alerts in parallel
     const [recentTraces, recentIssues, recentAlerts] = await Promise.all([
       db.trace.findMany({
         take: 8,
         orderBy: { createdAt: 'desc' },
+        where: traceWhere,
         include: { agent: { select: { name: true } }, _count: { select: { spans: true } } },
       }),
       db.issue.findMany({
         take: 8,
         orderBy: { createdAt: 'desc' },
+        where: issueWhere,
         include: { agent: { select: { name: true } } },
       }),
       db.alert.findMany({
         take: 8,
         orderBy: { createdAt: 'desc' },
+        where: alertWhere,
       }),
     ]);
 

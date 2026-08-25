@@ -2,6 +2,8 @@ import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
 import { z } from 'zod';
 import { error } from '@/lib/api-response';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 const rangeSchema = z.enum(['24h', '7d', '30d']).default('24h');
 
@@ -46,9 +48,21 @@ function getRangeMs(range: string): number {
 
 export async function GET(request: NextRequest) {
   try {
+    // Optional auth — demo mode if unauthenticated
+    let orgId: string | null = null
+    try {
+      const session = await getServerSession(authOptions)
+      if (session?.user) {
+        const user = session.user as { orgId?: string | null }
+        orgId = user.orgId ?? null
+      }
+    } catch { /* unauthenticated — demo mode */ }
+
     const { searchParams } = new URL(request.url);
     const range = rangeSchema.parse(searchParams.get('range') ?? '24h');
     const since = new Date(Date.now() - getRangeMs(range));
+
+    const agentWhere = orgId ? { orgId } : {};
 
     // 1. Time-series: group metrics by timestamp, avg across agents
     const timeSeriesPromises = METRIC_NAMES.map(async (name) => {
@@ -72,11 +86,11 @@ export async function GET(request: NextRequest) {
     // 2. Metric cards: aggregate from agents
     const [agentCount, traceCount, openIssueCount, agentAggs, traceAggs] =
       await Promise.all([
-        db.agent.count(),
-        db.trace.count(),
-        db.issue.count({ where: { status: { in: ['open', 'investigating', 'reopened'] } } }),
-        db.agent.aggregate({ _avg: { errorRate: true, avgLatency: true }, _sum: { totalRuns: true } }),
-        db.trace.aggregate({ _sum: { inputTokens: true, outputTokens: true } }),
+        db.agent.count({ where: agentWhere }),
+        db.trace.count({ where: orgId ? { agent: { orgId } } : undefined }),
+        db.issue.count({ where: { status: { in: ['open', 'investigating', 'reopened'] }, ...(orgId ? { agent: { orgId } } : {}) } }),
+        db.agent.aggregate({ _avg: { errorRate: true, avgLatency: true }, _sum: { totalRuns: true }, where: agentWhere }),
+        db.trace.aggregate({ _sum: { inputTokens: true, outputTokens: true }, where: orgId ? { agent: { orgId } } : undefined }),
       ]);
 
     const totalTokens = (traceAggs._sum.inputTokens ?? 0) + (traceAggs._sum.outputTokens ?? 0);
@@ -93,13 +107,15 @@ export async function GET(request: NextRequest) {
     ];
 
     // 3. Severity breakdown: count issues by severity
+    const issueWhere = orgId ? { agent: { orgId } } : {};
     const severityGroups = await db.issue.groupBy({
       by: ['severity'],
+      where: issueWhere,
       _count: { id: true },
     });
 
     const resolvedCount = await db.issue.count({
-      where: { status: 'resolved' },
+      where: { status: 'resolved', ...issueWhere },
     });
 
     const severityBreakdown = [
@@ -114,6 +130,7 @@ export async function GET(request: NextRequest) {
     // 4. Framework distribution: count agents by framework
     const frameworkGroups = await db.agent.groupBy({
       by: ['framework'],
+      where: agentWhere,
       _count: { id: true },
     });
 

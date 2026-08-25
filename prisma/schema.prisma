@@ -20,6 +20,8 @@ model User {
   apiKeys       ApiKey[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+
+  @@index([orgId])
 }
 
 model Organization {
@@ -48,6 +50,8 @@ model Agent {
   traces      Trace[]
   issues      Issue[]
   alerts      Alert[]
+
+  @@index([orgId])
 }
 
 model Trace {
@@ -62,6 +66,9 @@ model Trace {
   metadata     String?
   createdAt    DateTime @default(now())
   spans        Span[]
+
+  @@index([agentId])
+  @@index([traceId])
 }
 
 model Span {
@@ -79,6 +86,8 @@ model Span {
   tool         String?
   children     String?
   createdAt    DateTime @default(now())
+
+  @@index([traceId])
 }
 
 model Issue {
@@ -96,6 +105,8 @@ model Issue {
   suggestedFix String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([agentId])
 }
 
 model Alert {
@@ -109,6 +120,8 @@ model Alert {
   severity  String   @default("warning")
   status    String   @default("unread")
   createdAt DateTime @default(now())
+
+  @@index([agentId])
 }
 
 model Metric {
@@ -118,6 +131,8 @@ model Metric {
   value     Float
   timestamp DateTime @default(now())
   labels    String?
+
+  @@index([agentId])
 }
 
 model ApiKey {
@@ -142,6 +157,8 @@ model Webhook {
   lastUsedAt DateTime?
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  @@index([orgId])
 }
 
 model MonitoredEndpoint {
@@ -157,6 +174,8 @@ model MonitoredEndpoint {
   orgId          String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@index([orgId])
 }
 
 model HealingAction {
@@ -171,4 +190,6 @@ model HealingAction {
   timestamp    DateTime @default(now())
   orgId        String?
   createdAt    DateTime @default(now())
+
+  @@index([orgId])
 }

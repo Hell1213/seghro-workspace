@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       parsed.data;
 
     // Upsert Agent by name
-    const existingAgent = await db.agent.findUnique({ where: { name: agentName } });
+    const existingAgent = await db.agent.findFirst({ where: { name: agentName } });
 
     let agent;
     if (existingAgent) {

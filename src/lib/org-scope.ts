@@ -7,7 +7,8 @@ import { getAuthSession } from '@/lib/auth-guard';
 export async function getUserOrgId(): Promise<string | null> {
   try {
     const session = await getAuthSession();
-    const user = session?.user as { orgId?: string } | undefined;
+    if (!session?.user) return null;
+    const user = session.user as { orgId?: string | null } | undefined;
     return user?.orgId ?? null;
   } catch {
     return null;

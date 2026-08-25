@@ -1,11 +1,20 @@
 import { success, error } from '@/lib/api-response';
 import { getSubscription, PLAN_LIMITS, PLAN_PRICES, type PlanType } from '@/lib/billing';
-import { getUserOrgId } from '@/lib/org-scope';
 import { db } from '@/lib/db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function GET() {
   try {
-    const orgId = await getUserOrgId();
+    // Optional auth — demo mode if unauthenticated
+    let orgId: string | null = null;
+    try {
+      const session = await getServerSession(authOptions);
+      if (session?.user) {
+        const user = session.user as { orgId?: string | null };
+        orgId = user.orgId ?? null;
+      }
+    } catch { /* unauthenticated — demo mode */ }
 
     // ── Demo / unauthenticated fallback ────────────────────────────
     if (!orgId) {
