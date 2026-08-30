@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seghro"
+version = "0.1.0"
+description = "Seghro AI Agent Observability SDK for Python"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+dependencies = ["httpx>=0.25.0"]
+classifiers = ["Programming Language :: Python :: 3"]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.1.0"]
+all = ["langchain-core>=0.1.0"]
+
+[project.urls]
+Homepage = "https://seghro.dev"
+
+[tool.setuptools.packages.find]
+include = ["seghro*"]
