@@ -98,7 +98,7 @@ function SpanRow({ span, maxDuration, depth = 0 }: { span: Span; maxDuration: nu
             className={`h-full rounded-full ${spanBarColors[span.type]} opacity-80`}
             initial={{ width: 0 }}
             animate={{ width: `${widthPct}%` }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
           />
         </div>
       </button>

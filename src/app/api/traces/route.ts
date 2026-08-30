@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { getUserOrgId } from '@/lib/org-scope';
+import { getUserOrgId, isDemoMode } from '@/lib/org-scope';
+import { demoTraces } from '@/lib/demo-data';
 import { z } from 'zod';
 import { error, success, validationError } from '@/lib/api-response';
 import crypto from 'crypto';
@@ -13,10 +14,9 @@ const querySchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Org-scoped auth check
     const orgId = await getUserOrgId();
-    if (!orgId) {
-      console.warn('[/api/traces] No auth session — returning data in demo mode');
+    if (isDemoMode(orgId)) {
+      return success(demoTraces);
     }
 
     const { searchParams } = new URL(request.url);
@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Map to frontend-expected shape
     return success(traces.map((t) => ({
         id: t.id,
         agentId: t.agentId,

@@ -1,40 +1,44 @@
-# dependencies
+# Dependencies
 node_modules/
 .pnp
 .pnp.js
-.yarn/install-state.gz
 
-# testing
-coverage/
-
-# next.js
+# Build outputs
 .next/
 out/
-
-# production
 build/
+.standalone/
 
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files
+# Environment
 .env
-.env*.local
+.env.local
+.env.*.local
 
-# vercel
-.vercel
+# Database
+db/*.db
+db/*.db-journal
+db/*.db-wal
+db/*.db-shm
 
-# typescript
+# Logs
+*.log
+dev.log
+server.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
 *.tsbuildinfo
 next-env.d.ts
-
-# prisma
-db/*.db
-prisma/migrations/

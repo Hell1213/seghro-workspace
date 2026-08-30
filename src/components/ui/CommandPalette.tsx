@@ -477,7 +477,7 @@ function CommandPalettePanel({
         exit={{ opacity: 0, scale: 0.96, y: -10 }}
         transition={{
           duration: 0.2,
-          ease: [0.16, 1, 0.3, 1],
+          ease: [0.16, 1, 0.3, 1] as const,
         }}
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();

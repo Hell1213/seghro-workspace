@@ -2,6 +2,21 @@ import { PrismaClient } from '@prisma/client'
 
 const db = new PrismaClient()
 
+interface Agent {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  framework: string | null;
+  orgId: string | null;
+  lastRunAt: Date | null;
+  totalRuns: number;
+  errorRate: number;
+  avgLatency: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 async function main() {
   console.log('🌱 Seeding database...')
 
@@ -46,7 +61,7 @@ async function main() {
     { name: 'code-review-bot', description: 'Automated code review agent for pull request analysis', status: 'active', framework: 'CrewAI', totalRuns: 9874, errorRate: 3.7, avgLatency: 5.8, lastRunAt: new Date(Date.now() - 180000) },
   ]
 
-  const createdAgents = []
+  const createdAgents: Agent[] = []
   for (const a of agentsData) {
     const agent = await db.agent.create({ data: a })
     createdAgents.push(agent)
@@ -140,7 +155,7 @@ async function main() {
     { agentId: createdAgents[1].id, title: 'Hallucinated citation references', description: 'Agent generates plausible but non-existent paper citations in research summaries.', severity: 'P2', status: 'reopened', affectedRuns: 5, totalRuns: 120, failureRate: 4.2, rootCause: 'Model generates citations from training data.', suggestedFix: 'Constrain output to only cite papers from retrieval step.' },
   ]
 
-  const createdIssues = []
+  const createdIssues: Array<{ id: string; title: string; description: string | null; status: string; severity: string; agentId: string; affectedRuns: number; totalRuns: number; failureRate: number; rootCause: string | null; suggestedFix: string | null; createdAt: Date; updatedAt: Date }> = []
   for (const issue of issuesData) {
     const created = await db.issue.create({ data: issue })
     createdIssues.push(created)
@@ -198,6 +213,19 @@ async function main() {
     }
   }
   console.log(`✅ ${metricCount} metric data points created`)
+
+  // Seed monitored endpoints
+  const endpoints = [
+    { id: 'ep-openai-gpt4o', name: 'OpenAI GPT-4o', baseUrl: 'https://api.openai.com/v1', category: 'llm', status: 'healthy', circuitBreaker: 'closed', responseTime: 45, errorRate: 0.3 },
+    { id: 'ep-anthropic-claude', name: 'Anthropic Claude 3.5', baseUrl: 'https://api.anthropic.com/v1', category: 'llm', status: 'degraded', circuitBreaker: 'half-open', responseTime: 820, errorRate: 15.2 },
+    { id: 'ep-stripe', name: 'Stripe Payments', baseUrl: 'https://api.stripe.com/v1', category: 'payment', status: 'healthy', circuitBreaker: 'closed', responseTime: 187, errorRate: 0.4 },
+    { id: 'ep-tavily', name: 'Tavily Search', baseUrl: 'https://api.tavily.com', category: 'search', status: 'down', circuitBreaker: 'open', responseTime: 0, errorRate: 100 },
+  ]
+
+  for (const ep of endpoints) {
+    await db.monitoredEndpoint.upsert({ where: { id: ep.id }, update: ep, create: ep })
+    console.log(`✅ Endpoint created: ${ep.name}`)
+  }
 
   console.log('\n🎉 Seeding complete!')
   console.log(`   Demo user: demo@sentinel.dev / demo1234`)

@@ -1,9 +1,6 @@
 import { getAuthSession } from '@/lib/auth-guard';
+import { DEMO_ORG_ID, isDemoMode } from '@/lib/demo-data';
 
-/**
- * Get the current user's orgId from the session.
- * Returns null if not authenticated or user has no orgId.
- */
 export async function getUserOrgId(): Promise<string | null> {
   try {
     const session = await getAuthSession();
@@ -14,6 +11,12 @@ export async function getUserOrgId(): Promise<string | null> {
     return null;
   }
 }
+
+export function getDemoOrgId(): string {
+  return DEMO_ORG_ID;
+}
+
+export { isDemoMode };
 
 /**
  * Run a query with org-scoping when authenticated.

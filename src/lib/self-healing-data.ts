@@ -30,7 +30,7 @@ export interface HealingAction {
   details: string;
   result: 'success' | 'failed' | 'pending';
   timestamp: string;
-  duration?: number;
+  duration?: number | null;
 }
 
 export interface HealthHistory {

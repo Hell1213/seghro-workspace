@@ -70,7 +70,7 @@ function AnimatedTrace() {
             key={span.label}
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: 'easeOut' }}
+            transition={{ delay: 0.3 + i * 0.15, duration: 0.5, ease: 'easeOut' as const }}
             className="group"
           >
             <div className="flex items-center gap-3 mb-1">
@@ -82,7 +82,7 @@ function AnimatedTrace() {
                 className={`h-full rounded-full ${span.color}`}
                 initial={{ width: 0 }}
                 animate={{ width: span.width }}
-                transition={{ delay: 0.5 + i * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: 0.5 + i * 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] as const }}
               />
             </div>
           </motion.div>
@@ -252,7 +252,7 @@ export function HeroSection() {
         >
           <motion.div
             animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' as const }}
           >
             <ArrowDown className="h-5 w-5 text-gray-300 dark:text-gray-500" />
           </motion.div>

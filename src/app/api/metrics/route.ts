@@ -1,9 +1,10 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { z } from 'zod';
-import { error, success } from '@/lib/api-response';
+import { success, error } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { demoMetrics } from '@/lib/demo-data';
+import { z } from 'zod';
 
 const rangeSchema = z.enum(['24h', '7d', '30d']).default('24h');
 
@@ -37,26 +38,27 @@ const FRAMEWORK_COLORS: Record<string, string> = {
 
 function getRangeMs(range: string): number {
   switch (range) {
-    case '7d':
-      return 7 * 24 * 60 * 60 * 1000;
-    case '30d':
-      return 30 * 24 * 60 * 60 * 1000;
-    default:
-      return 24 * 60 * 60 * 1000;
+    case '7d': return 7 * 24 * 60 * 60 * 1000;
+    case '30d': return 30 * 24 * 60 * 60 * 1000;
+    default: return 24 * 60 * 60 * 1000;
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    // Optional auth — demo mode if unauthenticated
-    let orgId: string | null = null
+    let orgId: string | null = null;
     try {
-      const session = await getServerSession(authOptions)
+      const session = await getServerSession(authOptions);
       if (session?.user) {
-        const user = session.user as { orgId?: string | null }
-        orgId = user.orgId ?? null
+        const user = session.user as { orgId?: string | null };
+        orgId = user.orgId ?? null;
       }
     } catch { /* unauthenticated — demo mode */ }
+
+    // Demo mode: return demo metrics
+    if (!orgId) {
+      return success(demoMetrics);
+    }
 
     const { searchParams } = new URL(request.url);
     const range = rangeSchema.parse(searchParams.get('range') ?? '24h');
@@ -64,7 +66,6 @@ export async function GET(request: NextRequest) {
 
     const agentWhere = orgId ? { orgId } : {};
 
-    // 1. Time-series: group metrics by timestamp, avg across agents
     const timeSeriesPromises = METRIC_NAMES.map(async (name) => {
       const grouped = await db.metric.groupBy({
         by: ['timestamp'],
@@ -83,7 +84,6 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // 2. Metric cards: aggregate from agents
     const [agentCount, traceCount, openIssueCount, agentAggs, traceAggs] =
       await Promise.all([
         db.agent.count({ where: agentWhere }),
@@ -106,7 +106,6 @@ export async function GET(request: NextRequest) {
       { label: 'Mean Latency', value: `${avgLatency}s`, change: '+0.4s vs yesterday', trend: 'up' as const },
     ];
 
-    // 3. Severity breakdown: count issues by severity
     const issueWhere = orgId ? { agent: { orgId } } : {};
     const severityGroups = await db.issue.groupBy({
       by: ['severity'],
@@ -127,7 +126,6 @@ export async function GET(request: NextRequest) {
       { name: 'Resolved', value: resolvedCount, color: '#9ca3af' },
     ];
 
-    // 4. Framework distribution: count agents by framework
     const frameworkGroups = await db.agent.groupBy({
       by: ['framework'],
       where: agentWhere,

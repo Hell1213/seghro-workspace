@@ -69,7 +69,7 @@ interface Trace {
   id: string;
   agentId: string;
   traceId: string;
-  status: string;
+  status: 'success' | 'error' | 'warning';
   duration: number;
   inputTokens: number;
   outputTokens: number;
@@ -84,7 +84,7 @@ interface Issue {
   title: string;
   description: string;
   severity: 'P0' | 'P1' | 'P2';
-  status: string;
+  status: 'open' | 'investigating' | 'resolved' | 'wontfix' | 'reopened';
   affectedRuns: number;
   totalRuns: number;
   failureRate: number;
@@ -98,8 +98,8 @@ interface AlertItem {
   id: string;
   title: string;
   message: string;
-  severity: string;
-  status: string;
+  severity: 'critical' | 'warning' | 'info';
+  status: 'unread' | 'read' | 'acknowledged';
   channel: string;
   createdAt: string;
 }
@@ -391,7 +391,7 @@ export function DashboardSection() {
                           key={latestAlertId ?? 'badge'}
                           initial={{ scale: 1.3 }}
                           animate={{ scale: 1 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                          transition={{ type: 'spring' as const, stiffness: 400, damping: 15 }}
                           className="badge-pulse flex h-4 min-w-4 items-center justify-center rounded-full bg-[#dc2626] px-1 text-[9px] font-bold text-white"
                         >
                           {alertItems.filter((a) => a.status === 'unread').length}

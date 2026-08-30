@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { getUserOrgId } from '@/lib/org-scope';
+import { getUserOrgId, isDemoMode } from '@/lib/org-scope';
+import { demoAgents } from '@/lib/demo-data';
 import { z } from 'zod';
 import { error, success, validationError } from '@/lib/api-response';
 
@@ -17,10 +18,9 @@ const createSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Org-scoped auth check
     const orgId = await getUserOrgId();
-    if (!orgId) {
-      console.warn('[/api/agents] No auth session — returning data in demo mode');
+    if (isDemoMode(orgId)) {
+      return success(demoAgents);
     }
 
     const { searchParams } = new URL(request.url);
@@ -44,7 +44,6 @@ export async function GET(request: NextRequest) {
       orderBy: { updatedAt: 'desc' },
     });
 
-    // Map to match the frontend-expected shape (plain fields, ISO date strings)
     return success(agents.map((a) => ({
         id: a.id,
         name: a.name,

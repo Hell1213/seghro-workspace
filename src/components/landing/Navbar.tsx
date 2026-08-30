@@ -172,7 +172,7 @@ export function Navbar({ onSearchClick }: NavbarProps) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] as const }}
             className="md:hidden overflow-hidden bg-white/95 dark:bg-[#0a0a0a]/95 border-b border-gray-100 dark:border-gray-800 px-4 pb-4"
             style={{ backdropFilter: 'blur(12px)' }}
           >

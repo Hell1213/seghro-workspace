@@ -44,7 +44,7 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
         className="w-full max-w-lg relative z-10"
       >
         {/* Branding */}
@@ -71,7 +71,7 @@ export default function GlobalErrorBoundary({ error, reset }: ErrorPageProps) {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200, damping: 20 }}
+              transition={{ delay: 0.2, type: 'spring' as const, stiffness: 200, damping: 20 }}
               className="flex justify-center mb-6"
             >
               <div className="relative">

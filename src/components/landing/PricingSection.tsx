@@ -123,7 +123,7 @@ export function PricingSection() {
               transition={{
                 duration: 0.6,
                 delay: i * 0.1,
-                ease: [0.16, 1, 0.3, 1],
+                ease: [0.16, 1, 0.3, 1] as const,
               }}
               className={`glass-card card-lift rounded-2xl p-6 sm:p-8 ${
                 tier.highlighted

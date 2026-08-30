@@ -14,7 +14,7 @@ interface Issue {
   title: string;
   description: string;
   severity: 'P0' | 'P1' | 'P2';
-  status: 'open' | 'investigating' | 'resolved' | 'reopened';
+  status: 'open' | 'investigating' | 'resolved' | 'wontfix' | 'reopened';
   affectedRuns: number;
   totalRuns: number;
   failureRate: number;

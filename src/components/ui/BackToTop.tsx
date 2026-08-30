@@ -26,7 +26,7 @@ export function BackToTop() {
           exit={{ opacity: 0, y: 20, scale: 0.8 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          transition={{ type: 'spring' as const, stiffness: 300, damping: 25 }}
           className="fixed bottom-8 right-8 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-[#dc2626] text-white shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transition-shadow cursor-pointer animate-glow-pulse"
           aria-label="Back to top"
         >

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { getUserOrgId } from '@/lib/org-scope';
+import { getUserOrgId, isDemoMode } from '@/lib/org-scope';
+import { demoIssues } from '@/lib/demo-data';
 import { z } from 'zod';
 import { error, success, validationError } from '@/lib/api-response';
 
@@ -10,17 +11,11 @@ const querySchema = z.object({
   status: z.string().optional(),
 });
 
-const patchSchema = z.object({
-  id: z.string().min(1),
-  status: z.enum(['open', 'investigating', 'resolved', 'wontfix', 'reopened']),
-});
-
 export async function GET(request: NextRequest) {
   try {
-    // Org-scoped auth check
     const orgId = await getUserOrgId();
-    if (!orgId) {
-      console.warn('[/api/issues] No auth session — returning data in demo mode');
+    if (isDemoMode(orgId)) {
+      return success(demoIssues);
     }
 
     const { searchParams } = new URL(request.url);
@@ -46,7 +41,6 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    // Map to frontend-expected shape (includes agentName)
     return success(issues.map((i) => ({
         id: i.id,
         agentId: i.agentId,
@@ -69,11 +63,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(['open', 'investigating', 'resolved', 'wontfix', 'reopened']),
+});
+
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const parsed = patchSchema.safeParse(body);
-
     if (!parsed.success) {
       return validationError(parsed.error.flatten());
     }

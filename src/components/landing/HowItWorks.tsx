@@ -79,7 +79,7 @@ export function HowItWorks() {
                 transition={{
                   duration: 0.5,
                   delay: i * 0.1,
-                  ease: [0.16, 1, 0.3, 1],
+                  ease: [0.16, 1, 0.3, 1] as const,
                 }}
                 className="relative grid lg:grid-cols-2 gap-6 lg:gap-8 items-start"
               >

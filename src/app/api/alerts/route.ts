@@ -1,20 +1,15 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/lib/db';
-import { getUserOrgId } from '@/lib/org-scope';
+import { getUserOrgId, isDemoMode } from '@/lib/org-scope';
+import { demoAlerts } from '@/lib/demo-data';
 import { z } from 'zod';
 import { error, success, validationError } from '@/lib/api-response';
 
-const patchSchema = z.object({
-  id: z.string().min(1),
-  status: z.enum(['read', 'acknowledged', 'resolved']).optional(),
-});
-
 export async function GET() {
   try {
-    // Org-scoped auth check
     const orgId = await getUserOrgId();
-    if (!orgId) {
-      console.warn('[/api/alerts] No auth session — returning data in demo mode');
+    if (isDemoMode(orgId)) {
+      return success(demoAlerts);
     }
 
     const where: Record<string, unknown> = {};
@@ -42,11 +37,15 @@ export async function GET() {
   }
 }
 
+const patchSchema = z.object({
+  id: z.string().min(1),
+  status: z.enum(['read', 'acknowledged', 'resolved']).optional(),
+});
+
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const parsed = patchSchema.safeParse(body);
-
     if (!parsed.success) {
       return validationError(parsed.error.flatten());
     }

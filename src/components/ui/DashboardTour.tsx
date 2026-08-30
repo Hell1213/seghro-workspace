@@ -285,7 +285,7 @@ export default function DashboardTour() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.1, ease: 'easeOut' }}
+                transition={{ duration: 0.1, ease: 'easeOut' as const }}
                 className="fixed z-[70] pointer-events-auto"
                 style={{
                   left: tooltipPos.x,

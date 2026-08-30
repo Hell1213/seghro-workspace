@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { rateLimitMiddleware } from '@/lib/rate-limit'
-import { jwt } from 'next-auth/jwt'
+import { getToken } from 'next-auth/jwt'
 
 export const config = {
   matcher: ['/dashboard/:path*', '/api/:path*'],
@@ -66,7 +66,10 @@ export async function middleware(request: NextRequest) {
         loginUrl.searchParams.set('callbackUrl', pathname)
         return NextResponse.redirect(loginUrl)
       }
-      await jwt({ token, secret, secureCookie: pathname.startsWith('https://') })
+      const decoded = await getToken({ req: request, secret })
+      if (!decoded) {
+        throw new Error('Invalid token')
+      }
     } catch {
       // Invalid or expired token — redirect to login
       const loginUrl = new URL('/login', request.url)

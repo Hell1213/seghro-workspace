@@ -137,7 +137,7 @@ export function ToastNotifications({
               initial={{ x: 100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 100, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              transition={{ type: 'spring' as const, stiffness: 400, damping: 30 }}
               className={`relative rounded-xl border bg-white dark:bg-gray-900 shadow-xl border-l-4 border-l-transparent ${borderColor} ${bgClass}`}
             >
               <button

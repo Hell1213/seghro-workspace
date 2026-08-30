@@ -28,7 +28,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -140,7 +140,7 @@ function GettingStartedCard() {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as const }}
           className="mt-4 space-y-5 overflow-hidden"
         >
           {gettingStartedSteps.map((item) => (
@@ -389,7 +389,7 @@ function ApiReferenceTable({ isInView }: { isInView: boolean }) {
       className="glass-card rounded-2xl overflow-hidden"
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
     >
       <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
         <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
