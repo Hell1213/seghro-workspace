@@ -70,11 +70,20 @@ const patchSchema = z.object({
 
 export async function PATCH(request: NextRequest) {
   try {
+    const orgId = await getUserOrgId();
+    if (!orgId) return error('Unauthorized', 401);
+
     const body = await request.json();
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
       return validationError(parsed.error.flatten());
     }
+
+    // Verify the issue belongs to the user's org
+    const existing = await db.issue.findFirst({
+      where: { id: parsed.data.id, agent: { orgId } },
+    });
+    if (!existing) return error('Issue not found', 404);
 
     const updated = await db.issue.update({
       where: { id: parsed.data.id },

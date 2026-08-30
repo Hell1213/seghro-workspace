@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
           // CORS - allow specific origins in production
           {
             key: 'Access-Control-Allow-Origin',
-            value: process.env.ALLOWED_ORIGINS || '*',
+            value: process.env.ALLOWED_ORIGINS || 'https://seghro.dev',
           },
           {
             key: 'Access-Control-Allow-Methods',
@@ -54,7 +54,7 @@ const nextConfig: NextConfig = {
           // Content Security Policy
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: http: wss:; frame-ancestors 'self' *;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https: wss:; frame-ancestors 'self';",
           },
           // Strict-Transport-Security
           {

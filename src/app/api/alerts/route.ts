@@ -44,11 +44,20 @@ const patchSchema = z.object({
 
 export async function PATCH(request: NextRequest) {
   try {
+    const orgId = await getUserOrgId();
+    if (!orgId) return error('Unauthorized', 401);
+
     const body = await request.json();
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
       return validationError(parsed.error.flatten());
     }
+
+    // Verify the alert belongs to the user's org
+    const existing = await db.alert.findFirst({
+      where: { id: parsed.data.id, agent: { orgId } },
+    });
+    if (!existing) return error('Alert not found', 404);
 
     const newStatus = parsed.data.status ?? 'read';
     const updated = await db.alert.update({

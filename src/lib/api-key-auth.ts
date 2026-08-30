@@ -1,13 +1,6 @@
 import bcrypt from 'bcryptjs';
-import { db } from '@/lib/db';
+import { db } from './db';
 
-/**
- * Validate an API key from the Authorization header.
- * Expects format: `Bearer seghro_sk_...`
- *
- * Returns the user object if valid, null otherwise.
- * Also updates lastUsedAt on the key.
- */
 export async function validateApiKey(
   authHeader: string | null
 ): Promise<{ id: string; email: string; name: string | null; role: string } | null> {
@@ -20,8 +13,12 @@ export async function validateApiKey(
   if (!key.startsWith('seghro_sk_')) return null;
 
   try {
-    // Find all keys (SQLite is small enough; for larger DB add a prefix index)
-    const allKeys = await db.apiKey.findMany({
+    // Extract prefix for fast lookup (first 18 chars: "seghro_sk_" + 8 hex)
+    const keyPrefix = key.slice(0, 18);
+
+    // Filter by prefix first (uses index)
+    const candidates = await db.apiKey.findMany({
+      where: { keyPrefix },
       include: {
         user: {
           select: { id: true, email: true, name: true, role: true },
@@ -29,10 +26,10 @@ export async function validateApiKey(
       },
     });
 
-    for (const record of allKeys) {
+    // Only bcrypt.compare against candidates with matching prefix
+    for (const record of candidates) {
       const match = await bcrypt.compare(key, record.keyHash);
       if (match) {
-        // Check expiry
         if (record.expiresAt && new Date(record.expiresAt) < new Date()) {
           return null;
         }
