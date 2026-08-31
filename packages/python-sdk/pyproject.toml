@@ -4,13 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "seghro"
-version = "0.1.0"
-description = "Seghro AI Agent Observability SDK for Python"
+version = "0.1.1"
+description = "Seghro AI Agent Observability SDK for Python. Trace every AI agent execution, detect silent failures, and auto-heal API outages — one line of code."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.9"
+authors = [{ name = "Seghro", email = "founders@seghro.dev" }]
+keywords = ["ai", "observability", "tracing", "llm", "agents", "langchain", "crewai", "seghro"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
 dependencies = ["httpx>=0.25.0"]
-classifiers = ["Programming Language :: Python :: 3"]
 
 [project.optional-dependencies]
 langchain = ["langchain-core>=0.1.0"]
@@ -18,6 +29,8 @@ all = ["langchain-core>=0.1.0"]
 
 [project.urls]
 Homepage = "https://seghro.dev"
+Documentation = "https://seghro.dev/docs"
+Repository = "https://github.com/Hell1213/seghro"
 
 [tool.setuptools.packages.find]
 include = ["seghro*"]

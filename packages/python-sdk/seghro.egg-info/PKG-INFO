@@ -1,10 +1,21 @@
 Metadata-Version: 2.4
 Name: seghro
-Version: 0.1.0
-Summary: Seghro AI Agent Observability SDK for Python
+Version: 0.1.1
+Summary: Seghro AI Agent Observability SDK for Python. Trace every AI agent execution, detect silent failures, and auto-heal API outages — one line of code.
+Author-email: Seghro <founders@seghro.dev>
 License: MIT
 Project-URL: Homepage, https://seghro.dev
+Project-URL: Documentation, https://seghro.dev/docs
+Project-URL: Repository, https://github.com/Hell1213/seghro
+Keywords: ai,observability,tracing,llm,agents,langchain,crewai,seghro
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
 Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
 Requires-Dist: httpx>=0.25.0
@@ -12,3 +23,56 @@ Provides-Extra: langchain
 Requires-Dist: langchain-core>=0.1.0; extra == "langchain"
 Provides-Extra: all
 Requires-Dist: langchain-core>=0.1.0; extra == "all"
+
+# Seghro Python SDK
+
+**AI Agent Observability — one line of code.**
+
+Trace every AI agent execution, detect silent failures, and auto-heal API outages.
+
+## Install
+
+```bash
+pip install seghro
+# With LangChain support:
+pip install seghro[langchain]
+```
+
+## Quick Start
+
+```python
+from seghro import SeghroClient
+
+seghro = SeghroClient(
+    api_key="seghro_sk_...",
+    agent_name="my-agent",
+)
+
+seghro.ingest_trace(
+    status="success",
+    duration=1200,
+    input_tokens=150,
+    output_tokens=300,
+)
+```
+
+## LangChain Integration
+
+```python
+from seghro.langchain_callback import SeghroCallbackHandler
+
+seghro_handler = SeghroCallbackHandler(
+    api_key="seghro_sk_...",
+    agent_name="my-agent",
+)
+
+chain = LLMChain(
+    llm=llm,
+    prompt=prompt,
+    callbacks=[seghro_handler],
+)
+```
+
+## API Key
+
+Get your API key at https://seghro.dev/dashboard/settings
