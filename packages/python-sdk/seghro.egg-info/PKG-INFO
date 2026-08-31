@@ -1,0 +1,14 @@
+Metadata-Version: 2.4
+Name: seghro
+Version: 0.1.0
+Summary: Seghro AI Agent Observability SDK for Python
+License: MIT
+Project-URL: Homepage, https://seghro.dev
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: httpx>=0.25.0
+Provides-Extra: langchain
+Requires-Dist: langchain-core>=0.1.0; extra == "langchain"
+Provides-Extra: all
+Requires-Dist: langchain-core>=0.1.0; extra == "all"
