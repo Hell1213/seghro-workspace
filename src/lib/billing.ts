@@ -1,4 +1,4 @@
-import { razorpay, RAZORPAY_PLANS } from './razorpay';
+import { getRazorpay, RAZORPAY_PLANS } from './razorpay';
 import { db } from './db';
 
 export type PlanType = 'starter' | 'pro' | 'enterprise';
@@ -38,7 +38,7 @@ export async function createCheckoutSession(plan: PlanType, orgId: string, custo
   const planId = RAZORPAY_PLANS[plan];
   if (!planId) throw new Error(`No Razorpay plan for: ${plan}`);
 
-  const subscription = await razorpay.subscriptions.create({
+  const subscription = await getRazorpay().subscriptions.create({
     plan_id: planId,
     total_count: 12,
     customer_notify: 1,
