@@ -9,7 +9,6 @@ export async function runHealthChecks() {
   const results: { endpointId: string; healthy: boolean; statusCode: number; latency: number; error?: string }[] = [];
 
   for (const ep of endpoints) {
-    // Check circuit breaker before making request
     if (!shouldAllowRequest(ep.id)) {
       console.log(`[HealthMonitor] Circuit OPEN for ${ep.name}, skipping...`);
       results.push({ endpointId: ep.id, healthy: false, statusCode: 0, latency: 0, error: 'Circuit breaker OPEN' });
@@ -18,7 +17,9 @@ export async function runHealthChecks() {
 
     const start = Date.now();
     try {
-      const res = await fetch(ep.baseUrl, { method: 'GET', signal: AbortSignal.timeout(10000) });
+      // Use healthCheckUrl if available, otherwise use baseUrl
+      const url = ep.healthCheckUrl || ep.baseUrl;
+      const res = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(10000) });
       const latency = Date.now() - start;
       const healthy = res.ok;
       const statusCode = res.status;
@@ -41,7 +42,6 @@ export async function runHealthChecks() {
 
       results.push({ endpointId: ep.id, healthy, statusCode, latency });
 
-      // Trigger healing if unhealthy or high latency
       if (!healthy || latency > 5000) {
         await triggerHealing(ep.id, { statusCode, latency, errorMessage: `HTTP ${statusCode}` });
       }
@@ -72,7 +72,6 @@ async function triggerHealing(endpointId: string, context: { statusCode: number;
   const endpoint = await db.monitoredEndpoint.findUnique({ where: { id: endpointId } });
   if (!endpoint) return;
 
-  // Try built-in rules first
   const decision = matchBuiltinRule({
     endpointName: endpoint.name,
     endpointUrl: endpoint.baseUrl,
@@ -86,11 +85,9 @@ async function triggerHealing(endpointId: string, context: { statusCode: number;
   });
 
   if (decision) {
-    // Built-in rule matched — trip circuit and execute healing
     tripCircuit(endpointId);
     await executeHealingAction(endpointId, decision);
   } else {
-    // Unknown pattern — trip circuit, use safe defaults + LLM analysis
     tripCircuit(endpointId);
     await executeHealingAction(endpointId, {
       action: 'Safe defaults applied — open circuit, alert ops',
@@ -100,6 +97,5 @@ async function triggerHealing(endpointId: string, context: { statusCode: number;
       steps: ['Open circuit breaker', 'Alert ops team via webhook'],
       estimatedRecoveryMs: 30000,
     });
-    // Background LLM analysis could go here (fire-and-forget)
   }
 }

@@ -173,6 +173,7 @@ model MonitoredEndpoint {
   id             String   @id @default(cuid())
   name           String
   baseUrl        String
+  healthCheckUrl String?
   status         String   @default("healthy")
   responseTime   Float    @default(0)
   errorRate      Float    @default(0)

@@ -1,143 +1,131 @@
-import { NextRequest } from "next/server";
-import {
-  matchBuiltinRule,
-  getNextFallback,
-  SELF_HEALING_SYSTEM_PROMPT,
-  SELF_HEALING_USER_PROMPT,
-  type HealingContext,
-  type HealingDecision,
-} from "@/lib/self-healing-agent";
+import { NextRequest } from 'next/server';
+import { matchBuiltinRule, SELF_HEALING_SYSTEM_PROMPT, SELF_HEALING_USER_PROMPT, type HealingContext, type HealingDecision } from '@/lib/self-healing-agent';
 import { success, error } from '@/lib/api-response';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { executeHealingAction } from '@/lib/action-executor';
+import { getCircuitState, tripCircuit } from '@/lib/circuit-breaker';
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return error('Unauthorized', 401);
-    }
+    if (!session?.user) return error('Unauthorized', 401);
 
     const body = await request.json();
     const ctx: HealingContext = {
-      endpointName: body.endpointName ?? "unknown",
-      endpointUrl: body.endpointUrl ?? "",
-      category: body.category ?? "llm",
+      endpointName: body.endpointName ?? 'unknown',
+      endpointUrl: body.endpointUrl ?? '',
+      category: body.category ?? 'llm',
       statusCode: body.statusCode ?? 500,
-      errorMessage: body.errorMessage ?? "Unknown error",
+      errorMessage: body.errorMessage ?? 'Unknown error',
       latency: body.latency ?? 0,
-      circuitBreakerState: body.circuitBreakerState ?? "closed",
+      circuitBreakerState: body.circuitBreakerState ?? 'closed',
       recentErrors: body.recentErrors ?? [],
       retryCount: body.retryCount ?? 0,
     };
 
-    // Step 1: Try built-in pattern matching (instant, no LLM call)
+    // Try built-in rules first
     const builtinResult = matchBuiltinRule(ctx);
     if (builtinResult) {
+      // Find the endpoint and execute healing
+      const endpoint = await db.monitoredEndpoint.findFirst({ where: { name: ctx.endpointName } });
+      if (endpoint) {
+        tripCircuit(endpoint.id);
+        await executeHealingAction(endpoint.id, builtinResult);
+      }
       return success({
-        source: "builtin-rule",
+        source: 'builtin-rule',
         decision: builtinResult,
-        nextFallback: getNextFallback(ctx.category, ctx.endpointName),
         timestamp: new Date().toISOString(),
       });
     }
 
-    // Step 2: For unknown patterns, use LLM analysis (async, in background)
-    // Return the built-in fallback immediately, LLM analysis happens async
-    const llmDecision: HealingDecision = {
-      action: "LLM analysis initiated — applying safe defaults",
-      type: "automatic",
-      severity: "warning",
-      reasoning: `Unknown error pattern for ${ctx.endpointName} (${ctx.statusCode}). Applied safe defaults: open circuit breaker, activate fallback, alert ops. LLM analysis running in background for root cause.`,
-      steps: [
-        "Open circuit breaker",
-        "Activate fallback provider",
-        "Alert ops team",
-        "Run LLM root-cause analysis (background)",
-      ],
-      fallbackProvider: getNextFallback(ctx.category, ctx.endpointName) ?? undefined,
-      estimatedRecoveryMs: 10000,
-    };
+    // Unknown pattern — use LLM analysis
+    try {
+      const { generateText } = await import('ai');
+      const { openai } = await import('@ai-sdk/openai');
+      
+      const { text } = await generateText({
+        model: openai('gpt-4o-mini'),
+        system: SELF_HEALING_SYSTEM_PROMPT,
+        prompt: SELF_HEALING_USER_PROMPT(ctx),
+        temperature: 0.1,
+      });
 
-    // Fire-and-forget LLM analysis (non-blocking)
-    analyzeWithLLM(ctx).catch(() => {
-      // LLM analysis failed — built-in rules already handled it
-    });
+      const llmDecision: HealingDecision = JSON.parse(text);
+      
+      const endpoint = await db.monitoredEndpoint.findFirst({ where: { name: ctx.endpointName } });
+      if (endpoint) {
+        tripCircuit(endpoint.id);
+        await executeHealingAction(endpoint.id, llmDecision);
+      }
 
-    return success({
-      source: "safe-defaults",
-      decision: llmDecision,
-      nextFallback: getNextFallback(ctx.category, ctx.endpointName),
-      systemPrompt: SELF_HEALING_SYSTEM_PROMPT.slice(0, 120) + "...",
-      timestamp: new Date().toISOString(),
-    });
+      return success({
+        source: 'llm-analysis',
+        decision: llmDecision,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (llmErr) {
+      // LLM failed — apply safe defaults
+      const endpoint = await db.monitoredEndpoint.findFirst({ where: { name: ctx.endpointName } });
+      if (endpoint) {
+        tripCircuit(endpoint.id);
+        await executeHealingAction(endpoint.id, {
+          action: 'Safe defaults applied — open circuit, alert ops',
+          type: 'automatic',
+          severity: 'warning',
+          reasoning: `Unknown error pattern for ${ctx.endpointName} (${ctx.statusCode}). LLM analysis failed: ${String(llmErr).slice(0, 100)}. Applied safe defaults.`,
+          steps: ['Open circuit breaker', 'Alert ops team via webhook'],
+          estimatedRecoveryMs: 30000,
+        });
+      }
+      return success({
+        source: 'safe-defaults',
+        decision: {
+          action: 'Safe defaults applied',
+          type: 'automatic',
+          severity: 'warning',
+          reasoning: 'LLM analysis failed, applied safe defaults',
+          steps: ['Open circuit breaker', 'Alert ops team'],
+          estimatedRecoveryMs: 30000,
+        },
+        timestamp: new Date().toISOString(),
+      });
+    }
   } catch (err) {
     return error('Failed to process healing request');
   }
 }
 
-// ---- Background LLM analysis (fire-and-forget) ----
-
-async function analyzeWithLLM(ctx: HealingContext) {
-  try {
-    const ZAI = await import("z-ai-web-dev-sdk").then((m) => m.default || m);
-    const zai = await ZAI.create();
-
-    const userPrompt = SELF_HEALING_USER_PROMPT(ctx);
-
-    const response = await zai.chat.completions.create({
-      messages: [
-        { role: "system", content: SELF_HEALING_SYSTEM_PROMPT },
-        { role: "user", content: userPrompt },
-      ],
-      thinking: { type: "disabled" },
-    });
-
-    const content = response.choices?.[0]?.message?.content;
-    if (content) {
-      // Parse and log the LLM decision
-      try {
-        const parsed = JSON.parse(content);
-        console.log("[Seghro Self-Heal] LLM decision:", JSON.stringify(parsed));
-      } catch {
-        console.log("[Seghro Self-Heal] LLM analysis (raw):", content.slice(0, 200));
-      }
-    }
-  } catch (err) {
-    console.error("[Seghro Self-Heal] LLM analysis failed:", err);
-  }
-}
-
-// GET endpoint — returns the system prompt and available providers (for UI display)
 export async function GET() {
   return success({
     capabilities: [
-      "Circuit breaker: closed → open → half-open state machine",
-      "Automatic fallback routing across LLM providers",
-      "Exponential backoff retry with configurable limits",
-      "Request queuing during outages",
-      "Adaptive timeout adjustment",
-      "LLM-agnostic: works with any provider via API key",
-      "Built-in pattern matching for 8+ common failure types",
-      "Background LLM analysis for unknown patterns",
+      'Circuit breaker: closed → open → half-open state machine',
+      'Automatic fallback routing across LLM providers',
+      'Exponential backoff retry with configurable limits',
+      'Request queuing during outages',
+      'Adaptive timeout adjustment',
+      'LLM-agnostic: works with any provider via API key',
+      'Built-in pattern matching for 8+ common failure types',
+      'Background LLM analysis for unknown patterns',
     ],
     fallbackChains: {
-      llm: ["OpenAI GPT-4o", "Anthropic Claude 3.5", "Google Gemini Pro", "Meta Llama 3"],
-      payment: ["Stripe", "Adyen", "PayPal"],
-      search: ["Tavily", "Brave Search", "Bing Web Search"],
-      database: ["Pinecone", "Weaviate", "ChromaDB"],
-      mcp: ["GitHub MCP", "GitLab MCP", "Local Tools"],
+      llm: ['OpenAI GPT-4o', 'Anthropic Claude 3.5', 'Google Gemini Pro', 'Meta Llama 3'],
+      payment: ['Stripe', 'Adyen', 'PayPal'],
+      search: ['Tavily', 'Brave Search', 'Bing Web Search'],
+      database: ['Pinecone', 'Weaviate', 'ChromaDB'],
+      mcp: ['GitHub MCP', 'GitLab MCP', 'Local Tools'],
     },
     supportedFailurePatterns: [
-      "llm-429: Rate limit → backoff + fallback",
-      "llm-5xx: Server error → circuit open + fallback",
-      "payment-409: Conflict → idempotent retry",
-      "payment-5xx: Payment down → queue + alert",
-      "db-connection: Connection refused → cache fallback",
-      "search-down: Search down → circuit open + fallback search",
-      "mcp-5xx: MCP error → backoff + alternative MCP",
-      "timeout: Request timeout → increase timeout + retry",
+      'llm-429: Rate limit → backoff + fallback',
+      'llm-5xx: Server error → circuit open + fallback',
+      'payment-409: Conflict → idempotent retry',
+      'payment-5xx: Payment down → queue + alert',
+      'db-connection: Connection refused → cache fallback',
+      'search-down: Search down → circuit open + fallback search',
+      'mcp-5xx: MCP error → backoff + alternative MCP',
+      'timeout: Request timeout → increase timeout + retry',
     ],
-    systemPromptPreview: SELF_HEALING_SYSTEM_PROMPT.slice(0, 300) + "...",
   });
 }
