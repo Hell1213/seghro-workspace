@@ -1,12 +1,20 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+
+function getResend(): Resend {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
+
 const FROM = process.env.EMAIL_FROM || 'Seghro <noreply@seghro.dev>';
 const URL = process.env.NEXTAUTH_URL || 'http://localhost:3000';
 
 export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${URL}/reset-password?token=${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: 'Reset your Seghro password',
@@ -22,7 +30,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 
 export async function sendVerificationEmail(email: string, token: string) {
   const verifyUrl = `${URL}/verify-email?token=${token}`;
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: 'Verify your Seghro email',
