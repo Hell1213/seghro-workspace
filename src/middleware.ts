@@ -7,7 +7,6 @@ export const config = {
   matcher: ['/dashboard/:path*', '/api/:path*'],
 }
 
-// Generate a short request ID for log correlation (Edge-compatible)
 function requestId(): string {
   const ts = Date.now().toString(36)
   const rand = Math.random().toString(36).slice(2, 10)
@@ -18,7 +17,14 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const reqId = requestId()
 
-  // ---------- Rate limiting for /api/* ----------
+  // Skip middleware for NextAuth routes (they have their own security)
+  if (pathname.startsWith('/api/auth')) {
+    const response = NextResponse.next()
+    response.headers.set('X-Request-Id', reqId)
+    return response
+  }
+
+  // Rate limiting for non-auth API routes
   if (pathname.startsWith('/api')) {
     const rl = rateLimitMiddleware(request)
 
@@ -45,10 +51,9 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // ---------- Auth guard for /dashboard/* ----------
+  // Auth guard for /dashboard/*
   const secret = process.env.NEXTAUTH_SECRET
   if (!secret) {
-    // Fallback: just check cookie existence if secret not configured
     const token = request.cookies.get('next-auth.session-token')
       || request.cookies.get('__Secure-next-auth.session-token')
     if (!token) {
@@ -57,7 +62,6 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
   } else {
-    // Validate JWT token signature and expiry
     try {
       const token = request.cookies.get('next-auth.session-token')?.value
         || request.cookies.get('__Secure-next-auth.session-token')?.value
@@ -71,14 +75,12 @@ export async function middleware(request: NextRequest) {
         throw new Error('Invalid token')
       }
     } catch {
-      // Invalid or expired token — redirect to login
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(loginUrl)
     }
   }
 
-  // Add security headers
   const response = NextResponse.next()
   response.headers.set('X-Request-Id', reqId)
   response.headers.set('X-Content-Type-Options', 'nosniff')
