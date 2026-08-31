@@ -1,14 +1,55 @@
 {
   "name": "@seghro/sdk",
   "version": "0.1.0",
-  "description": "Seghro AI Agent Observability SDK",
+  "description": "Seghro AI Agent Observability SDK for JavaScript/TypeScript. Trace every AI agent execution, detect silent failures, and auto-heal API outages — one line of code.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": ["dist"],
-  "scripts": { "build": "tsc", "dev": "tsc --watch" },
-  "dependencies": { "@opentelemetry/api": "^1.9.0" },
-  "peerDependencies": { "@langchain/core": ">=0.1.0", "ai": ">=3.0.0" },
-  "peerDependenciesMeta": { "@langchain/core": { "optional": true }, "ai": { "optional": true } },
-  "devDependencies": { "typescript": "^5.0.0", "@types/node": "^20.0.0" },
-  "license": "MIT"
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "observability",
+    "tracing",
+    "llm",
+    "agents",
+    "langchain",
+    "vercel-ai",
+    "crewai",
+    "seghro",
+    "monitoring",
+    "self-healing"
+  ],
+  "author": "Seghro <founders@seghro.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hell1213/seghro"
+  },
+  "bugs": {
+    "url": "https://github.com/Hell1213/seghro/issues"
+  },
+  "homepage": "https://seghro.dev",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0"
+  },
+  "peerDependencies": {
+    "@langchain/core": ">=0.1.0",
+    "ai": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@langchain/core": {
+      "optional": true
+    },
+    "ai": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
 }
