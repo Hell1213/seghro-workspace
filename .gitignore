@@ -44,3 +44,4 @@ coverage/
 next-env.d.ts
 packages/python-sdk/.venv/
 .env
+.vercel
